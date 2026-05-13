@@ -85,7 +85,7 @@ const useTabContext = () => {
   return context;
 };
 
-export const Root = ({
+export function Root({
   children,
   className = "",
   defaultValue = "",
@@ -94,7 +94,7 @@ export const Root = ({
   direction = "row",
   type = "fill",
   ...props
-}: TabRootProps) => {
+}: TabRootProps) {
   const [innerValue, setInnerValue] = useState(defaultValue);
   const currentValue = value ?? innerValue;
 
@@ -132,9 +132,9 @@ export const Root = ({
       </div>
     </TabContext.Provider>
   );
-};
+}
 
-export const Item = ({
+export function Item({
   children,
   className = "",
   activeClassName = "",
@@ -142,7 +142,7 @@ export const Item = ({
   value,
   onClick,
   ...props
-}: TabItemProps) => {
+}: TabItemProps) {
   const context = useTabContext();
   const isActive = context.value === value;
 
@@ -181,4 +181,11 @@ export const Item = ({
       {children}
     </button>
   );
-};
+}
+
+const Tab = {
+  Root,
+  Item,
+} as const;
+
+export default Tab;

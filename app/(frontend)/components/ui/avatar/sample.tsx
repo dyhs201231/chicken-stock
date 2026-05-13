@@ -1,6 +1,6 @@
 import Avatar from ".";
 
-const AvatarSample = () => {
+export default function AvatarSample() {
   return (
     <div className="flex flex-col gap-4 rounded border p-5">
       <h1>Avatar Sample</h1>
@@ -15,6 +15,4 @@ const AvatarSample = () => {
       </div>
     </div>
   );
-};
-
-export default AvatarSample;
+}

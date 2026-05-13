@@ -2,7 +2,7 @@ import React from "react";
 import Button from ".";
 import { IconMinus, IconPlus } from "@tabler/icons-react";
 
-const ButtonSample = () => {
+export default function ButtonSample() {
   return (
     <div className="flex w-[600] flex-col gap-4 rounded border bg-white p-5">
       <h1 className="text-black">Button Sample</h1>
@@ -55,6 +55,4 @@ const ButtonSample = () => {
       </div>
     </div>
   );
-};
-
-export default ButtonSample;
+}

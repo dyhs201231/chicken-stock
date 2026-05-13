@@ -1,6 +1,6 @@
 import * as Tab from ".";
 
-const TabSample = () => {
+export default function TabSample() {
   return (
     <div className="flex flex-col gap-4 rounded border bg-white p-5">
       <h1 className="text-black">Tab Sample</h1>
@@ -124,6 +124,4 @@ const TabSample = () => {
       </Tab.Root>
     </div>
   );
-};
-
-export default TabSample;
+}

@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Modal from ".";
 
-const ModalSample = () => {
+export default function ModalSample() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -38,6 +38,4 @@ const ModalSample = () => {
       </div>
     </div>
   );
-};
-
-export default ModalSample;
+}

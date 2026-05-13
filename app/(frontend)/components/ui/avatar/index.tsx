@@ -32,7 +32,7 @@ const avatarLoading: Record<AvatarType, "lazy" | "eager"> = {
   mypage: "eager",
 };
 
-const Avatar = ({ src, type, alt }: AvatarProps) => {
+export default function Avatar({ src, type, alt }: AvatarProps) {
   return (
     <div
       className={`relative overflow-hidden ${avatarClassName[type]}`}
@@ -48,6 +48,4 @@ const Avatar = ({ src, type, alt }: AvatarProps) => {
       />
     </div>
   );
-};
-
-export default Avatar;
+}

@@ -370,7 +370,10 @@ function ModalRoot({
 }
 
 const ModalTrigger = forwardRef<HTMLButtonElement, ModalTriggerProps>(
-  ({ className, onClick, type = "button", ...props }, ref) => {
+  function ModalTrigger(
+    { className, onClick, type = "button", ...props },
+    ref,
+  ) {
     const { setOpen } = useModalContext("Modal.Trigger");
 
     const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
@@ -396,7 +399,10 @@ const ModalTrigger = forwardRef<HTMLButtonElement, ModalTriggerProps>(
 ModalTrigger.displayName = "Modal.Trigger";
 
 const ModalOverlay = forwardRef<HTMLDivElement, ModalOverlayProps>(
-  ({ children, className, portalContainer, onOverlayClick, ...props }, ref) => {
+  function ModalOverlay(
+    { children, className, portalContainer, onOverlayClick, ...props },
+    ref,
+  ) {
     const {
       isOpen,
       isPresent,
@@ -449,7 +455,7 @@ const ModalOverlay = forwardRef<HTMLDivElement, ModalOverlayProps>(
 ModalOverlay.displayName = "Modal.Overlay";
 
 const ModalContent = forwardRef<HTMLDivElement, ModalContentProps>(
-  (
+  function ModalContent(
     {
       children,
       className,
@@ -459,7 +465,7 @@ const ModalContent = forwardRef<HTMLDivElement, ModalContentProps>(
       ...props
     },
     ref,
-  ) => {
+  ) {
     const {
       isOpen,
       isPresent,
@@ -521,7 +527,7 @@ const ModalContent = forwardRef<HTMLDivElement, ModalContentProps>(
 ModalContent.displayName = "Modal.Content";
 
 const ModalClose = forwardRef<HTMLButtonElement, ModalCloseProps>(
-  (
+  function ModalClose(
     {
       children = <IconX stroke={2} aria-hidden="true" />,
       className,
@@ -530,7 +536,7 @@ const ModalClose = forwardRef<HTMLButtonElement, ModalCloseProps>(
       ...props
     },
     ref,
-  ) => {
+  ) {
     const { setOpen } = useModalContext("Modal.Close");
 
     const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
