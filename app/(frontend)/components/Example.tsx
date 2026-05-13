@@ -1,9 +1,4 @@
-import {
-  Dropdown,
-  Input,
-  SearchIcon,
-  SegmentedControl,
-} from "./ui";
+import { Input, Popover, SearchIcon, SegmentedControl } from "./ui";
 
 const marketOptions = [
   { label: "전체", value: "all" },
@@ -54,32 +49,18 @@ const graphPeriodOptions = [
   { label: "년", value: "year" },
 ];
 
-const dropdownItems = [
-  {
-    label: "김현수",
-    value: "kim",
-    icon: (
-      <span className="grid size-8 place-items-center rounded-full bg-lime-900 text-sm text-lime-200">
-        김
-      </span>
-    ),
-  },
-  { label: "마이페이지", value: "mypage" },
-  { label: "계좌 설정", value: "account" },
-];
-
 const recentSearches = ["스피어", "TIGER 미국나스닥100커버드콜(합성)", "천보"];
 
 export default function Example() {
   return (
     <main className="min-h-screen bg-white px-10 py-9 font-sans text-zinc-950">
-      <section className="border-b-2 border-dashed border-zinc-950 pb-5">
-        <h1 className="text-4xl font-bold tracking-normal">Common UI</h1>
-      </section>
-
       <section className="grid gap-20 py-8">
         <div>
-          <h2 className="mb-6 text-4xl font-semibold tracking-normal">Input</h2>
+          <h2 className="mb-6 border-b-2 border-dashed border-zinc-950 pb-5 text-4xl font-semibold tracking-normal">
+            Input
+          </h2>
+
+          <h3 className="mb-5 text-2xl font-semibold tracking-normal">헤더</h3>
           <div className="mb-16 flex flex-wrap items-center gap-4">
             <Input
               aria-label="종목 검색"
@@ -89,36 +70,37 @@ export default function Example() {
               placeholder="종목, 용어를 검색해보세요."
               variant="underline"
             />
-            <Input
-              aria-label="검색어 입력"
-              containerClassName=""
-              inputSize="sm"
-              leftIcon={<SearchIcon className="size-5" />}
-              placeholder="검색어를 입력해주세요"
-              variant="underline"
-            />
           </div>
 
-          <h3 className="mb-5 text-4xl font-semibold tracking-normal">
+          <h3 className="mb-5 text-2xl font-semibold tracking-normal">
             종목 상세
           </h3>
           <div className="mb-16 grid w-52 gap-3">
             <Input
               aria-label="현재 가격"
               inputSize="sm"
-              placeholder="187,600 원"
+              rightAddon="원"
+              placeholder="187,600"
+              type="number"
+              width={105}
             />
             <Input
               aria-label="최대 구매 가능"
               inputSize="sm"
               placeholder="최대 9주 가능"
+              width={105}
             />
-            <Input aria-label="수량" inputSize="sm" placeholder="수량 입력" />
+            <Input
+              aria-label="수량"
+              inputSize="sm"
+              placeholder="수량 입력"
+              width={105}
+            />
             <Input
               aria-label="포커스 예시"
               autoFocus
-              className="w-32"
               inputSize="sm"
+              width={105}
             />
             <Input
               aria-label="주수"
@@ -128,7 +110,7 @@ export default function Example() {
             />
           </div>
 
-          <h3 className="mb-7 text-4xl font-semibold tracking-normal">
+          <h3 className="mb-7 text-2xl font-semibold tracking-normal">
             포트폴리오
           </h3>
           <div className="grid w-[28rem] gap-5">
@@ -165,10 +147,12 @@ export default function Example() {
           </div>
         </div>
 
+        {/* Segmented Control */}
         <div>
-          <h2 className="mb-7 text-4xl font-semibold tracking-normal">
+          <h2 className="mb-6 border-b-2 border-dashed border-zinc-950 pb-5 text-4xl font-semibold tracking-normal">
             Segmented Control
           </h2>
+
           <div className="mb-20 flex flex-wrap items-center gap-6">
             <SegmentedControl
               aria-label="시장 선택"
@@ -190,6 +174,7 @@ export default function Example() {
           <h3 className="mb-6 text-4xl font-semibold tracking-normal">
             종목 상세
           </h3>
+
           <div className="flex flex-wrap items-center gap-5">
             <SegmentedControl
               aria-label="통화 선택"
@@ -211,6 +196,7 @@ export default function Example() {
               options={priceTypeOptions}
             />
           </div>
+
           <div className="mt-8 ml-28">
             <SegmentedControl
               aria-label="그래프 기간"
@@ -221,21 +207,47 @@ export default function Example() {
           </div>
         </div>
 
+        {/* Popover */}
         <div className="bg-zinc-300 p-8">
-          <h2 className="mb-6 text-4xl font-semibold tracking-normal">
-            Dropdown
+          <h2 className="mb-6 border-b-2 border-dashed border-zinc-950 pb-5 text-4xl font-semibold tracking-normal">
+            Popover
           </h2>
+
           <div className="mb-5 flex flex-wrap items-start gap-4">
-            <Dropdown items={dropdownItems} className="w-80" />
-            <button
-              className="flex h-14 w-80 items-center justify-center gap-4 rounded-md bg-white px-4 text-base font-semibold shadow-[0_1px_3px_rgba(0,0,0,0.1)]"
-              type="button"
-            >
-              <span className="text-3xl font-bold text-blue-500">G</span>
-              구글 계정으로 로그인
-            </button>
+            <Popover className="h-[170px] w-[380px] px-[39px] pt-[31px] pb-[34px]">
+              <div className="flex items-center gap-[18px]">
+                <div className="relative size-[50px] overflow-hidden rounded-full bg-[radial-gradient(circle_at_35%_35%,#e3f77c_0,#789315_28%,#203a08_58%,#0d1605_100%)]"></div>
+                <span className="text-xl font-semibold text-zinc-950">
+                  김현수
+                </span>
+              </div>
+
+              <div className="mt-[13px] h-px bg-zinc-300" />
+
+              <button
+                className="flex h-[59px] w-full items-center justify-between text-[21px] font-medium text-zinc-800"
+                type="button"
+              >
+                <span>마이페이지</span>
+                <span className="text-[34px] leading-none text-zinc-950">
+                  ›
+                </span>
+              </button>
+            </Popover>
+            <Popover className="flex h-[68px] w-[380px] items-center justify-center">
+              <button
+                className="flex h-full w-full items-center justify-center gap-5 text-[21px] font-medium text-zinc-950"
+                type="button"
+              >
+                <span className="text-4xl font-bold">
+                  <span className="text-[#4285f4]">G</span>
+                </span>
+                구글 계정으로 로그인
+              </button>
+            </Popover>
           </div>
-          <div className="w-[34rem] rounded-md bg-white p-3">
+
+          <Popover className="h-[170px] w-[650px] px-3 pt-2">
             <Input
               aria-label="최근 검색"
               className="bg-zinc-300"
@@ -256,7 +268,7 @@ export default function Example() {
                 </span>
               ))}
             </div>
-          </div>
+          </Popover>
         </div>
       </section>
     </main>

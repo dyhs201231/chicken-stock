@@ -13,32 +13,29 @@ type SegmentedOption = {
   selectedTextClassName?: string;
 };
 type SegmentedControlProps = {
+  "aria-label": string;
   options: SegmentedOption[];
   value?: string;
   defaultValue?: string;
   selectedStyle?: SegmentedSelectedStyle;
-  onValueChange?: (value: string) => void;
-  "aria-label": string;
   className?: string;
+  onValueChange?: (value: string) => void;
 };
 
 export default function SegmentedControl({
+  "aria-label": ariaLabel,
+  selectedStyle = "panel",
+  className = "",
   options,
   value,
   defaultValue,
-  selectedStyle = "panel",
   onValueChange,
-  "aria-label": ariaLabel,
-  className = "",
 }: SegmentedControlProps) {
   const groupId = useId();
-
   const [internalValue, setInternalValue] = useState(
     defaultValue ?? options[0]?.value,
   );
-
   const selectedValue = value ?? internalValue;
-
   const selectValue = (nextValue: string) => {
     setInternalValue(nextValue);
     onValueChange?.(nextValue);

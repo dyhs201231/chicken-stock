@@ -1,8 +1,11 @@
-import { InputHTMLAttributes, ReactNode, Ref } from "react";
+import { CSSProperties, InputHTMLAttributes, ReactNode, Ref } from "react";
 
 type InputVariant = "underline" | "pill" | "box";
 type InputSize = "sm" | "md";
-type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "size"> & {
+type InputProps = Omit<
+  InputHTMLAttributes<HTMLInputElement>,
+  "size" | "width"
+> & {
   variant?: InputVariant;
   inputSize?: InputSize;
   placeholder?: string;
@@ -10,6 +13,7 @@ type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "size"> & {
   focusable?: boolean;
   leftIcon?: ReactNode;
   rightAddon?: ReactNode;
+  width?: CSSProperties["width"];
   ref?: Ref<HTMLInputElement>;
 };
 
@@ -60,38 +64,24 @@ export default function Input({
   inputSize = "md",
   containerClassName = "w-full",
   focusable = true,
+  type = "text",
   leftIcon,
   rightAddon,
+  width,
   ref,
-  type = "text",
+  style,
   ...props
 }: InputProps) {
-  const input = (
-    <input
-      ref={ref}
-      type={type}
-      className={[
-        "w-full min-w-0 text-zinc-950 transition outline-none placeholder:text-zinc-400 disabled:cursor-not-allowed disabled:bg-zinc-100 disabled:text-zinc-400",
-        leftIcon ? "pl-8" : "",
-        rightAddon ? "pr-8" : "",
-        variantClassName[variant].base,
-        focusable ? variantClassName[variant].focus : "",
-        sizeClassName[inputSize],
-        className,
-      ].join(" ")}
-      {...props}
-    />
-  );
-
-  if (!leftIcon && !rightAddon) {
-    return input;
-  }
+  const containerStyle = leftIcon || rightAddon ? { width } : undefined;
+  const inputStyle =
+    !leftIcon && !rightAddon && width ? { ...style, width } : style;
 
   return (
     <span
       className={["relative inline-flex items-center", containerClassName].join(
         " ",
       )}
+      style={containerStyle}
     >
       {leftIcon ? (
         <span className="pointer-events-none absolute left-2 text-zinc-400">
@@ -99,10 +89,27 @@ export default function Input({
         </span>
       ) : null}
 
-      {input}
+      <input
+        ref={ref}
+        type={type}
+        style={inputStyle}
+        className={[
+          "w-full min-w-0 text-zinc-950 transition outline-none placeholder:text-zinc-400 disabled:cursor-not-allowed disabled:bg-zinc-100 disabled:text-zinc-400",
+          leftIcon ? "pl-8" : "",
+          rightAddon ? "pr-8" : "",
+          type === "number"
+            ? "[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            : "",
+          variantClassName[variant].base,
+          focusable ? variantClassName[variant].focus : "",
+          sizeClassName[inputSize],
+          className,
+        ].join(" ")}
+        {...props}
+      />
 
       {rightAddon ? (
-        <span className="pointer-events-none absolute right-0 text-base font-medium text-zinc-950">
+        <span className="pointer-events-none absolute right-2 text-base font-medium text-zinc-950">
           {rightAddon}
         </span>
       ) : null}
