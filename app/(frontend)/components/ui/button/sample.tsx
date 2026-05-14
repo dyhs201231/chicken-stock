@@ -4,7 +4,7 @@ import { IconMinus, IconPlus } from "@tabler/icons-react";
 
 export default function ButtonSample() {
   return (
-    <div className="flex w-[600] flex-col gap-4 rounded border bg-white p-5">
+    <div className="flex w-[600px] flex-col gap-4 rounded border bg-white p-5">
       <h1 className="text-black">Button Sample</h1>
 
       <div className="flex gap-4">
@@ -52,6 +52,12 @@ export default function ButtonSample() {
             <IconPlus stroke={2} size={14} />
           </Button>
         </div>
+      </div>
+
+      <div className="flex gap-4">
+        <Button variant="step-controls">다음</Button>
+        <Button variant="step-controls">이전</Button>
+        <Button variant="step-controls">취소</Button>
       </div>
     </div>
   );

@@ -7,7 +7,7 @@ export default function ModalSample() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="flex flex-col gap-4 rounded border p-5">
+    <div className="flex w-fit flex-col gap-4 rounded border p-5">
       <h1>Modal Sample</h1>
 
       <div className="flex gap-5">

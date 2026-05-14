@@ -15,7 +15,9 @@ type ButtonVariant =
   | "stock-count"
   | "quantity-left"
   | "quantity-right"
-  | "percentage";
+  | "percentage"
+  | "step-controls"
+  | "custom";
 
 type ButtonProps = {
   className?: string;
@@ -48,6 +50,9 @@ const buttonVariants: Record<ButtonVariant, string> = {
     "bg-[#D9D9D9] text-[#BABABA] w-[29px] h-[29px] border-l-[0.5px] border-[#BABABA] flex items-center justify-center rounded-r-[10px]",
   percentage:
     "bg-[#D9D9D9] text-[#615E5E] max-w-[35px] h-[30px] flex items-center justify-center rounded-[10px] w-full flex-1 text-sm",
+  "step-controls":
+    "bg-[#D9D9D9]/40 text-black max-w-[90px] h-[45px] flex items-center justify-center rounded-[10px] w-full flex-1 text-xl",
+  custom: "",
 };
 
 export default function Button({

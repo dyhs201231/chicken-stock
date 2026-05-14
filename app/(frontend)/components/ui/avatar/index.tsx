@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { twMerge } from "tailwind-merge";
 
 export type AvatarType =
   | "header"
@@ -12,6 +13,7 @@ export interface AvatarProps {
   src: string;
   alt?: string;
   type: AvatarType;
+  className?: string;
 }
 
 const avatarClassName: Record<AvatarType, string> = {
@@ -32,10 +34,14 @@ const avatarLoading: Record<AvatarType, "lazy" | "eager"> = {
   mypage: "eager",
 };
 
-export default function Avatar({ src, type, alt }: AvatarProps) {
+export default function Avatar({ src, type, alt, className }: AvatarProps) {
   return (
     <div
-      className={`relative overflow-hidden ${avatarClassName[type]}`}
+      className={twMerge(
+        "relative overflow-hidden",
+        avatarClassName[type],
+        className,
+      )}
       data-testid={`avatar-${type}`}
     >
       <Image

@@ -2,7 +2,7 @@ import * as Tab from ".";
 
 export default function TabSample() {
   return (
-    <div className="flex flex-col gap-4 rounded border bg-white p-5">
+    <div className="flex w-fit flex-col gap-4 rounded border bg-white p-5">
       <h1 className="text-black">Tab Sample</h1>
 
       <Tab.Root defaultValue="차트 / 호가" direction="row" type="fill">
