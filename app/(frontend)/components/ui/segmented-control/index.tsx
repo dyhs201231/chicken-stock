@@ -1,30 +1,36 @@
 "use client";
 
-import { CSSProperties, useId, useState } from "react";
+import { useId, useState } from "react";
+import { twMerge } from "tailwind-merge";
 
-type SegmentedSelectedStyle = "panel" | "inverted-panel" | "text";
+type SegmentedStyle = "panel" | "invertedPanel" | "text";
 type SegmentedOption = {
   label: string;
   value: string;
   disabled?: boolean;
-  labelClassName?: string;
-  labelWidth?: CSSProperties["width"];
-  selectedTextColor?: string;
-  selectedTextClassName?: string;
+  className?: string;
+  selected?: string;
 };
 type SegmentedControlProps = {
   "aria-label": string;
   options: SegmentedOption[];
   value?: string;
   defaultValue?: string;
-  selectedStyle?: SegmentedSelectedStyle;
+  style?: SegmentedStyle;
   className?: string;
   onValueChange?: (value: string) => void;
 };
 
+const selectedVariants: Record<SegmentedStyle, string> = {
+  panel: "bg-white text-zinc-950 shadow-[0_1px_2px_rgba(0,0,0,0.12)]",
+  invertedPanel:
+    "bg-zinc-200 text-zinc-950 shadow-[0_1px_2px_rgba(0,0,0,0.12)]",
+  text: "text-white",
+};
+
 export default function SegmentedControl({
   "aria-label": ariaLabel,
-  selectedStyle = "panel",
+  style = "panel",
   className = "",
   options,
   value,
@@ -44,43 +50,30 @@ export default function SegmentedControl({
   return (
     <div
       aria-label={ariaLabel}
-      className={[
+      className={twMerge(
         "inline-flex h-8 items-center rounded-md p-0.5 text-sm font-semibold text-zinc-950",
-        selectedStyle === "inverted-panel" ? "bg-white" : "bg-zinc-200",
+        style === "invertedPanel" ? "bg-white" : "bg-zinc-200",
         className,
-      ].join(" ")}
+      )}
       role="radiogroup"
     >
       {options.map((option) => {
         const selected = option.value === selectedValue;
         const id = `${groupId}-${option.value}`;
-        const selectedClassName =
-          selectedStyle === "panel"
-            ? "bg-white text-zinc-950 shadow-[0_1px_2px_rgba(0,0,0,0.12)]"
-            : selectedStyle === "inverted-panel"
-              ? "bg-zinc-200 text-zinc-950 shadow-[0_1px_2px_rgba(0,0,0,0.12)]"
-              : "text-white";
-        const labelStyle: CSSProperties = {
-          ...(option.labelWidth ? { width: option.labelWidth } : {}),
-          ...(selected && option.selectedTextColor
-            ? { color: option.selectedTextColor }
-            : {}),
-        };
 
         return (
           <label
             key={option.value}
             htmlFor={id}
-            style={labelStyle}
-            className={[
+            className={twMerge(
               "relative inline-flex h-7 min-w-12 cursor-pointer items-center justify-center rounded px-3 transition",
               selected
-                ? selectedClassName
+                ? selectedVariants[style]
                 : "text-zinc-500 hover:text-zinc-800",
-              option.labelClassName,
-              selected ? option.selectedTextClassName : "",
-              option.disabled ? "cursor-not-allowed opacity-45" : "",
-            ].join(" ")}
+              option.disabled ? "cursor-not-allowed opacity-45" : undefined,
+              option.className,
+              selected ? option.selected : undefined,
+            )}
           >
             <input
               id={id}
