@@ -51,7 +51,7 @@ export const AnyNull = runtime.objectEnumValues.instances.AnyNull
 export const ModelName = {
   User: 'User',
   Article: 'Article',
-  EducationLevel: 'EducationLevel'
+  EducationSummary: 'EducationSummary'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -83,11 +83,12 @@ export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof User
 
 export const ArticleScalarFieldEnum = {
   id: 'id',
-  educationLevelId: 'educationLevelId',
+  educationSummaryId: 'educationSummaryId',
   title: 'title',
   content: 'content',
   imageUrl: 'imageUrl',
   estimatedReadTime: 'estimatedReadTime',
+  sortOrder: 'sortOrder',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -95,18 +96,17 @@ export const ArticleScalarFieldEnum = {
 export type ArticleScalarFieldEnum = (typeof ArticleScalarFieldEnum)[keyof typeof ArticleScalarFieldEnum]
 
 
-export const EducationLevelScalarFieldEnum = {
+export const EducationSummaryScalarFieldEnum = {
   id: 'id',
   stage: 'stage',
   label: 'label',
   imageUrl: 'imageUrl',
   summary: 'summary',
-  sortOrder: 'sortOrder',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
-export type EducationLevelScalarFieldEnum = (typeof EducationLevelScalarFieldEnum)[keyof typeof EducationLevelScalarFieldEnum]
+export type EducationSummaryScalarFieldEnum = (typeof EducationSummaryScalarFieldEnum)[keyof typeof EducationSummaryScalarFieldEnum]
 
 
 export const SortOrder = {

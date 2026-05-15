@@ -137,21 +137,21 @@ export type StringWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedStringFilter<$PrismaModel>
 }
 
-export type EnumEducationLevelLabelFilter<$PrismaModel = never> = {
-  equals?: $Enums.EducationLevelLabel | Prisma.EnumEducationLevelLabelFieldRefInput<$PrismaModel>
-  in?: $Enums.EducationLevelLabel[] | Prisma.ListEnumEducationLevelLabelFieldRefInput<$PrismaModel>
-  notIn?: $Enums.EducationLevelLabel[] | Prisma.ListEnumEducationLevelLabelFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumEducationLevelLabelFilter<$PrismaModel> | $Enums.EducationLevelLabel
+export type EnumEducationSummaryLabelFilter<$PrismaModel = never> = {
+  equals?: $Enums.EducationSummaryLabel | Prisma.EnumEducationSummaryLabelFieldRefInput<$PrismaModel>
+  in?: $Enums.EducationSummaryLabel[] | Prisma.ListEnumEducationSummaryLabelFieldRefInput<$PrismaModel>
+  notIn?: $Enums.EducationSummaryLabel[] | Prisma.ListEnumEducationSummaryLabelFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumEducationSummaryLabelFilter<$PrismaModel> | $Enums.EducationSummaryLabel
 }
 
-export type EnumEducationLevelLabelWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.EducationLevelLabel | Prisma.EnumEducationLevelLabelFieldRefInput<$PrismaModel>
-  in?: $Enums.EducationLevelLabel[] | Prisma.ListEnumEducationLevelLabelFieldRefInput<$PrismaModel>
-  notIn?: $Enums.EducationLevelLabel[] | Prisma.ListEnumEducationLevelLabelFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumEducationLevelLabelWithAggregatesFilter<$PrismaModel> | $Enums.EducationLevelLabel
+export type EnumEducationSummaryLabelWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.EducationSummaryLabel | Prisma.EnumEducationSummaryLabelFieldRefInput<$PrismaModel>
+  in?: $Enums.EducationSummaryLabel[] | Prisma.ListEnumEducationSummaryLabelFieldRefInput<$PrismaModel>
+  notIn?: $Enums.EducationSummaryLabel[] | Prisma.ListEnumEducationSummaryLabelFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumEducationSummaryLabelWithAggregatesFilter<$PrismaModel> | $Enums.EducationSummaryLabel
   _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumEducationLevelLabelFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumEducationLevelLabelFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumEducationSummaryLabelFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumEducationSummaryLabelFilter<$PrismaModel>
 }
 
 export type NestedIntFilter<$PrismaModel = never> = {
@@ -290,21 +290,21 @@ export type NestedStringWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedStringFilter<$PrismaModel>
 }
 
-export type NestedEnumEducationLevelLabelFilter<$PrismaModel = never> = {
-  equals?: $Enums.EducationLevelLabel | Prisma.EnumEducationLevelLabelFieldRefInput<$PrismaModel>
-  in?: $Enums.EducationLevelLabel[] | Prisma.ListEnumEducationLevelLabelFieldRefInput<$PrismaModel>
-  notIn?: $Enums.EducationLevelLabel[] | Prisma.ListEnumEducationLevelLabelFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumEducationLevelLabelFilter<$PrismaModel> | $Enums.EducationLevelLabel
+export type NestedEnumEducationSummaryLabelFilter<$PrismaModel = never> = {
+  equals?: $Enums.EducationSummaryLabel | Prisma.EnumEducationSummaryLabelFieldRefInput<$PrismaModel>
+  in?: $Enums.EducationSummaryLabel[] | Prisma.ListEnumEducationSummaryLabelFieldRefInput<$PrismaModel>
+  notIn?: $Enums.EducationSummaryLabel[] | Prisma.ListEnumEducationSummaryLabelFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumEducationSummaryLabelFilter<$PrismaModel> | $Enums.EducationSummaryLabel
 }
 
-export type NestedEnumEducationLevelLabelWithAggregatesFilter<$PrismaModel = never> = {
-  equals?: $Enums.EducationLevelLabel | Prisma.EnumEducationLevelLabelFieldRefInput<$PrismaModel>
-  in?: $Enums.EducationLevelLabel[] | Prisma.ListEnumEducationLevelLabelFieldRefInput<$PrismaModel>
-  notIn?: $Enums.EducationLevelLabel[] | Prisma.ListEnumEducationLevelLabelFieldRefInput<$PrismaModel>
-  not?: Prisma.NestedEnumEducationLevelLabelWithAggregatesFilter<$PrismaModel> | $Enums.EducationLevelLabel
+export type NestedEnumEducationSummaryLabelWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.EducationSummaryLabel | Prisma.EnumEducationSummaryLabelFieldRefInput<$PrismaModel>
+  in?: $Enums.EducationSummaryLabel[] | Prisma.ListEnumEducationSummaryLabelFieldRefInput<$PrismaModel>
+  notIn?: $Enums.EducationSummaryLabel[] | Prisma.ListEnumEducationSummaryLabelFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumEducationSummaryLabelWithAggregatesFilter<$PrismaModel> | $Enums.EducationSummaryLabel
   _count?: Prisma.NestedIntFilter<$PrismaModel>
-  _min?: Prisma.NestedEnumEducationLevelLabelFilter<$PrismaModel>
-  _max?: Prisma.NestedEnumEducationLevelLabelFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumEducationSummaryLabelFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumEducationSummaryLabelFilter<$PrismaModel>
 }
 
 

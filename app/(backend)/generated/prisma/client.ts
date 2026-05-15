@@ -55,7 +55,7 @@ export type User = Prisma.UserModel
  */
 export type Article = Prisma.ArticleModel
 /**
- * Model EducationLevel
+ * Model EducationSummary
  * 
  */
-export type EducationLevel = Prisma.EducationLevelModel
+export type EducationSummary = Prisma.EducationSummaryModel

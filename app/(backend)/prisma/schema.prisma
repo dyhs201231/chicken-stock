@@ -8,7 +8,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum EducationLevelLabel {
+enum EducationSummaryLabel {
   BEGINNER
   INTERMEDIATE
   ADVANCED
@@ -25,29 +25,29 @@ model User {
 }
 
 model Article {
-  id                Int            @id @default(autoincrement())
-  educationLevelId  Int            @map("education_level_id")
-  educationLevel    EducationLevel @relation(fields: [educationLevelId], references: [id])
-  title             String
-  content           String
-  imageUrl          String         @map("image_url")
-  estimatedReadTime Int            @map("estimated_read_time")
-  createdAt         DateTime       @default(now()) @map("created_at")
-  updatedAt         DateTime       @updatedAt @map("updated_at")
+  id                 Int              @id @default(autoincrement())
+  educationSummaryId Int              @map("education_summary_id")
+  educationSummary   EducationSummary @relation(fields: [educationSummaryId], references: [id])
+  title              String
+  content            String
+  imageUrl           String           @map("image_url")
+  estimatedReadTime  Int              @map("estimated_read_time")
+  sortOrder          Int              @default(0) @map("sort_order")
+  createdAt          DateTime         @default(now()) @map("created_at")
+  updatedAt          DateTime         @updatedAt @map("updated_at")
 
-  @@index([educationLevelId])
+  @@index([educationSummaryId])
 }
 
-model EducationLevel {
-  id        Int                 @id @default(autoincrement())
-  stage     Int                 @unique
-  label     EducationLevelLabel
-  imageUrl  String              @map("image_url")
+model EducationSummary {
+  id        Int                   @id @default(autoincrement())
+  stage     Int                   @unique
+  label     EducationSummaryLabel
+  imageUrl  String                @map("image_url")
   summary   String
-  sortOrder Int                 @map("sort_order")
-  createdAt DateTime            @default(now()) @map("created_at")
-  updatedAt DateTime            @updatedAt @map("updated_at")
+  createdAt DateTime              @default(now()) @map("created_at")
+  updatedAt DateTime              @updatedAt @map("updated_at")
   articles  Article[]
 
-  @@map("Education_level")
+  @@map("Education_summary")
 }

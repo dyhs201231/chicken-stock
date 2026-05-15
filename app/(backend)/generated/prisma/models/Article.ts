@@ -28,45 +28,50 @@ export type AggregateArticle = {
 
 export type ArticleAvgAggregateOutputType = {
   id: number | null
-  educationLevelId: number | null
+  educationSummaryId: number | null
   estimatedReadTime: number | null
+  sortOrder: number | null
 }
 
 export type ArticleSumAggregateOutputType = {
   id: number | null
-  educationLevelId: number | null
+  educationSummaryId: number | null
   estimatedReadTime: number | null
+  sortOrder: number | null
 }
 
 export type ArticleMinAggregateOutputType = {
   id: number | null
-  educationLevelId: number | null
+  educationSummaryId: number | null
   title: string | null
   content: string | null
   imageUrl: string | null
   estimatedReadTime: number | null
+  sortOrder: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
 
 export type ArticleMaxAggregateOutputType = {
   id: number | null
-  educationLevelId: number | null
+  educationSummaryId: number | null
   title: string | null
   content: string | null
   imageUrl: string | null
   estimatedReadTime: number | null
+  sortOrder: number | null
   createdAt: Date | null
   updatedAt: Date | null
 }
 
 export type ArticleCountAggregateOutputType = {
   id: number
-  educationLevelId: number
+  educationSummaryId: number
   title: number
   content: number
   imageUrl: number
   estimatedReadTime: number
+  sortOrder: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -75,45 +80,50 @@ export type ArticleCountAggregateOutputType = {
 
 export type ArticleAvgAggregateInputType = {
   id?: true
-  educationLevelId?: true
+  educationSummaryId?: true
   estimatedReadTime?: true
+  sortOrder?: true
 }
 
 export type ArticleSumAggregateInputType = {
   id?: true
-  educationLevelId?: true
+  educationSummaryId?: true
   estimatedReadTime?: true
+  sortOrder?: true
 }
 
 export type ArticleMinAggregateInputType = {
   id?: true
-  educationLevelId?: true
+  educationSummaryId?: true
   title?: true
   content?: true
   imageUrl?: true
   estimatedReadTime?: true
+  sortOrder?: true
   createdAt?: true
   updatedAt?: true
 }
 
 export type ArticleMaxAggregateInputType = {
   id?: true
-  educationLevelId?: true
+  educationSummaryId?: true
   title?: true
   content?: true
   imageUrl?: true
   estimatedReadTime?: true
+  sortOrder?: true
   createdAt?: true
   updatedAt?: true
 }
 
 export type ArticleCountAggregateInputType = {
   id?: true
-  educationLevelId?: true
+  educationSummaryId?: true
   title?: true
   content?: true
   imageUrl?: true
   estimatedReadTime?: true
+  sortOrder?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -207,11 +217,12 @@ export type ArticleGroupByArgs<ExtArgs extends runtime.Types.Extensions.Internal
 
 export type ArticleGroupByOutputType = {
   id: number
-  educationLevelId: number
+  educationSummaryId: number
   title: string
   content: string
   imageUrl: string
   estimatedReadTime: number
+  sortOrder: number
   createdAt: Date
   updatedAt: Date
   _count: ArticleCountAggregateOutputType | null
@@ -241,26 +252,28 @@ export type ArticleWhereInput = {
   OR?: Prisma.ArticleWhereInput[]
   NOT?: Prisma.ArticleWhereInput | Prisma.ArticleWhereInput[]
   id?: Prisma.IntFilter<"Article"> | number
-  educationLevelId?: Prisma.IntFilter<"Article"> | number
+  educationSummaryId?: Prisma.IntFilter<"Article"> | number
   title?: Prisma.StringFilter<"Article"> | string
   content?: Prisma.StringFilter<"Article"> | string
   imageUrl?: Prisma.StringFilter<"Article"> | string
   estimatedReadTime?: Prisma.IntFilter<"Article"> | number
+  sortOrder?: Prisma.IntFilter<"Article"> | number
   createdAt?: Prisma.DateTimeFilter<"Article"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Article"> | Date | string
-  educationLevel?: Prisma.XOR<Prisma.EducationLevelScalarRelationFilter, Prisma.EducationLevelWhereInput>
+  educationSummary?: Prisma.XOR<Prisma.EducationSummaryScalarRelationFilter, Prisma.EducationSummaryWhereInput>
 }
 
 export type ArticleOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  educationLevelId?: Prisma.SortOrder
+  educationSummaryId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   content?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   estimatedReadTime?: Prisma.SortOrder
+  sortOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  educationLevel?: Prisma.EducationLevelOrderByWithRelationInput
+  educationSummary?: Prisma.EducationSummaryOrderByWithRelationInput
 }
 
 export type ArticleWhereUniqueInput = Prisma.AtLeast<{
@@ -268,23 +281,25 @@ export type ArticleWhereUniqueInput = Prisma.AtLeast<{
   AND?: Prisma.ArticleWhereInput | Prisma.ArticleWhereInput[]
   OR?: Prisma.ArticleWhereInput[]
   NOT?: Prisma.ArticleWhereInput | Prisma.ArticleWhereInput[]
-  educationLevelId?: Prisma.IntFilter<"Article"> | number
+  educationSummaryId?: Prisma.IntFilter<"Article"> | number
   title?: Prisma.StringFilter<"Article"> | string
   content?: Prisma.StringFilter<"Article"> | string
   imageUrl?: Prisma.StringFilter<"Article"> | string
   estimatedReadTime?: Prisma.IntFilter<"Article"> | number
+  sortOrder?: Prisma.IntFilter<"Article"> | number
   createdAt?: Prisma.DateTimeFilter<"Article"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Article"> | Date | string
-  educationLevel?: Prisma.XOR<Prisma.EducationLevelScalarRelationFilter, Prisma.EducationLevelWhereInput>
+  educationSummary?: Prisma.XOR<Prisma.EducationSummaryScalarRelationFilter, Prisma.EducationSummaryWhereInput>
 }, "id">
 
 export type ArticleOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  educationLevelId?: Prisma.SortOrder
+  educationSummaryId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   content?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   estimatedReadTime?: Prisma.SortOrder
+  sortOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.ArticleCountOrderByAggregateInput
@@ -299,11 +314,12 @@ export type ArticleScalarWhereWithAggregatesInput = {
   OR?: Prisma.ArticleScalarWhereWithAggregatesInput[]
   NOT?: Prisma.ArticleScalarWhereWithAggregatesInput | Prisma.ArticleScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"Article"> | number
-  educationLevelId?: Prisma.IntWithAggregatesFilter<"Article"> | number
+  educationSummaryId?: Prisma.IntWithAggregatesFilter<"Article"> | number
   title?: Prisma.StringWithAggregatesFilter<"Article"> | string
   content?: Prisma.StringWithAggregatesFilter<"Article"> | string
   imageUrl?: Prisma.StringWithAggregatesFilter<"Article"> | string
   estimatedReadTime?: Prisma.IntWithAggregatesFilter<"Article"> | number
+  sortOrder?: Prisma.IntWithAggregatesFilter<"Article"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Article"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Article"> | Date | string
 }
@@ -313,18 +329,20 @@ export type ArticleCreateInput = {
   content: string
   imageUrl: string
   estimatedReadTime: number
+  sortOrder?: number
   createdAt?: Date | string
   updatedAt?: Date | string
-  educationLevel: Prisma.EducationLevelCreateNestedOneWithoutArticlesInput
+  educationSummary: Prisma.EducationSummaryCreateNestedOneWithoutArticlesInput
 }
 
 export type ArticleUncheckedCreateInput = {
   id?: number
-  educationLevelId: number
+  educationSummaryId: number
   title: string
   content: string
   imageUrl: string
   estimatedReadTime: number
+  sortOrder?: number
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -334,29 +352,32 @@ export type ArticleUpdateInput = {
   content?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   estimatedReadTime?: Prisma.IntFieldUpdateOperationsInput | number
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  educationLevel?: Prisma.EducationLevelUpdateOneRequiredWithoutArticlesNestedInput
+  educationSummary?: Prisma.EducationSummaryUpdateOneRequiredWithoutArticlesNestedInput
 }
 
 export type ArticleUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  educationLevelId?: Prisma.IntFieldUpdateOperationsInput | number
+  educationSummaryId?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   estimatedReadTime?: Prisma.IntFieldUpdateOperationsInput | number
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ArticleCreateManyInput = {
   id?: number
-  educationLevelId: number
+  educationSummaryId: number
   title: string
   content: string
   imageUrl: string
   estimatedReadTime: number
+  sortOrder?: number
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -366,64 +387,71 @@ export type ArticleUpdateManyMutationInput = {
   content?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   estimatedReadTime?: Prisma.IntFieldUpdateOperationsInput | number
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ArticleUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  educationLevelId?: Prisma.IntFieldUpdateOperationsInput | number
+  educationSummaryId?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   estimatedReadTime?: Prisma.IntFieldUpdateOperationsInput | number
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type ArticleCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  educationLevelId?: Prisma.SortOrder
+  educationSummaryId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   content?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   estimatedReadTime?: Prisma.SortOrder
+  sortOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type ArticleAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  educationLevelId?: Prisma.SortOrder
+  educationSummaryId?: Prisma.SortOrder
   estimatedReadTime?: Prisma.SortOrder
+  sortOrder?: Prisma.SortOrder
 }
 
 export type ArticleMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  educationLevelId?: Prisma.SortOrder
+  educationSummaryId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   content?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   estimatedReadTime?: Prisma.SortOrder
+  sortOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type ArticleMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  educationLevelId?: Prisma.SortOrder
+  educationSummaryId?: Prisma.SortOrder
   title?: Prisma.SortOrder
   content?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   estimatedReadTime?: Prisma.SortOrder
+  sortOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type ArticleSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  educationLevelId?: Prisma.SortOrder
+  educationSummaryId?: Prisma.SortOrder
   estimatedReadTime?: Prisma.SortOrder
+  sortOrder?: Prisma.SortOrder
 }
 
 export type ArticleListRelationFilter = {
@@ -440,91 +468,93 @@ export type StringFieldUpdateOperationsInput = {
   set?: string
 }
 
-export type ArticleCreateNestedManyWithoutEducationLevelInput = {
-  create?: Prisma.XOR<Prisma.ArticleCreateWithoutEducationLevelInput, Prisma.ArticleUncheckedCreateWithoutEducationLevelInput> | Prisma.ArticleCreateWithoutEducationLevelInput[] | Prisma.ArticleUncheckedCreateWithoutEducationLevelInput[]
-  connectOrCreate?: Prisma.ArticleCreateOrConnectWithoutEducationLevelInput | Prisma.ArticleCreateOrConnectWithoutEducationLevelInput[]
-  createMany?: Prisma.ArticleCreateManyEducationLevelInputEnvelope
+export type ArticleCreateNestedManyWithoutEducationSummaryInput = {
+  create?: Prisma.XOR<Prisma.ArticleCreateWithoutEducationSummaryInput, Prisma.ArticleUncheckedCreateWithoutEducationSummaryInput> | Prisma.ArticleCreateWithoutEducationSummaryInput[] | Prisma.ArticleUncheckedCreateWithoutEducationSummaryInput[]
+  connectOrCreate?: Prisma.ArticleCreateOrConnectWithoutEducationSummaryInput | Prisma.ArticleCreateOrConnectWithoutEducationSummaryInput[]
+  createMany?: Prisma.ArticleCreateManyEducationSummaryInputEnvelope
   connect?: Prisma.ArticleWhereUniqueInput | Prisma.ArticleWhereUniqueInput[]
 }
 
-export type ArticleUncheckedCreateNestedManyWithoutEducationLevelInput = {
-  create?: Prisma.XOR<Prisma.ArticleCreateWithoutEducationLevelInput, Prisma.ArticleUncheckedCreateWithoutEducationLevelInput> | Prisma.ArticleCreateWithoutEducationLevelInput[] | Prisma.ArticleUncheckedCreateWithoutEducationLevelInput[]
-  connectOrCreate?: Prisma.ArticleCreateOrConnectWithoutEducationLevelInput | Prisma.ArticleCreateOrConnectWithoutEducationLevelInput[]
-  createMany?: Prisma.ArticleCreateManyEducationLevelInputEnvelope
+export type ArticleUncheckedCreateNestedManyWithoutEducationSummaryInput = {
+  create?: Prisma.XOR<Prisma.ArticleCreateWithoutEducationSummaryInput, Prisma.ArticleUncheckedCreateWithoutEducationSummaryInput> | Prisma.ArticleCreateWithoutEducationSummaryInput[] | Prisma.ArticleUncheckedCreateWithoutEducationSummaryInput[]
+  connectOrCreate?: Prisma.ArticleCreateOrConnectWithoutEducationSummaryInput | Prisma.ArticleCreateOrConnectWithoutEducationSummaryInput[]
+  createMany?: Prisma.ArticleCreateManyEducationSummaryInputEnvelope
   connect?: Prisma.ArticleWhereUniqueInput | Prisma.ArticleWhereUniqueInput[]
 }
 
-export type ArticleUpdateManyWithoutEducationLevelNestedInput = {
-  create?: Prisma.XOR<Prisma.ArticleCreateWithoutEducationLevelInput, Prisma.ArticleUncheckedCreateWithoutEducationLevelInput> | Prisma.ArticleCreateWithoutEducationLevelInput[] | Prisma.ArticleUncheckedCreateWithoutEducationLevelInput[]
-  connectOrCreate?: Prisma.ArticleCreateOrConnectWithoutEducationLevelInput | Prisma.ArticleCreateOrConnectWithoutEducationLevelInput[]
-  upsert?: Prisma.ArticleUpsertWithWhereUniqueWithoutEducationLevelInput | Prisma.ArticleUpsertWithWhereUniqueWithoutEducationLevelInput[]
-  createMany?: Prisma.ArticleCreateManyEducationLevelInputEnvelope
+export type ArticleUpdateManyWithoutEducationSummaryNestedInput = {
+  create?: Prisma.XOR<Prisma.ArticleCreateWithoutEducationSummaryInput, Prisma.ArticleUncheckedCreateWithoutEducationSummaryInput> | Prisma.ArticleCreateWithoutEducationSummaryInput[] | Prisma.ArticleUncheckedCreateWithoutEducationSummaryInput[]
+  connectOrCreate?: Prisma.ArticleCreateOrConnectWithoutEducationSummaryInput | Prisma.ArticleCreateOrConnectWithoutEducationSummaryInput[]
+  upsert?: Prisma.ArticleUpsertWithWhereUniqueWithoutEducationSummaryInput | Prisma.ArticleUpsertWithWhereUniqueWithoutEducationSummaryInput[]
+  createMany?: Prisma.ArticleCreateManyEducationSummaryInputEnvelope
   set?: Prisma.ArticleWhereUniqueInput | Prisma.ArticleWhereUniqueInput[]
   disconnect?: Prisma.ArticleWhereUniqueInput | Prisma.ArticleWhereUniqueInput[]
   delete?: Prisma.ArticleWhereUniqueInput | Prisma.ArticleWhereUniqueInput[]
   connect?: Prisma.ArticleWhereUniqueInput | Prisma.ArticleWhereUniqueInput[]
-  update?: Prisma.ArticleUpdateWithWhereUniqueWithoutEducationLevelInput | Prisma.ArticleUpdateWithWhereUniqueWithoutEducationLevelInput[]
-  updateMany?: Prisma.ArticleUpdateManyWithWhereWithoutEducationLevelInput | Prisma.ArticleUpdateManyWithWhereWithoutEducationLevelInput[]
+  update?: Prisma.ArticleUpdateWithWhereUniqueWithoutEducationSummaryInput | Prisma.ArticleUpdateWithWhereUniqueWithoutEducationSummaryInput[]
+  updateMany?: Prisma.ArticleUpdateManyWithWhereWithoutEducationSummaryInput | Prisma.ArticleUpdateManyWithWhereWithoutEducationSummaryInput[]
   deleteMany?: Prisma.ArticleScalarWhereInput | Prisma.ArticleScalarWhereInput[]
 }
 
-export type ArticleUncheckedUpdateManyWithoutEducationLevelNestedInput = {
-  create?: Prisma.XOR<Prisma.ArticleCreateWithoutEducationLevelInput, Prisma.ArticleUncheckedCreateWithoutEducationLevelInput> | Prisma.ArticleCreateWithoutEducationLevelInput[] | Prisma.ArticleUncheckedCreateWithoutEducationLevelInput[]
-  connectOrCreate?: Prisma.ArticleCreateOrConnectWithoutEducationLevelInput | Prisma.ArticleCreateOrConnectWithoutEducationLevelInput[]
-  upsert?: Prisma.ArticleUpsertWithWhereUniqueWithoutEducationLevelInput | Prisma.ArticleUpsertWithWhereUniqueWithoutEducationLevelInput[]
-  createMany?: Prisma.ArticleCreateManyEducationLevelInputEnvelope
+export type ArticleUncheckedUpdateManyWithoutEducationSummaryNestedInput = {
+  create?: Prisma.XOR<Prisma.ArticleCreateWithoutEducationSummaryInput, Prisma.ArticleUncheckedCreateWithoutEducationSummaryInput> | Prisma.ArticleCreateWithoutEducationSummaryInput[] | Prisma.ArticleUncheckedCreateWithoutEducationSummaryInput[]
+  connectOrCreate?: Prisma.ArticleCreateOrConnectWithoutEducationSummaryInput | Prisma.ArticleCreateOrConnectWithoutEducationSummaryInput[]
+  upsert?: Prisma.ArticleUpsertWithWhereUniqueWithoutEducationSummaryInput | Prisma.ArticleUpsertWithWhereUniqueWithoutEducationSummaryInput[]
+  createMany?: Prisma.ArticleCreateManyEducationSummaryInputEnvelope
   set?: Prisma.ArticleWhereUniqueInput | Prisma.ArticleWhereUniqueInput[]
   disconnect?: Prisma.ArticleWhereUniqueInput | Prisma.ArticleWhereUniqueInput[]
   delete?: Prisma.ArticleWhereUniqueInput | Prisma.ArticleWhereUniqueInput[]
   connect?: Prisma.ArticleWhereUniqueInput | Prisma.ArticleWhereUniqueInput[]
-  update?: Prisma.ArticleUpdateWithWhereUniqueWithoutEducationLevelInput | Prisma.ArticleUpdateWithWhereUniqueWithoutEducationLevelInput[]
-  updateMany?: Prisma.ArticleUpdateManyWithWhereWithoutEducationLevelInput | Prisma.ArticleUpdateManyWithWhereWithoutEducationLevelInput[]
+  update?: Prisma.ArticleUpdateWithWhereUniqueWithoutEducationSummaryInput | Prisma.ArticleUpdateWithWhereUniqueWithoutEducationSummaryInput[]
+  updateMany?: Prisma.ArticleUpdateManyWithWhereWithoutEducationSummaryInput | Prisma.ArticleUpdateManyWithWhereWithoutEducationSummaryInput[]
   deleteMany?: Prisma.ArticleScalarWhereInput | Prisma.ArticleScalarWhereInput[]
 }
 
-export type ArticleCreateWithoutEducationLevelInput = {
+export type ArticleCreateWithoutEducationSummaryInput = {
   title: string
   content: string
   imageUrl: string
   estimatedReadTime: number
+  sortOrder?: number
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
-export type ArticleUncheckedCreateWithoutEducationLevelInput = {
+export type ArticleUncheckedCreateWithoutEducationSummaryInput = {
   id?: number
   title: string
   content: string
   imageUrl: string
   estimatedReadTime: number
+  sortOrder?: number
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
-export type ArticleCreateOrConnectWithoutEducationLevelInput = {
+export type ArticleCreateOrConnectWithoutEducationSummaryInput = {
   where: Prisma.ArticleWhereUniqueInput
-  create: Prisma.XOR<Prisma.ArticleCreateWithoutEducationLevelInput, Prisma.ArticleUncheckedCreateWithoutEducationLevelInput>
+  create: Prisma.XOR<Prisma.ArticleCreateWithoutEducationSummaryInput, Prisma.ArticleUncheckedCreateWithoutEducationSummaryInput>
 }
 
-export type ArticleCreateManyEducationLevelInputEnvelope = {
-  data: Prisma.ArticleCreateManyEducationLevelInput | Prisma.ArticleCreateManyEducationLevelInput[]
+export type ArticleCreateManyEducationSummaryInputEnvelope = {
+  data: Prisma.ArticleCreateManyEducationSummaryInput | Prisma.ArticleCreateManyEducationSummaryInput[]
   skipDuplicates?: boolean
 }
 
-export type ArticleUpsertWithWhereUniqueWithoutEducationLevelInput = {
+export type ArticleUpsertWithWhereUniqueWithoutEducationSummaryInput = {
   where: Prisma.ArticleWhereUniqueInput
-  update: Prisma.XOR<Prisma.ArticleUpdateWithoutEducationLevelInput, Prisma.ArticleUncheckedUpdateWithoutEducationLevelInput>
-  create: Prisma.XOR<Prisma.ArticleCreateWithoutEducationLevelInput, Prisma.ArticleUncheckedCreateWithoutEducationLevelInput>
+  update: Prisma.XOR<Prisma.ArticleUpdateWithoutEducationSummaryInput, Prisma.ArticleUncheckedUpdateWithoutEducationSummaryInput>
+  create: Prisma.XOR<Prisma.ArticleCreateWithoutEducationSummaryInput, Prisma.ArticleUncheckedCreateWithoutEducationSummaryInput>
 }
 
-export type ArticleUpdateWithWhereUniqueWithoutEducationLevelInput = {
+export type ArticleUpdateWithWhereUniqueWithoutEducationSummaryInput = {
   where: Prisma.ArticleWhereUniqueInput
-  data: Prisma.XOR<Prisma.ArticleUpdateWithoutEducationLevelInput, Prisma.ArticleUncheckedUpdateWithoutEducationLevelInput>
+  data: Prisma.XOR<Prisma.ArticleUpdateWithoutEducationSummaryInput, Prisma.ArticleUncheckedUpdateWithoutEducationSummaryInput>
 }
 
-export type ArticleUpdateManyWithWhereWithoutEducationLevelInput = {
+export type ArticleUpdateManyWithWhereWithoutEducationSummaryInput = {
   where: Prisma.ArticleScalarWhereInput
-  data: Prisma.XOR<Prisma.ArticleUpdateManyMutationInput, Prisma.ArticleUncheckedUpdateManyWithoutEducationLevelInput>
+  data: Prisma.XOR<Prisma.ArticleUpdateManyMutationInput, Prisma.ArticleUncheckedUpdateManyWithoutEducationSummaryInput>
 }
 
 export type ArticleScalarWhereInput = {
@@ -532,50 +562,55 @@ export type ArticleScalarWhereInput = {
   OR?: Prisma.ArticleScalarWhereInput[]
   NOT?: Prisma.ArticleScalarWhereInput | Prisma.ArticleScalarWhereInput[]
   id?: Prisma.IntFilter<"Article"> | number
-  educationLevelId?: Prisma.IntFilter<"Article"> | number
+  educationSummaryId?: Prisma.IntFilter<"Article"> | number
   title?: Prisma.StringFilter<"Article"> | string
   content?: Prisma.StringFilter<"Article"> | string
   imageUrl?: Prisma.StringFilter<"Article"> | string
   estimatedReadTime?: Prisma.IntFilter<"Article"> | number
+  sortOrder?: Prisma.IntFilter<"Article"> | number
   createdAt?: Prisma.DateTimeFilter<"Article"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Article"> | Date | string
 }
 
-export type ArticleCreateManyEducationLevelInput = {
+export type ArticleCreateManyEducationSummaryInput = {
   id?: number
   title: string
   content: string
   imageUrl: string
   estimatedReadTime: number
+  sortOrder?: number
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
-export type ArticleUpdateWithoutEducationLevelInput = {
+export type ArticleUpdateWithoutEducationSummaryInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   estimatedReadTime?: Prisma.IntFieldUpdateOperationsInput | number
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type ArticleUncheckedUpdateWithoutEducationLevelInput = {
+export type ArticleUncheckedUpdateWithoutEducationSummaryInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   estimatedReadTime?: Prisma.IntFieldUpdateOperationsInput | number
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type ArticleUncheckedUpdateManyWithoutEducationLevelInput = {
+export type ArticleUncheckedUpdateManyWithoutEducationSummaryInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   title?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   estimatedReadTime?: Prisma.IntFieldUpdateOperationsInput | number
+  sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -584,74 +619,79 @@ export type ArticleUncheckedUpdateManyWithoutEducationLevelInput = {
 
 export type ArticleSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  educationLevelId?: boolean
+  educationSummaryId?: boolean
   title?: boolean
   content?: boolean
   imageUrl?: boolean
   estimatedReadTime?: boolean
+  sortOrder?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  educationLevel?: boolean | Prisma.EducationLevelDefaultArgs<ExtArgs>
+  educationSummary?: boolean | Prisma.EducationSummaryDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["article"]>
 
 export type ArticleSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  educationLevelId?: boolean
+  educationSummaryId?: boolean
   title?: boolean
   content?: boolean
   imageUrl?: boolean
   estimatedReadTime?: boolean
+  sortOrder?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  educationLevel?: boolean | Prisma.EducationLevelDefaultArgs<ExtArgs>
+  educationSummary?: boolean | Prisma.EducationSummaryDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["article"]>
 
 export type ArticleSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  educationLevelId?: boolean
+  educationSummaryId?: boolean
   title?: boolean
   content?: boolean
   imageUrl?: boolean
   estimatedReadTime?: boolean
+  sortOrder?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  educationLevel?: boolean | Prisma.EducationLevelDefaultArgs<ExtArgs>
+  educationSummary?: boolean | Prisma.EducationSummaryDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["article"]>
 
 export type ArticleSelectScalar = {
   id?: boolean
-  educationLevelId?: boolean
+  educationSummaryId?: boolean
   title?: boolean
   content?: boolean
   imageUrl?: boolean
   estimatedReadTime?: boolean
+  sortOrder?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ArticleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "educationLevelId" | "title" | "content" | "imageUrl" | "estimatedReadTime" | "createdAt" | "updatedAt", ExtArgs["result"]["article"]>
+export type ArticleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "educationSummaryId" | "title" | "content" | "imageUrl" | "estimatedReadTime" | "sortOrder" | "createdAt" | "updatedAt", ExtArgs["result"]["article"]>
 export type ArticleInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  educationLevel?: boolean | Prisma.EducationLevelDefaultArgs<ExtArgs>
+  educationSummary?: boolean | Prisma.EducationSummaryDefaultArgs<ExtArgs>
 }
 export type ArticleIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  educationLevel?: boolean | Prisma.EducationLevelDefaultArgs<ExtArgs>
+  educationSummary?: boolean | Prisma.EducationSummaryDefaultArgs<ExtArgs>
 }
 export type ArticleIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  educationLevel?: boolean | Prisma.EducationLevelDefaultArgs<ExtArgs>
+  educationSummary?: boolean | Prisma.EducationSummaryDefaultArgs<ExtArgs>
 }
 
 export type $ArticlePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Article"
   objects: {
-    educationLevel: Prisma.$EducationLevelPayload<ExtArgs>
+    educationSummary: Prisma.$EducationSummaryPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
-    educationLevelId: number
+    educationSummaryId: number
     title: string
     content: string
     imageUrl: string
     estimatedReadTime: number
+    sortOrder: number
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["article"]>
@@ -1048,7 +1088,7 @@ readonly fields: ArticleFieldRefs;
  */
 export interface Prisma__ArticleClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  educationLevel<T extends Prisma.EducationLevelDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.EducationLevelDefaultArgs<ExtArgs>>): Prisma.Prisma__EducationLevelClient<runtime.Types.Result.GetResult<Prisma.$EducationLevelPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  educationSummary<T extends Prisma.EducationSummaryDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.EducationSummaryDefaultArgs<ExtArgs>>): Prisma.Prisma__EducationSummaryClient<runtime.Types.Result.GetResult<Prisma.$EducationSummaryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1079,11 +1119,12 @@ export interface Prisma__ArticleClient<T, Null = never, ExtArgs extends runtime.
  */
 export interface ArticleFieldRefs {
   readonly id: Prisma.FieldRef<"Article", 'Int'>
-  readonly educationLevelId: Prisma.FieldRef<"Article", 'Int'>
+  readonly educationSummaryId: Prisma.FieldRef<"Article", 'Int'>
   readonly title: Prisma.FieldRef<"Article", 'String'>
   readonly content: Prisma.FieldRef<"Article", 'String'>
   readonly imageUrl: Prisma.FieldRef<"Article", 'String'>
   readonly estimatedReadTime: Prisma.FieldRef<"Article", 'Int'>
+  readonly sortOrder: Prisma.FieldRef<"Article", 'Int'>
   readonly createdAt: Prisma.FieldRef<"Article", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Article", 'DateTime'>
 }

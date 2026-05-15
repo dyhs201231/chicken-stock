@@ -392,7 +392,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export const ModelName = {
   User: 'User',
   Article: 'Article',
-  EducationLevel: 'EducationLevel'
+  EducationSummary: 'EducationSummary'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -408,7 +408,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "article" | "educationLevel"
+    modelProps: "user" | "article" | "educationSummary"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -560,77 +560,77 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    EducationLevel: {
-      payload: Prisma.$EducationLevelPayload<ExtArgs>
-      fields: Prisma.EducationLevelFieldRefs
+    EducationSummary: {
+      payload: Prisma.$EducationSummaryPayload<ExtArgs>
+      fields: Prisma.EducationSummaryFieldRefs
       operations: {
         findUnique: {
-          args: Prisma.EducationLevelFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$EducationLevelPayload> | null
+          args: Prisma.EducationSummaryFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EducationSummaryPayload> | null
         }
         findUniqueOrThrow: {
-          args: Prisma.EducationLevelFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$EducationLevelPayload>
+          args: Prisma.EducationSummaryFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EducationSummaryPayload>
         }
         findFirst: {
-          args: Prisma.EducationLevelFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$EducationLevelPayload> | null
+          args: Prisma.EducationSummaryFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EducationSummaryPayload> | null
         }
         findFirstOrThrow: {
-          args: Prisma.EducationLevelFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$EducationLevelPayload>
+          args: Prisma.EducationSummaryFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EducationSummaryPayload>
         }
         findMany: {
-          args: Prisma.EducationLevelFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$EducationLevelPayload>[]
+          args: Prisma.EducationSummaryFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EducationSummaryPayload>[]
         }
         create: {
-          args: Prisma.EducationLevelCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$EducationLevelPayload>
+          args: Prisma.EducationSummaryCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EducationSummaryPayload>
         }
         createMany: {
-          args: Prisma.EducationLevelCreateManyArgs<ExtArgs>
+          args: Prisma.EducationSummaryCreateManyArgs<ExtArgs>
           result: BatchPayload
         }
         createManyAndReturn: {
-          args: Prisma.EducationLevelCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$EducationLevelPayload>[]
+          args: Prisma.EducationSummaryCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EducationSummaryPayload>[]
         }
         delete: {
-          args: Prisma.EducationLevelDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$EducationLevelPayload>
+          args: Prisma.EducationSummaryDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EducationSummaryPayload>
         }
         update: {
-          args: Prisma.EducationLevelUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$EducationLevelPayload>
+          args: Prisma.EducationSummaryUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EducationSummaryPayload>
         }
         deleteMany: {
-          args: Prisma.EducationLevelDeleteManyArgs<ExtArgs>
+          args: Prisma.EducationSummaryDeleteManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateMany: {
-          args: Prisma.EducationLevelUpdateManyArgs<ExtArgs>
+          args: Prisma.EducationSummaryUpdateManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateManyAndReturn: {
-          args: Prisma.EducationLevelUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$EducationLevelPayload>[]
+          args: Prisma.EducationSummaryUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EducationSummaryPayload>[]
         }
         upsert: {
-          args: Prisma.EducationLevelUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$EducationLevelPayload>
+          args: Prisma.EducationSummaryUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$EducationSummaryPayload>
         }
         aggregate: {
-          args: Prisma.EducationLevelAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateEducationLevel>
+          args: Prisma.EducationSummaryAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateEducationSummary>
         }
         groupBy: {
-          args: Prisma.EducationLevelGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.EducationLevelGroupByOutputType>[]
+          args: Prisma.EducationSummaryGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EducationSummaryGroupByOutputType>[]
         }
         count: {
-          args: Prisma.EducationLevelCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.EducationLevelCountAggregateOutputType> | number
+          args: Prisma.EducationSummaryCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.EducationSummaryCountAggregateOutputType> | number
         }
       }
     }
@@ -686,11 +686,12 @@ export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof User
 
 export const ArticleScalarFieldEnum = {
   id: 'id',
-  educationLevelId: 'educationLevelId',
+  educationSummaryId: 'educationSummaryId',
   title: 'title',
   content: 'content',
   imageUrl: 'imageUrl',
   estimatedReadTime: 'estimatedReadTime',
+  sortOrder: 'sortOrder',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -698,18 +699,17 @@ export const ArticleScalarFieldEnum = {
 export type ArticleScalarFieldEnum = (typeof ArticleScalarFieldEnum)[keyof typeof ArticleScalarFieldEnum]
 
 
-export const EducationLevelScalarFieldEnum = {
+export const EducationSummaryScalarFieldEnum = {
   id: 'id',
   stage: 'stage',
   label: 'label',
   imageUrl: 'imageUrl',
   summary: 'summary',
-  sortOrder: 'sortOrder',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
-export type EducationLevelScalarFieldEnum = (typeof EducationLevelScalarFieldEnum)[keyof typeof EducationLevelScalarFieldEnum]
+export type EducationSummaryScalarFieldEnum = (typeof EducationSummaryScalarFieldEnum)[keyof typeof EducationSummaryScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -785,16 +785,16 @@ export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaM
 
 
 /**
- * Reference to a field of type 'EducationLevelLabel'
+ * Reference to a field of type 'EducationSummaryLabel'
  */
-export type EnumEducationLevelLabelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EducationLevelLabel'>
+export type EnumEducationSummaryLabelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EducationSummaryLabel'>
     
 
 
 /**
- * Reference to a field of type 'EducationLevelLabel[]'
+ * Reference to a field of type 'EducationSummaryLabel[]'
  */
-export type ListEnumEducationLevelLabelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EducationLevelLabel[]'>
+export type ListEnumEducationSummaryLabelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EducationSummaryLabel[]'>
     
 
 
@@ -900,7 +900,7 @@ export interface PrismaClientOptions {
 export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   article?: Prisma.ArticleOmit
-  educationLevel?: Prisma.EducationLevelOmit
+  educationSummary?: Prisma.EducationSummaryOmit
 }
 
 /* Types for Logging */

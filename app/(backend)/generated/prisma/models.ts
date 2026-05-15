@@ -10,5 +10,5 @@
  */
 export type * from './models/User'
 export type * from './models/Article'
-export type * from './models/EducationLevel'
+export type * from './models/EducationSummary'
 export type * from './commonInputTypes'
