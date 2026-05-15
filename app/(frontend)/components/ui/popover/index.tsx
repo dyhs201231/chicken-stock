@@ -14,12 +14,15 @@ import {
   useId,
   useRef,
   useState,
+  useSyncExternalStore,
 } from "react";
+import { createPortal } from "react-dom";
 import { twMerge } from "tailwind-merge";
 
 type PopoverContextValue = {
   contentId: string;
   open: boolean;
+  portalRef: RefObject<HTMLDivElement | null>;
   rootRef: RefObject<HTMLDivElement | null>;
   setOpen: (open: boolean) => void;
 };
@@ -41,12 +44,39 @@ type PopoverContentProps = HTMLAttributes<HTMLDivElement> & {
   ref?: Ref<HTMLDivElement>;
 };
 
+type PopoverPortalProps = {
+  children: ReactNode;
+  container?: Element | DocumentFragment | null;
+  forceMount?: boolean;
+};
+
 type PopoverComponent = typeof Popover & {
   Trigger: typeof PopoverTrigger;
+  Portal: typeof PopoverPortal;
   Content: typeof PopoverContent;
 };
 
 const PopoverContext = createContext<PopoverContextValue | null>(null);
+
+function subscribeToHydrationStore() {
+  return () => {};
+}
+
+function getHydratedSnapshot() {
+  return true;
+}
+
+function getServerSnapshot() {
+  return false;
+}
+
+function useHydrated() {
+  return useSyncExternalStore(
+    subscribeToHydrationStore,
+    getHydratedSnapshot,
+    getServerSnapshot,
+  );
+}
 
 function usePopoverContext(componentName: string) {
   const context = useContext(PopoverContext);
@@ -84,17 +114,21 @@ function Popover({
 }: PopoverProps) {
   const contentId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
+  const portalRef = useRef<HTMLDivElement>(null);
   const [internalOpen, setInternalOpen] = useState(defaultOpen);
   const isControlled = open !== undefined;
   const currentOpen = isControlled ? open : internalOpen;
 
-  const setOpen = useCallback((nextOpen: boolean) => {
-    if (!isControlled) {
-      setInternalOpen(nextOpen);
-    }
+  const setOpen = useCallback(
+    (nextOpen: boolean) => {
+      if (!isControlled) {
+        setInternalOpen(nextOpen);
+      }
 
-    onOpenChange?.(nextOpen);
-  }, [isControlled, onOpenChange]);
+      onOpenChange?.(nextOpen);
+    },
+    [isControlled, onOpenChange],
+  );
 
   useEffect(() => {
     if (!currentOpen) {
@@ -102,7 +136,12 @@ function Popover({
     }
 
     const closeOnOutsidePointerDown = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) {
+      const target = event.target as Node;
+
+      if (
+        !rootRef.current?.contains(target) &&
+        !portalRef.current?.contains(target)
+      ) {
         setOpen(false);
       }
     };
@@ -127,6 +166,7 @@ function Popover({
       value={{
         contentId,
         open: currentOpen,
+        portalRef,
         rootRef,
         setOpen,
       }}
@@ -139,6 +179,26 @@ function Popover({
         {children}
       </div>
     </PopoverContext.Provider>
+  );
+}
+
+function PopoverPortal({
+  children,
+  container,
+  forceMount = false,
+}: PopoverPortalProps) {
+  const { open, portalRef } = usePopoverContext("Popover.Portal");
+  const mounted = useHydrated();
+
+  if (!mounted || (!forceMount && !open)) {
+    return null;
+  }
+
+  return createPortal(
+    <div ref={portalRef} style={{ display: "contents" }}>
+      {children}
+    </div>,
+    container ?? document.body,
   );
 }
 
@@ -209,6 +269,7 @@ function PopoverContent({
 
 Object.assign(Popover, {
   Trigger: PopoverTrigger,
+  Portal: PopoverPortal,
   Content: PopoverContent,
 });
 

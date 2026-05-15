@@ -52,12 +52,14 @@ export default function PopoverSample() {
           <Popover.Trigger className="rounded-md bg-white px-4 py-2 text-sm font-semibold text-zinc-950">
             로그인
           </Popover.Trigger>
-          <Popover.Content className="flex h-17 w-95 items-center justify-center">
-            <span className="text-4xl font-bold">
-              <span className="text-[#4285f4]">G</span>
-            </span>
-            구글 계정으로 로그인
-          </Popover.Content>
+          <Popover.Portal>
+            <Popover.Content className="fixed top-28 left-8 flex h-17 w-95 items-center justify-center">
+              <span className="text-4xl font-bold">
+                <span className="text-[#4285f4]">G</span>
+              </span>
+              구글 계정으로 로그인
+            </Popover.Content>
+          </Popover.Portal>
         </Popover>
       </div>
 
