@@ -29,14 +29,12 @@ export type AggregateArticle = {
 export type ArticleAvgAggregateOutputType = {
   id: number | null
   educationSummaryId: number | null
-  estimatedReadTime: number | null
   sortOrder: number | null
 }
 
 export type ArticleSumAggregateOutputType = {
   id: number | null
   educationSummaryId: number | null
-  estimatedReadTime: number | null
   sortOrder: number | null
 }
 
@@ -46,7 +44,6 @@ export type ArticleMinAggregateOutputType = {
   title: string | null
   content: string | null
   imageUrl: string | null
-  estimatedReadTime: number | null
   sortOrder: number | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -58,7 +55,6 @@ export type ArticleMaxAggregateOutputType = {
   title: string | null
   content: string | null
   imageUrl: string | null
-  estimatedReadTime: number | null
   sortOrder: number | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -70,7 +66,6 @@ export type ArticleCountAggregateOutputType = {
   title: number
   content: number
   imageUrl: number
-  estimatedReadTime: number
   sortOrder: number
   createdAt: number
   updatedAt: number
@@ -81,14 +76,12 @@ export type ArticleCountAggregateOutputType = {
 export type ArticleAvgAggregateInputType = {
   id?: true
   educationSummaryId?: true
-  estimatedReadTime?: true
   sortOrder?: true
 }
 
 export type ArticleSumAggregateInputType = {
   id?: true
   educationSummaryId?: true
-  estimatedReadTime?: true
   sortOrder?: true
 }
 
@@ -98,7 +91,6 @@ export type ArticleMinAggregateInputType = {
   title?: true
   content?: true
   imageUrl?: true
-  estimatedReadTime?: true
   sortOrder?: true
   createdAt?: true
   updatedAt?: true
@@ -110,7 +102,6 @@ export type ArticleMaxAggregateInputType = {
   title?: true
   content?: true
   imageUrl?: true
-  estimatedReadTime?: true
   sortOrder?: true
   createdAt?: true
   updatedAt?: true
@@ -122,7 +113,6 @@ export type ArticleCountAggregateInputType = {
   title?: true
   content?: true
   imageUrl?: true
-  estimatedReadTime?: true
   sortOrder?: true
   createdAt?: true
   updatedAt?: true
@@ -221,7 +211,6 @@ export type ArticleGroupByOutputType = {
   title: string
   content: string
   imageUrl: string
-  estimatedReadTime: number
   sortOrder: number
   createdAt: Date
   updatedAt: Date
@@ -256,7 +245,6 @@ export type ArticleWhereInput = {
   title?: Prisma.StringFilter<"Article"> | string
   content?: Prisma.StringFilter<"Article"> | string
   imageUrl?: Prisma.StringFilter<"Article"> | string
-  estimatedReadTime?: Prisma.IntFilter<"Article"> | number
   sortOrder?: Prisma.IntFilter<"Article"> | number
   createdAt?: Prisma.DateTimeFilter<"Article"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Article"> | Date | string
@@ -269,7 +257,6 @@ export type ArticleOrderByWithRelationInput = {
   title?: Prisma.SortOrder
   content?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
-  estimatedReadTime?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -285,7 +272,6 @@ export type ArticleWhereUniqueInput = Prisma.AtLeast<{
   title?: Prisma.StringFilter<"Article"> | string
   content?: Prisma.StringFilter<"Article"> | string
   imageUrl?: Prisma.StringFilter<"Article"> | string
-  estimatedReadTime?: Prisma.IntFilter<"Article"> | number
   sortOrder?: Prisma.IntFilter<"Article"> | number
   createdAt?: Prisma.DateTimeFilter<"Article"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Article"> | Date | string
@@ -298,7 +284,6 @@ export type ArticleOrderByWithAggregationInput = {
   title?: Prisma.SortOrder
   content?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
-  estimatedReadTime?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -318,7 +303,6 @@ export type ArticleScalarWhereWithAggregatesInput = {
   title?: Prisma.StringWithAggregatesFilter<"Article"> | string
   content?: Prisma.StringWithAggregatesFilter<"Article"> | string
   imageUrl?: Prisma.StringWithAggregatesFilter<"Article"> | string
-  estimatedReadTime?: Prisma.IntWithAggregatesFilter<"Article"> | number
   sortOrder?: Prisma.IntWithAggregatesFilter<"Article"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Article"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Article"> | Date | string
@@ -328,7 +312,6 @@ export type ArticleCreateInput = {
   title: string
   content: string
   imageUrl: string
-  estimatedReadTime: number
   sortOrder?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -341,7 +324,6 @@ export type ArticleUncheckedCreateInput = {
   title: string
   content: string
   imageUrl: string
-  estimatedReadTime: number
   sortOrder?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -351,7 +333,6 @@ export type ArticleUpdateInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  estimatedReadTime?: Prisma.IntFieldUpdateOperationsInput | number
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -364,7 +345,6 @@ export type ArticleUncheckedUpdateInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  estimatedReadTime?: Prisma.IntFieldUpdateOperationsInput | number
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -376,7 +356,6 @@ export type ArticleCreateManyInput = {
   title: string
   content: string
   imageUrl: string
-  estimatedReadTime: number
   sortOrder?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -386,7 +365,6 @@ export type ArticleUpdateManyMutationInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  estimatedReadTime?: Prisma.IntFieldUpdateOperationsInput | number
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -398,7 +376,6 @@ export type ArticleUncheckedUpdateManyInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  estimatedReadTime?: Prisma.IntFieldUpdateOperationsInput | number
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -410,7 +387,6 @@ export type ArticleCountOrderByAggregateInput = {
   title?: Prisma.SortOrder
   content?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
-  estimatedReadTime?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -419,7 +395,6 @@ export type ArticleCountOrderByAggregateInput = {
 export type ArticleAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
   educationSummaryId?: Prisma.SortOrder
-  estimatedReadTime?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
 }
 
@@ -429,7 +404,6 @@ export type ArticleMaxOrderByAggregateInput = {
   title?: Prisma.SortOrder
   content?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
-  estimatedReadTime?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -441,7 +415,6 @@ export type ArticleMinOrderByAggregateInput = {
   title?: Prisma.SortOrder
   content?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
-  estimatedReadTime?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -450,7 +423,6 @@ export type ArticleMinOrderByAggregateInput = {
 export type ArticleSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   educationSummaryId?: Prisma.SortOrder
-  estimatedReadTime?: Prisma.SortOrder
   sortOrder?: Prisma.SortOrder
 }
 
@@ -514,7 +486,6 @@ export type ArticleCreateWithoutEducationSummaryInput = {
   title: string
   content: string
   imageUrl: string
-  estimatedReadTime: number
   sortOrder?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -525,7 +496,6 @@ export type ArticleUncheckedCreateWithoutEducationSummaryInput = {
   title: string
   content: string
   imageUrl: string
-  estimatedReadTime: number
   sortOrder?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -566,7 +536,6 @@ export type ArticleScalarWhereInput = {
   title?: Prisma.StringFilter<"Article"> | string
   content?: Prisma.StringFilter<"Article"> | string
   imageUrl?: Prisma.StringFilter<"Article"> | string
-  estimatedReadTime?: Prisma.IntFilter<"Article"> | number
   sortOrder?: Prisma.IntFilter<"Article"> | number
   createdAt?: Prisma.DateTimeFilter<"Article"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Article"> | Date | string
@@ -577,7 +546,6 @@ export type ArticleCreateManyEducationSummaryInput = {
   title: string
   content: string
   imageUrl: string
-  estimatedReadTime: number
   sortOrder?: number
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -587,7 +555,6 @@ export type ArticleUpdateWithoutEducationSummaryInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  estimatedReadTime?: Prisma.IntFieldUpdateOperationsInput | number
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -598,7 +565,6 @@ export type ArticleUncheckedUpdateWithoutEducationSummaryInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  estimatedReadTime?: Prisma.IntFieldUpdateOperationsInput | number
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -609,7 +575,6 @@ export type ArticleUncheckedUpdateManyWithoutEducationSummaryInput = {
   title?: Prisma.StringFieldUpdateOperationsInput | string
   content?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
-  estimatedReadTime?: Prisma.IntFieldUpdateOperationsInput | number
   sortOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -623,7 +588,6 @@ export type ArticleSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   title?: boolean
   content?: boolean
   imageUrl?: boolean
-  estimatedReadTime?: boolean
   sortOrder?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -636,7 +600,6 @@ export type ArticleSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   title?: boolean
   content?: boolean
   imageUrl?: boolean
-  estimatedReadTime?: boolean
   sortOrder?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -649,7 +612,6 @@ export type ArticleSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   title?: boolean
   content?: boolean
   imageUrl?: boolean
-  estimatedReadTime?: boolean
   sortOrder?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -662,13 +624,12 @@ export type ArticleSelectScalar = {
   title?: boolean
   content?: boolean
   imageUrl?: boolean
-  estimatedReadTime?: boolean
   sortOrder?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type ArticleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "educationSummaryId" | "title" | "content" | "imageUrl" | "estimatedReadTime" | "sortOrder" | "createdAt" | "updatedAt", ExtArgs["result"]["article"]>
+export type ArticleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "educationSummaryId" | "title" | "content" | "imageUrl" | "sortOrder" | "createdAt" | "updatedAt", ExtArgs["result"]["article"]>
 export type ArticleInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   educationSummary?: boolean | Prisma.EducationSummaryDefaultArgs<ExtArgs>
 }
@@ -690,7 +651,6 @@ export type $ArticlePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     title: string
     content: string
     imageUrl: string
-    estimatedReadTime: number
     sortOrder: number
     createdAt: Date
     updatedAt: Date
@@ -1123,7 +1083,6 @@ export interface ArticleFieldRefs {
   readonly title: Prisma.FieldRef<"Article", 'String'>
   readonly content: Prisma.FieldRef<"Article", 'String'>
   readonly imageUrl: Prisma.FieldRef<"Article", 'String'>
-  readonly estimatedReadTime: Prisma.FieldRef<"Article", 'Int'>
   readonly sortOrder: Prisma.FieldRef<"Article", 'Int'>
   readonly createdAt: Prisma.FieldRef<"Article", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Article", 'DateTime'>

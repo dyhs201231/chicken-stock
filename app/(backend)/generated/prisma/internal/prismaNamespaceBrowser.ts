@@ -87,7 +87,6 @@ export const ArticleScalarFieldEnum = {
   title: 'title',
   content: 'content',
   imageUrl: 'imageUrl',
-  estimatedReadTime: 'estimatedReadTime',
   sortOrder: 'sortOrder',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
