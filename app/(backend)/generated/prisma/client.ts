@@ -49,3 +49,13 @@ path.join(process.cwd(), "app/(backend)/generated/prisma/libquery_engine-darwin-
  * 
  */
 export type User = Prisma.UserModel
+/**
+ * Model Article
+ * 
+ */
+export type Article = Prisma.ArticleModel
+/**
+ * Model EducationLevel
+ * 
+ */
+export type EducationLevel = Prisma.EducationLevelModel
