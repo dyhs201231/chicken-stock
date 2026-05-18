@@ -40,6 +40,7 @@ export type EducationSummaryMinAggregateOutputType = {
   id: number | null
   stage: number | null
   label: $Enums.EducationSummaryLabel | null
+  title: string | null
   imageUrl: string | null
   summary: string | null
   createdAt: Date | null
@@ -50,6 +51,7 @@ export type EducationSummaryMaxAggregateOutputType = {
   id: number | null
   stage: number | null
   label: $Enums.EducationSummaryLabel | null
+  title: string | null
   imageUrl: string | null
   summary: string | null
   createdAt: Date | null
@@ -60,6 +62,7 @@ export type EducationSummaryCountAggregateOutputType = {
   id: number
   stage: number
   label: number
+  title: number
   imageUrl: number
   summary: number
   createdAt: number
@@ -82,6 +85,7 @@ export type EducationSummaryMinAggregateInputType = {
   id?: true
   stage?: true
   label?: true
+  title?: true
   imageUrl?: true
   summary?: true
   createdAt?: true
@@ -92,6 +96,7 @@ export type EducationSummaryMaxAggregateInputType = {
   id?: true
   stage?: true
   label?: true
+  title?: true
   imageUrl?: true
   summary?: true
   createdAt?: true
@@ -102,6 +107,7 @@ export type EducationSummaryCountAggregateInputType = {
   id?: true
   stage?: true
   label?: true
+  title?: true
   imageUrl?: true
   summary?: true
   createdAt?: true
@@ -199,6 +205,7 @@ export type EducationSummaryGroupByOutputType = {
   id: number
   stage: number
   label: $Enums.EducationSummaryLabel
+  title: string
   imageUrl: string
   summary: string
   createdAt: Date
@@ -232,6 +239,7 @@ export type EducationSummaryWhereInput = {
   id?: Prisma.IntFilter<"EducationSummary"> | number
   stage?: Prisma.IntFilter<"EducationSummary"> | number
   label?: Prisma.EnumEducationSummaryLabelFilter<"EducationSummary"> | $Enums.EducationSummaryLabel
+  title?: Prisma.StringFilter<"EducationSummary"> | string
   imageUrl?: Prisma.StringFilter<"EducationSummary"> | string
   summary?: Prisma.StringFilter<"EducationSummary"> | string
   createdAt?: Prisma.DateTimeFilter<"EducationSummary"> | Date | string
@@ -243,6 +251,7 @@ export type EducationSummaryOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   stage?: Prisma.SortOrder
   label?: Prisma.SortOrder
+  title?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   summary?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -257,6 +266,7 @@ export type EducationSummaryWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.EducationSummaryWhereInput[]
   NOT?: Prisma.EducationSummaryWhereInput | Prisma.EducationSummaryWhereInput[]
   label?: Prisma.EnumEducationSummaryLabelFilter<"EducationSummary"> | $Enums.EducationSummaryLabel
+  title?: Prisma.StringFilter<"EducationSummary"> | string
   imageUrl?: Prisma.StringFilter<"EducationSummary"> | string
   summary?: Prisma.StringFilter<"EducationSummary"> | string
   createdAt?: Prisma.DateTimeFilter<"EducationSummary"> | Date | string
@@ -268,6 +278,7 @@ export type EducationSummaryOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   stage?: Prisma.SortOrder
   label?: Prisma.SortOrder
+  title?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   summary?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -286,6 +297,7 @@ export type EducationSummaryScalarWhereWithAggregatesInput = {
   id?: Prisma.IntWithAggregatesFilter<"EducationSummary"> | number
   stage?: Prisma.IntWithAggregatesFilter<"EducationSummary"> | number
   label?: Prisma.EnumEducationSummaryLabelWithAggregatesFilter<"EducationSummary"> | $Enums.EducationSummaryLabel
+  title?: Prisma.StringWithAggregatesFilter<"EducationSummary"> | string
   imageUrl?: Prisma.StringWithAggregatesFilter<"EducationSummary"> | string
   summary?: Prisma.StringWithAggregatesFilter<"EducationSummary"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"EducationSummary"> | Date | string
@@ -295,6 +307,7 @@ export type EducationSummaryScalarWhereWithAggregatesInput = {
 export type EducationSummaryCreateInput = {
   stage: number
   label: $Enums.EducationSummaryLabel
+  title?: string
   imageUrl: string
   summary: string
   createdAt?: Date | string
@@ -306,6 +319,7 @@ export type EducationSummaryUncheckedCreateInput = {
   id?: number
   stage: number
   label: $Enums.EducationSummaryLabel
+  title?: string
   imageUrl: string
   summary: string
   createdAt?: Date | string
@@ -316,6 +330,7 @@ export type EducationSummaryUncheckedCreateInput = {
 export type EducationSummaryUpdateInput = {
   stage?: Prisma.IntFieldUpdateOperationsInput | number
   label?: Prisma.EnumEducationSummaryLabelFieldUpdateOperationsInput | $Enums.EducationSummaryLabel
+  title?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   summary?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -327,6 +342,7 @@ export type EducationSummaryUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   stage?: Prisma.IntFieldUpdateOperationsInput | number
   label?: Prisma.EnumEducationSummaryLabelFieldUpdateOperationsInput | $Enums.EducationSummaryLabel
+  title?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   summary?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -338,6 +354,7 @@ export type EducationSummaryCreateManyInput = {
   id?: number
   stage: number
   label: $Enums.EducationSummaryLabel
+  title?: string
   imageUrl: string
   summary: string
   createdAt?: Date | string
@@ -347,6 +364,7 @@ export type EducationSummaryCreateManyInput = {
 export type EducationSummaryUpdateManyMutationInput = {
   stage?: Prisma.IntFieldUpdateOperationsInput | number
   label?: Prisma.EnumEducationSummaryLabelFieldUpdateOperationsInput | $Enums.EducationSummaryLabel
+  title?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   summary?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -357,6 +375,7 @@ export type EducationSummaryUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   stage?: Prisma.IntFieldUpdateOperationsInput | number
   label?: Prisma.EnumEducationSummaryLabelFieldUpdateOperationsInput | $Enums.EducationSummaryLabel
+  title?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   summary?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -372,6 +391,7 @@ export type EducationSummaryCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   stage?: Prisma.SortOrder
   label?: Prisma.SortOrder
+  title?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   summary?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -387,6 +407,7 @@ export type EducationSummaryMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   stage?: Prisma.SortOrder
   label?: Prisma.SortOrder
+  title?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   summary?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -397,6 +418,7 @@ export type EducationSummaryMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   stage?: Prisma.SortOrder
   label?: Prisma.SortOrder
+  title?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   summary?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
@@ -429,6 +451,7 @@ export type EnumEducationSummaryLabelFieldUpdateOperationsInput = {
 export type EducationSummaryCreateWithoutArticlesInput = {
   stage: number
   label: $Enums.EducationSummaryLabel
+  title?: string
   imageUrl: string
   summary: string
   createdAt?: Date | string
@@ -439,6 +462,7 @@ export type EducationSummaryUncheckedCreateWithoutArticlesInput = {
   id?: number
   stage: number
   label: $Enums.EducationSummaryLabel
+  title?: string
   imageUrl: string
   summary: string
   createdAt?: Date | string
@@ -464,6 +488,7 @@ export type EducationSummaryUpdateToOneWithWhereWithoutArticlesInput = {
 export type EducationSummaryUpdateWithoutArticlesInput = {
   stage?: Prisma.IntFieldUpdateOperationsInput | number
   label?: Prisma.EnumEducationSummaryLabelFieldUpdateOperationsInput | $Enums.EducationSummaryLabel
+  title?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   summary?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -474,6 +499,7 @@ export type EducationSummaryUncheckedUpdateWithoutArticlesInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   stage?: Prisma.IntFieldUpdateOperationsInput | number
   label?: Prisma.EnumEducationSummaryLabelFieldUpdateOperationsInput | $Enums.EducationSummaryLabel
+  title?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   summary?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -515,6 +541,7 @@ export type EducationSummarySelect<ExtArgs extends runtime.Types.Extensions.Inte
   id?: boolean
   stage?: boolean
   label?: boolean
+  title?: boolean
   imageUrl?: boolean
   summary?: boolean
   createdAt?: boolean
@@ -527,6 +554,7 @@ export type EducationSummarySelectCreateManyAndReturn<ExtArgs extends runtime.Ty
   id?: boolean
   stage?: boolean
   label?: boolean
+  title?: boolean
   imageUrl?: boolean
   summary?: boolean
   createdAt?: boolean
@@ -537,6 +565,7 @@ export type EducationSummarySelectUpdateManyAndReturn<ExtArgs extends runtime.Ty
   id?: boolean
   stage?: boolean
   label?: boolean
+  title?: boolean
   imageUrl?: boolean
   summary?: boolean
   createdAt?: boolean
@@ -547,13 +576,14 @@ export type EducationSummarySelectScalar = {
   id?: boolean
   stage?: boolean
   label?: boolean
+  title?: boolean
   imageUrl?: boolean
   summary?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type EducationSummaryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "stage" | "label" | "imageUrl" | "summary" | "createdAt" | "updatedAt", ExtArgs["result"]["educationSummary"]>
+export type EducationSummaryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "stage" | "label" | "title" | "imageUrl" | "summary" | "createdAt" | "updatedAt", ExtArgs["result"]["educationSummary"]>
 export type EducationSummaryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   articles?: boolean | Prisma.EducationSummary$articlesArgs<ExtArgs>
   _count?: boolean | Prisma.EducationSummaryCountOutputTypeDefaultArgs<ExtArgs>
@@ -570,6 +600,7 @@ export type $EducationSummaryPayload<ExtArgs extends runtime.Types.Extensions.In
     id: number
     stage: number
     label: $Enums.EducationSummaryLabel
+    title: string
     imageUrl: string
     summary: string
     createdAt: Date
@@ -1001,6 +1032,7 @@ export interface EducationSummaryFieldRefs {
   readonly id: Prisma.FieldRef<"EducationSummary", 'Int'>
   readonly stage: Prisma.FieldRef<"EducationSummary", 'Int'>
   readonly label: Prisma.FieldRef<"EducationSummary", 'EducationSummaryLabel'>
+  readonly title: Prisma.FieldRef<"EducationSummary", 'String'>
   readonly imageUrl: Prisma.FieldRef<"EducationSummary", 'String'>
   readonly summary: Prisma.FieldRef<"EducationSummary", 'String'>
   readonly createdAt: Prisma.FieldRef<"EducationSummary", 'DateTime'>

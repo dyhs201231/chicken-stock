@@ -99,6 +99,7 @@ export const EducationSummaryScalarFieldEnum = {
   id: 'id',
   stage: 'stage',
   label: 'label',
+  title: 'title',
   imageUrl: 'imageUrl',
   summary: 'summary',
   createdAt: 'createdAt',
