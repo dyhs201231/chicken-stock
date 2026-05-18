@@ -6,6 +6,8 @@ export async function GET() {
     const educationSummaries = await prisma.educationSummary.findMany({
       orderBy: { stage: "asc" },
       select: {
+        title: true,
+        stage: true,
         summary: true,
         articles: {
           orderBy: { sortOrder: "asc" },
