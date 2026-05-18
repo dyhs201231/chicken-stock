@@ -1,21 +1,19 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import Image, { type StaticImageData } from "next/image";
 import { twMerge } from "tailwind-merge";
 import { IconInfoCircle } from "@tabler/icons-react";
 import Modal from "../../ui/modal";
 
-export type EducationListItem =
-  | string
-  | {
-      id?: string;
-      title: string;
-      description?: string;
-    };
+export type EducationListItem = {
+  id?: string;
+  title: string;
+  description?: string;
+};
 
 export type EducationCardData = {
-  summary: string | string[];
+  summary: string[];
   list: EducationListItem[];
 };
 
@@ -28,10 +26,6 @@ export type EducationCardProps = {
 };
 
 type OpenPanel = "summary" | "list" | null;
-
-function getSummaryItems(summary: EducationCardData["summary"]) {
-  return Array.isArray(summary) ? summary : [summary];
-}
 
 function getListItemKey(item: EducationListItem, index: number) {
   if (typeof item === "string") {
@@ -49,11 +43,7 @@ export default function EducationCard({
   className,
 }: EducationCardProps) {
   const [openPanel, setOpenPanel] = useState<OpenPanel>(null);
-  const summaryItems = useMemo(
-    () => getSummaryItems(data.summary),
-    [data.summary],
-  );
-  const hasSummary = summaryItems.some((item) => item.trim().length > 0);
+  const hasSummary = data.summary.some((item) => item.trim().length > 0);
   const hasList = data.list.length > 0;
 
   return (
@@ -116,11 +106,11 @@ export default function EducationCard({
                 </h3>
 
                 {hasSummary ? (
-                  <div className="space-y-3 text-xl leading-10 whitespace-pre">
-                    {summaryItems.map((item, index) => (
-                      <p key={`${item}-${index}`}>{item}</p>
+                  <ul className="mt-8 list-disc space-y-5 pl-11 text-xl leading-7">
+                    {data.summary.map((item, index) => (
+                      <li key={`${item}-${index}`}>{item}</li>
                     ))}
-                  </div>
+                  </ul>
                 ) : (
                   <p className="mt-5 rounded-lg bg-zinc-100 px-4 py-5 text-center text-sm text-zinc-500">
                     아직 요약이 준비되지 않았어요.
