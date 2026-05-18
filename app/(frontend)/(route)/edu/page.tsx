@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import EducationCard from "../../components/edu/education-card";
 import { useEducationSummariesQuery } from "../../apis/edu/queries";
 
@@ -23,6 +23,14 @@ const educationCardStyles = [
 ] as const;
 
 export default function Edu() {
+  const [openLevel] = useState(() => {
+    if (typeof window === "undefined") {
+      return null;
+    }
+
+    return new URLSearchParams(window.location.search).get("openLevel");
+  });
+
   const {
     data: educationSummaries = [],
     isError,
@@ -41,6 +49,7 @@ export default function Edu() {
           summary: summary.summary,
           list: summary.articles.map((article) => ({
             id: String(article.id),
+            level: String(summary.stage),
             title: article.title,
           })),
         },
@@ -81,6 +90,7 @@ export default function Edu() {
                 image={card.image}
                 data={card.data}
                 className={card.className}
+                autoOpenList={openLevel === card.level}
               />
             ))
           ) : (

@@ -2,12 +2,14 @@
 
 import { useState } from "react";
 import Image, { type StaticImageData } from "next/image";
+import Link from "next/link";
 import { twMerge } from "tailwind-merge";
 import { IconInfoCircle } from "@tabler/icons-react";
 import Modal from "../../ui/modal";
 
 export type EducationListItem = {
   id?: string;
+  level?: string;
   title: string;
   description?: string;
 };
@@ -23,15 +25,12 @@ export type EducationCardProps = {
   image: string | StaticImageData;
   data: EducationCardData;
   className?: string;
+  autoOpenList?: boolean;
 };
 
-type OpenPanel = "summary" | "list" | null;
+type OpenPanel = "summary" | "list" | "closed" | null;
 
 function getListItemKey(item: EducationListItem, index: number) {
-  if (typeof item === "string") {
-    return `${item}-${index}`;
-  }
-
   return item.id ?? `${item.title}-${index}`;
 }
 
@@ -41,10 +40,12 @@ export default function EducationCard({
   image,
   data,
   className,
+  autoOpenList = false,
 }: EducationCardProps) {
   const [openPanel, setOpenPanel] = useState<OpenPanel>(null);
   const hasSummary = data.summary.some((item) => item.trim().length > 0);
   const hasList = data.list.length > 0;
+  const visiblePanel = openPanel === null && autoOpenList ? "list" : openPanel;
 
   return (
     <>
@@ -94,12 +95,12 @@ export default function EducationCard({
       </article>
 
       <Modal.Root
-        isOpen={openPanel !== null}
-        setIsOpen={(isOpen) => setOpenPanel(isOpen ? openPanel : null)}
+        isOpen={visiblePanel === "summary" || visiblePanel === "list"}
+        setIsOpen={(isOpen) => setOpenPanel(isOpen ? visiblePanel : "closed")}
       >
         <Modal.Overlay>
           <Modal.Content className="w-[min(100%,600px)] rounded-2xl p-7">
-            {openPanel === "summary" ? (
+            {visiblePanel === "summary" ? (
               <section>
                 <h3 className="mt-1 text-2xl font-semibold tracking-normal">
                   이런걸 배울 수 있어요
@@ -119,7 +120,7 @@ export default function EducationCard({
               </section>
             ) : null}
 
-            {openPanel === "list" ? (
+            {visiblePanel === "list" ? (
               <section>
                 <h3 className="mt-1 text-2xl font-semibold tracking-normal">
                   Level {level} 목록
@@ -138,9 +139,19 @@ export default function EducationCard({
                           </span>
 
                           <div className="min-w-0">
-                            <p className="text-xl">
-                              {typeof item === "string" ? item : item.title}
-                            </p>
+                            {!item.id ? (
+                              <p className="text-xl">{item.title}</p>
+                            ) : (
+                              <Link
+                                href={{
+                                  pathname: `/edu/articles/${item.id}`,
+                                  query: { level: item.level ?? level },
+                                }}
+                                className="block text-xl transition-colors hover:text-[#72327d] focus-visible:ring-2 focus-visible:ring-[#72327d] focus-visible:ring-offset-2 focus-visible:outline-none"
+                              >
+                                {item.title}
+                              </Link>
+                            )}
                           </div>
                         </div>
                       </li>
