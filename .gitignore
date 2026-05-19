@@ -23,6 +23,8 @@
 # misc
 .DS_Store
 *.pem
+AGENTS.md
+/app/(frontend)/_docs/
 
 # debug
 npm-debug.log*

@@ -9,7 +9,20 @@
 * 🟢 You can import this file directly.
 */
 
+export const UserType = {
+  NORMAL: 'NORMAL',
+  AGENT: 'AGENT'
+} as const
+
+export type UserType = (typeof UserType)[keyof typeof UserType]
 
 
-// This file is empty because there are no enums in the schema.
-export {}
+export const InvestmentType = {
+  공격투자형: '공격투자형',
+  적극투자형: '적극투자형',
+  위험중립형: '위험중립형',
+  안정추구형: '안정추구형',
+  안정형: '안정형'
+} as const
+
+export type InvestmentType = (typeof InvestmentType)[keyof typeof InvestmentType]

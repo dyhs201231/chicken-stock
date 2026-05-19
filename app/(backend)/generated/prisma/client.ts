@@ -49,3 +49,8 @@ path.join(process.cwd(), "app/(backend)/generated/prisma/libquery_engine-darwin-
  * 
  */
 export type User = Prisma.UserModel
+/**
+ * Model RefreshToken
+ * 
+ */
+export type RefreshToken = Prisma.RefreshTokenModel
