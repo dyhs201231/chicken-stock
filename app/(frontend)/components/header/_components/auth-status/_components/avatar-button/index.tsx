@@ -5,10 +5,12 @@ import { useGetMyInfo } from "@/app/(frontend)/apis/auth/queries";
 import { Avatar, Popover } from "@/app/(frontend)/components/ui";
 import { IconChevronRight } from "@tabler/icons-react";
 import Link from "next/link";
+import { useState } from "react";
 
 export default function AvatarButton() {
   const { data, isPending } = useGetMyInfo();
   const { mutate: logout, isPending: isLogoutPending } = usePostLogout();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -19,7 +21,11 @@ export default function AvatarButton() {
   }
 
   return (
-    <Popover className="flex items-center">
+    <Popover
+      className="flex items-center"
+      open={menuOpen}
+      onOpenChange={setMenuOpen}
+    >
       <Popover.Trigger className="cursor-pointer">
         <Avatar
           type="header"
@@ -40,7 +46,11 @@ export default function AvatarButton() {
             <p className="text-xl">{data.user.name}</p>
           </div>
 
-          <Link href="/my" className="flex items-center justify-between py-3">
+          <Link
+            href="/my"
+            className="flex items-center justify-between py-3"
+            onNavigate={() => setMenuOpen(false)}
+          >
             <p className="text-xl">마이페이지</p>
 
             <IconChevronRight stroke={2} />
