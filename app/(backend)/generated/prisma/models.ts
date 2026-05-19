@@ -10,5 +10,8 @@
  */
 export type * from './models/User'
 export type * from './models/Article'
+export type * from './models/Quiz'
+export type * from './models/UserQuizSubmission'
 export type * from './models/EducationSummary'
+export type * from './models/UserEducationLevelProgress'
 export type * from './commonInputTypes'
