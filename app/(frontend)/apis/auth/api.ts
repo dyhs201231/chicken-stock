@@ -35,3 +35,11 @@ export async function postLogout() {
 
   return data;
 }
+
+export async function deleteAccount() {
+  const { data } = await requests.delete<{ ok: true }>(
+    "/api/auth/delete-account",
+  );
+
+  return data;
+}
