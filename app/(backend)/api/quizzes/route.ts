@@ -37,10 +37,51 @@ function selectQuizFields() {
     quizType: true,
     question: true,
     description: true,
-    answer: true,
-    explanation: true,
     optionText: true,
   } as const;
+}
+
+type QuizSubmissionRequestBody = {
+  user_id?: unknown;
+  userId?: unknown;
+  quiz_id?: unknown;
+  quizId?: unknown;
+  user_answer?: unknown;
+  userAnswer?: unknown;
+  is_skip?: unknown;
+  isSkip?: unknown;
+};
+
+function parseRequiredPositiveInteger(value: unknown) {
+  if (typeof value !== "number" && typeof value !== "string") {
+    return null;
+  }
+
+  return parsePositiveInteger(String(value));
+}
+
+function parseRequiredPositiveBigInt(value: unknown) {
+  if (typeof value !== "number" && typeof value !== "string") {
+    return null;
+  }
+
+  return parsePositiveBigInt(String(value));
+}
+
+function parseOptionalBoolean(value: unknown) {
+  if (typeof value === "boolean") {
+    return value;
+  }
+
+  if (value === "true") {
+    return true;
+  }
+
+  if (value === "false") {
+    return false;
+  }
+
+  return null;
 }
 
 export async function GET(request: NextRequest) {
@@ -160,6 +201,127 @@ export async function GET(request: NextRequest) {
         : error instanceof Error
         ? error.message
         : "QUIZ_FETCH_FAILED";
+
+    return NextResponse.json({ ok: false, error: message }, { status: 500 });
+  }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = (await request.json()) as QuizSubmissionRequestBody;
+    const userId = parseRequiredPositiveBigInt(body.user_id ?? body.userId);
+    const quizId = parseRequiredPositiveInteger(body.quiz_id ?? body.quizId);
+    const userAnswerValue = body.user_answer ?? body.userAnswer;
+    const isSkipValue = body.is_skip ?? body.isSkip;
+    const hasUserAnswer =
+      typeof userAnswerValue === "string" && userAnswerValue.length > 0;
+    const hasIsSkip = isSkipValue !== undefined && isSkipValue !== null;
+    const isSkip = hasIsSkip ? parseOptionalBoolean(isSkipValue) : false;
+
+    if (!userId || !quizId) {
+      return NextResponse.json(
+        { ok: false, error: "INVALID_QUIZ_SUBMISSION_QUERY" },
+        { status: 400 },
+      );
+    }
+
+    if (!hasUserAnswer && !hasIsSkip) {
+      return NextResponse.json(
+        { ok: false, error: "QUIZ_ANSWER_OR_SKIP_REQUIRED" },
+        { status: 400 },
+      );
+    }
+
+    if (hasIsSkip && isSkip === null) {
+      return NextResponse.json(
+        { ok: false, error: "INVALID_IS_SKIP" },
+        { status: 400 },
+      );
+    }
+
+    if (hasUserAnswer && isSkip === true) {
+      return NextResponse.json(
+        { ok: false, error: "ANSWER_AND_SKIP_CONFLICT" },
+        { status: 400 },
+      );
+    }
+
+    if (!hasUserAnswer && isSkip !== true) {
+      return NextResponse.json(
+        { ok: false, error: "QUIZ_ANSWER_OR_SKIP_REQUIRED" },
+        { status: 400 },
+      );
+    }
+
+    const quiz = await prisma.quiz.findUnique({
+      where: { id: quizId },
+      select: {
+        answer: true,
+        explanation: true,
+      },
+    });
+
+    if (!quiz) {
+      return NextResponse.json(
+        { ok: false, error: "QUIZ_NOT_FOUND" },
+        { status: 404 },
+      );
+    }
+
+    const selectedAnswer = hasUserAnswer ? userAnswerValue : "";
+    const isCorrect = hasUserAnswer && selectedAnswer === quiz.answer;
+    const answeredAt = isCorrect ? new Date() : null;
+
+    const submission = await prisma.userQuizSubmission.upsert({
+      where: {
+        userId_quizId: {
+          userId,
+          quizId,
+        },
+      },
+      create: {
+        userId,
+        quizId,
+        selectedAnswer,
+        isSkip: isSkip ?? false,
+        isCorrect,
+        answeredAt,
+      },
+      update: {
+        selectedAnswer,
+        isSkip: isSkip ?? false,
+        isCorrect,
+        answeredAt,
+      },
+      select: {
+        isCorrect: true,
+        isSkip: true,
+      },
+    });
+
+    if (hasUserAnswer) {
+      return NextResponse.json({
+        ok: true,
+        data: {
+          isCorrect: submission.isCorrect,
+          explanation: quiz.explanation,
+        },
+      });
+    }
+
+    return NextResponse.json({
+      ok: true,
+      data: {
+        isSkip: submission.isSkip,
+      },
+    });
+  } catch (error) {
+    const message =
+      process.env.NODE_ENV === "production"
+        ? "QUIZ_SUBMISSION_FAILED"
+        : error instanceof Error
+        ? error.message
+        : "QUIZ_SUBMISSION_FAILED";
 
     return NextResponse.json({ ok: false, error: message }, { status: 500 });
   }
