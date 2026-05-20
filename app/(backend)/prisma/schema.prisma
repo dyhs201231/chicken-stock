@@ -89,7 +89,7 @@ model UserQuizSubmission {
   selectedAnswer String   @map("selected_answer") @db.Text
   isSkip         Boolean  @map("is_skip")
   isCorrect      Boolean  @map("is_correct")
-  answeredAt     DateTime @map("answered_at")
+  answeredAt     DateTime? @map("answered_at")
   createdAt      DateTime @default(now()) @map("created_at")
   updatedAt      DateTime @updatedAt @map("updated_at")
 

@@ -207,7 +207,7 @@ export type UserQuizSubmissionGroupByOutputType = {
   selectedAnswer: string
   isSkip: boolean
   isCorrect: boolean
-  answeredAt: Date
+  answeredAt: Date | null
   createdAt: Date
   updatedAt: Date
   _count: UserQuizSubmissionCountAggregateOutputType | null
@@ -241,7 +241,7 @@ export type UserQuizSubmissionWhereInput = {
   selectedAnswer?: Prisma.StringFilter<"UserQuizSubmission"> | string
   isSkip?: Prisma.BoolFilter<"UserQuizSubmission"> | boolean
   isCorrect?: Prisma.BoolFilter<"UserQuizSubmission"> | boolean
-  answeredAt?: Prisma.DateTimeFilter<"UserQuizSubmission"> | Date | string
+  answeredAt?: Prisma.DateTimeNullableFilter<"UserQuizSubmission"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"UserQuizSubmission"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"UserQuizSubmission"> | Date | string
   quiz?: Prisma.XOR<Prisma.QuizScalarRelationFilter, Prisma.QuizWhereInput>
@@ -253,7 +253,7 @@ export type UserQuizSubmissionOrderByWithRelationInput = {
   selectedAnswer?: Prisma.SortOrder
   isSkip?: Prisma.SortOrder
   isCorrect?: Prisma.SortOrder
-  answeredAt?: Prisma.SortOrder
+  answeredAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   quiz?: Prisma.QuizOrderByWithRelationInput
@@ -269,7 +269,7 @@ export type UserQuizSubmissionWhereUniqueInput = Prisma.AtLeast<{
   selectedAnswer?: Prisma.StringFilter<"UserQuizSubmission"> | string
   isSkip?: Prisma.BoolFilter<"UserQuizSubmission"> | boolean
   isCorrect?: Prisma.BoolFilter<"UserQuizSubmission"> | boolean
-  answeredAt?: Prisma.DateTimeFilter<"UserQuizSubmission"> | Date | string
+  answeredAt?: Prisma.DateTimeNullableFilter<"UserQuizSubmission"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"UserQuizSubmission"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"UserQuizSubmission"> | Date | string
   quiz?: Prisma.XOR<Prisma.QuizScalarRelationFilter, Prisma.QuizWhereInput>
@@ -281,7 +281,7 @@ export type UserQuizSubmissionOrderByWithAggregationInput = {
   selectedAnswer?: Prisma.SortOrder
   isSkip?: Prisma.SortOrder
   isCorrect?: Prisma.SortOrder
-  answeredAt?: Prisma.SortOrder
+  answeredAt?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.UserQuizSubmissionCountOrderByAggregateInput
@@ -300,7 +300,7 @@ export type UserQuizSubmissionScalarWhereWithAggregatesInput = {
   selectedAnswer?: Prisma.StringWithAggregatesFilter<"UserQuizSubmission"> | string
   isSkip?: Prisma.BoolWithAggregatesFilter<"UserQuizSubmission"> | boolean
   isCorrect?: Prisma.BoolWithAggregatesFilter<"UserQuizSubmission"> | boolean
-  answeredAt?: Prisma.DateTimeWithAggregatesFilter<"UserQuizSubmission"> | Date | string
+  answeredAt?: Prisma.DateTimeNullableWithAggregatesFilter<"UserQuizSubmission"> | Date | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"UserQuizSubmission"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"UserQuizSubmission"> | Date | string
 }
@@ -310,7 +310,7 @@ export type UserQuizSubmissionCreateInput = {
   selectedAnswer: string
   isSkip: boolean
   isCorrect: boolean
-  answeredAt: Date | string
+  answeredAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   quiz: Prisma.QuizCreateNestedOneWithoutSubmissionsInput
@@ -322,7 +322,7 @@ export type UserQuizSubmissionUncheckedCreateInput = {
   selectedAnswer: string
   isSkip: boolean
   isCorrect: boolean
-  answeredAt: Date | string
+  answeredAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -332,7 +332,7 @@ export type UserQuizSubmissionUpdateInput = {
   selectedAnswer?: Prisma.StringFieldUpdateOperationsInput | string
   isSkip?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isCorrect?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  answeredAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  answeredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   quiz?: Prisma.QuizUpdateOneRequiredWithoutSubmissionsNestedInput
@@ -344,7 +344,7 @@ export type UserQuizSubmissionUncheckedUpdateInput = {
   selectedAnswer?: Prisma.StringFieldUpdateOperationsInput | string
   isSkip?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isCorrect?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  answeredAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  answeredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -355,7 +355,7 @@ export type UserQuizSubmissionCreateManyInput = {
   selectedAnswer: string
   isSkip: boolean
   isCorrect: boolean
-  answeredAt: Date | string
+  answeredAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -365,7 +365,7 @@ export type UserQuizSubmissionUpdateManyMutationInput = {
   selectedAnswer?: Prisma.StringFieldUpdateOperationsInput | string
   isSkip?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isCorrect?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  answeredAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  answeredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -376,7 +376,7 @@ export type UserQuizSubmissionUncheckedUpdateManyInput = {
   selectedAnswer?: Prisma.StringFieldUpdateOperationsInput | string
   isSkip?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isCorrect?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  answeredAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  answeredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -485,12 +485,16 @@ export type BoolFieldUpdateOperationsInput = {
   set?: boolean
 }
 
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
+}
+
 export type UserQuizSubmissionCreateWithoutQuizInput = {
   userId: bigint | number
   selectedAnswer: string
   isSkip: boolean
   isCorrect: boolean
-  answeredAt: Date | string
+  answeredAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -500,7 +504,7 @@ export type UserQuizSubmissionUncheckedCreateWithoutQuizInput = {
   selectedAnswer: string
   isSkip: boolean
   isCorrect: boolean
-  answeredAt: Date | string
+  answeredAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -540,7 +544,7 @@ export type UserQuizSubmissionScalarWhereInput = {
   selectedAnswer?: Prisma.StringFilter<"UserQuizSubmission"> | string
   isSkip?: Prisma.BoolFilter<"UserQuizSubmission"> | boolean
   isCorrect?: Prisma.BoolFilter<"UserQuizSubmission"> | boolean
-  answeredAt?: Prisma.DateTimeFilter<"UserQuizSubmission"> | Date | string
+  answeredAt?: Prisma.DateTimeNullableFilter<"UserQuizSubmission"> | Date | string | null
   createdAt?: Prisma.DateTimeFilter<"UserQuizSubmission"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"UserQuizSubmission"> | Date | string
 }
@@ -550,7 +554,7 @@ export type UserQuizSubmissionCreateManyQuizInput = {
   selectedAnswer: string
   isSkip: boolean
   isCorrect: boolean
-  answeredAt: Date | string
+  answeredAt?: Date | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -560,7 +564,7 @@ export type UserQuizSubmissionUpdateWithoutQuizInput = {
   selectedAnswer?: Prisma.StringFieldUpdateOperationsInput | string
   isSkip?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isCorrect?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  answeredAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  answeredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -570,7 +574,7 @@ export type UserQuizSubmissionUncheckedUpdateWithoutQuizInput = {
   selectedAnswer?: Prisma.StringFieldUpdateOperationsInput | string
   isSkip?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isCorrect?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  answeredAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  answeredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -580,7 +584,7 @@ export type UserQuizSubmissionUncheckedUpdateManyWithoutQuizInput = {
   selectedAnswer?: Prisma.StringFieldUpdateOperationsInput | string
   isSkip?: Prisma.BoolFieldUpdateOperationsInput | boolean
   isCorrect?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  answeredAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  answeredAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -656,7 +660,7 @@ export type $UserQuizSubmissionPayload<ExtArgs extends runtime.Types.Extensions.
     selectedAnswer: string
     isSkip: boolean
     isCorrect: boolean
-    answeredAt: Date
+    answeredAt: Date | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["userQuizSubmission"]>
