@@ -153,6 +153,15 @@ export default async function ArticlePage({
             아직 본문이 준비되지 않았어요.
           </p>
         )}
+
+        <div className="mt-16 flex justify-center">
+          <Link
+            href={`/edu/quizzes/${articlesId}`}
+            className="inline-flex min-h-14 items-center justify-center rounded-lg bg-zinc-950 px-10 text-2xl font-semibold text-white transition-colors hover:bg-zinc-800 focus-visible:ring-2 focus-visible:ring-zinc-500 focus-visible:ring-offset-2 focus-visible:outline-none"
+          >
+            퀴즈 풀러 가기
+          </Link>
+        </div>
       </article>
     </main>
   );
