@@ -60,6 +60,7 @@ export async function GET(request: NextRequest) {
           title: true,
           content: true,
           imageUrl: true,
+          sortOrder: true,
           educationSummary: {
             select: {
               stage: true,
@@ -97,6 +98,7 @@ export async function GET(request: NextRequest) {
           select: {
             id: true,
             title: true,
+            sortOrder: true,
           },
         },
       },
