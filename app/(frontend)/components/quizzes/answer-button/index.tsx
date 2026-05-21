@@ -27,13 +27,11 @@ const selectedAnswerButtonVariants: Record<AnswerButtonVariant, string> = {
 
 const trueFalseIconConfig = {
   true: {
-    alt: "O",
     height: 91,
     src: "/icon/quizzes/o.svg",
     width: 91,
   },
   false: {
-    alt: "X",
     height: 78,
     src: "/icon/quizzes/x.svg",
     width: 81,
@@ -41,7 +39,6 @@ const trueFalseIconConfig = {
 } satisfies Record<
   Exclude<AnswerButtonVariant, "default">,
   {
-    alt: string;
     height: number;
     src: string;
     width: number;
@@ -73,7 +70,8 @@ export default function AnswerButton({
         <>
           <span className="sr-only">{children}</span>
           <Image
-            alt={trueFalseIcon.alt}
+            alt=""
+            aria-hidden="true"
             height={trueFalseIcon.height}
             src={trueFalseIcon.src}
             width={trueFalseIcon.width}

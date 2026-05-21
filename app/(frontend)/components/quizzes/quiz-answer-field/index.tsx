@@ -35,9 +35,11 @@ export default function QuizAnswerField({
   }
 
   if (quizType === "TRUE_FALSE") {
+    const trueFalseOptions = optionText.length > 0 ? optionText : ["O", "X"];
+
     return (
       <div className="grid w-full max-w-4xl grid-cols-2 gap-6">
-        {optionText.map((option) => (
+        {trueFalseOptions.map((option) => (
           <AnswerButton
             key={option}
             isSelected={selectedAnswer === option}
