@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import QuizAnswerField, { type QuizType } from "../quiz-answer-field";
 
 export type QuizContentData = {
@@ -15,11 +14,19 @@ export type QuizContentData = {
 
 type QuizContentProps = {
   quiz: QuizContentData;
+  selectedAnswer: string;
+  shortAnswer: string;
+  onSelectAnswer: (answer: string) => void;
+  onShortAnswerChange: (answer: string) => void;
 };
 
-export default function QuizContent({ quiz }: QuizContentProps) {
-  const [shortAnswer, setShortAnswer] = useState("");
-  const [selectedAnswer, setSelectedAnswer] = useState("");
+export default function QuizContent({
+  quiz,
+  selectedAnswer,
+  shortAnswer,
+  onSelectAnswer,
+  onShortAnswerChange,
+}: QuizContentProps) {
   const descriptionLines = quiz.description.split("\n");
 
   return (
@@ -46,8 +53,8 @@ export default function QuizContent({ quiz }: QuizContentProps) {
           quizType={quiz.quizType}
           selectedAnswer={selectedAnswer}
           shortAnswer={shortAnswer}
-          onSelectAnswer={setSelectedAnswer}
-          onShortAnswerChange={setShortAnswer}
+          onSelectAnswer={onSelectAnswer}
+          onShortAnswerChange={onShortAnswerChange}
         />
       </div>
     </>
