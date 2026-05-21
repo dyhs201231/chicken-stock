@@ -1,13 +1,17 @@
 "use client";
 
 import { useArticleQuizzesQuery } from "@/app/(frontend)/apis/quizzes/queries";
-import QuizContent from "../quiz-content";
+import QuizInteraction from "../quiz-interaction";
 
 type QuizContainerProps = {
   articleId: number;
+  userId?: string;
 };
 
-export default function QuizContainer({ articleId }: QuizContainerProps) {
+export default function QuizContainer({
+  articleId,
+  userId,
+}: QuizContainerProps) {
   const {
     data: quizzes = [],
     error,
@@ -44,8 +48,6 @@ export default function QuizContainer({ articleId }: QuizContainerProps) {
   }
 
   return (
-    <section className="mx-auto flex w-full max-w-6xl flex-col rounded-3xl bg-white px-16 py-6 text-black shadow-[0_4px_4px_rgba(0,0,0,0.25)]">
-      <QuizContent key={currentQuiz.id} quiz={currentQuiz} />
-    </section>
+    <QuizInteraction key={currentQuiz.id} quiz={currentQuiz} userId={userId} />
   );
 }

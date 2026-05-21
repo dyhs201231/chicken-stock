@@ -11,6 +11,8 @@ type QuizPageProps = {
   }>;
   searchParams: Promise<{
     level?: string;
+    userId?: string;
+    user_id?: string;
   }>;
 };
 
@@ -45,7 +47,8 @@ export default async function QuizPage({
   searchParams,
 }: QuizPageProps) {
   const { quizId } = await params;
-  const { level } = await searchParams;
+  const { level, userId, user_id } = await searchParams;
+  const currentUserId = userId ?? user_id;
   const { articleHref, articleId, label } = await getQuizArticleContext(
     quizId,
     level,
@@ -66,16 +69,7 @@ export default async function QuizPage({
           Level {label.level} | {label.order}. {label.title}
         </p>
 
-        <QuizContainer articleId={articleId} />
-
-        <div className="mt-8 flex w-full items-center justify-end px-14 text-2xl">
-          <button
-            type="button"
-            className="text-zinc-500 transition hover:text-black"
-          >
-            확인
-          </button>
-        </div>
+        <QuizContainer articleId={articleId} userId={currentUserId} />
       </div>
     </main>
   );

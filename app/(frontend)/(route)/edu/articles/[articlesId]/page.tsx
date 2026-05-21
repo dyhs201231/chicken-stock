@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { IconChevronLeft } from "@tabler/icons-react";
 import { getEducationArticle } from "@/app/(frontend)/apis/edu/queries";
+import { getArticleQuizProgress } from "@/app/(frontend)/apis/quizzes/queries";
 import { getRequestOrigin } from "../../../../lib/server/request";
 import { parseArticleContent } from "../../../../utils/edu/article-content";
 import { isPositiveIntegerString } from "../../../../utils/number";
@@ -13,6 +14,8 @@ type ArticlePageProps = {
   }>;
   searchParams: Promise<{
     level?: string;
+    userId?: string;
+    user_id?: string;
   }>;
 };
 
@@ -21,7 +24,11 @@ export default async function ArticlePage({
   searchParams,
 }: ArticlePageProps) {
   const { articlesId } = await params;
-  const { level } = await searchParams;
+  const { level, userId, user_id } = await searchParams;
+  const currentUserId = userId ?? user_id;
+  const currentUserIdParam = isPositiveIntegerString(currentUserId)
+    ? currentUserId
+    : null;
 
   if (!isPositiveIntegerString(articlesId) || !isPositiveIntegerString(level)) {
     return (
@@ -33,10 +40,11 @@ export default async function ArticlePage({
   }
 
   const articleLevel = level ?? "";
+  const requestOrigin = await getRequestOrigin();
   const article = await getEducationArticle(
     articlesId,
     articleLevel,
-    await getRequestOrigin(),
+    requestOrigin,
   );
 
   if (!article) {
@@ -53,6 +61,13 @@ export default async function ArticlePage({
     contentBlocks[0]?.type === "heading" && contentBlocks[0].level === 1
       ? contentBlocks.slice(1)
       : contentBlocks;
+  const quizProgress = currentUserIdParam
+    ? await getArticleQuizProgress(articlesId, currentUserIdParam, requestOrigin)
+    : null;
+  const isQuizCompleted = quizProgress?.isCorrect === true;
+  const quizLinkQuery = currentUserIdParam
+    ? { level: articleLevel, userId: currentUserIdParam }
+    : { level: articleLevel };
 
   return (
     <main className="relative min-h-[calc(100dvh-74px)] bg-white px-5 pt-36 pb-20 text-zinc-950">
@@ -155,15 +170,25 @@ export default async function ArticlePage({
         )}
 
         <div className="mt-16 flex justify-center">
-          <Link
-            href={{
-              pathname: `/edu/quizzes/${articlesId}`,
-              query: { level: articleLevel },
-            }}
-            className="inline-flex min-h-14 items-center justify-center rounded-lg bg-zinc-950 px-10 text-2xl font-semibold text-white transition-colors hover:bg-zinc-800 focus-visible:ring-2 focus-visible:ring-zinc-500 focus-visible:ring-offset-2 focus-visible:outline-none"
-          >
-            퀴즈 풀러 가기
-          </Link>
+          {isQuizCompleted ? (
+            <button
+              type="button"
+              className="inline-flex min-h-14 cursor-not-allowed items-center justify-center rounded-lg bg-zinc-300 px-10 text-2xl font-semibold text-zinc-500"
+              disabled
+            >
+              퀴즈 완료
+            </button>
+          ) : (
+            <Link
+              href={{
+                pathname: `/edu/quizzes/${articlesId}`,
+                query: quizLinkQuery,
+              }}
+              className="inline-flex min-h-14 items-center justify-center rounded-lg bg-zinc-950 px-10 text-2xl font-semibold text-white transition-colors hover:bg-zinc-800 focus-visible:ring-2 focus-visible:ring-zinc-500 focus-visible:ring-offset-2 focus-visible:outline-none"
+            >
+              퀴즈 풀러 가기
+            </Link>
+          )}
         </div>
       </article>
     </main>
