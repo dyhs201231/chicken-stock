@@ -36,9 +36,11 @@ export type User_type = (typeof User_type)[keyof typeof User_type]
 
 
 export const Investment_type = {
-  CONSERVATIVE: 'CONSERVATIVE',
-  BALANCED: 'BALANCED',
-  AGGRESSIVE: 'AGGRESSIVE'
+  Aggressive: 'Aggressive',
+  Active: 'Active',
+  Balanced: 'Balanced',
+  Conservative: 'Conservative',
+  Stable: 'Stable'
 } as const
 
 export type Investment_type = (typeof Investment_type)[keyof typeof Investment_type]

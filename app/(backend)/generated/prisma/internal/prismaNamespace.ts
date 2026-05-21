@@ -905,6 +905,7 @@ export const UserScalarFieldEnum = {
   email: 'email',
   investmentType: 'investmentType',
   profileImageUrl: 'profileImageUrl',
+  balance: 'balance',
   currentLevel: 'currentLevel',
   currentStep: 'currentStep',
   totalSteps: 'totalSteps',

@@ -28,6 +28,7 @@ export type AggregateUser = {
 
 export type UserAvgAggregateOutputType = {
   id: number | null
+  balance: number | null
   currentLevel: number | null
   currentStep: number | null
   totalSteps: number | null
@@ -35,6 +36,7 @@ export type UserAvgAggregateOutputType = {
 
 export type UserSumAggregateOutputType = {
   id: bigint | null
+  balance: number | null
   currentLevel: number | null
   currentStep: number | null
   totalSteps: number | null
@@ -47,6 +49,7 @@ export type UserMinAggregateOutputType = {
   email: string | null
   investmentType: $Enums.Investment_type | null
   profileImageUrl: string | null
+  balance: number | null
   currentLevel: number | null
   currentStep: number | null
   totalSteps: number | null
@@ -61,6 +64,7 @@ export type UserMaxAggregateOutputType = {
   email: string | null
   investmentType: $Enums.Investment_type | null
   profileImageUrl: string | null
+  balance: number | null
   currentLevel: number | null
   currentStep: number | null
   totalSteps: number | null
@@ -75,6 +79,7 @@ export type UserCountAggregateOutputType = {
   email: number
   investmentType: number
   profileImageUrl: number
+  balance: number
   currentLevel: number
   currentStep: number
   totalSteps: number
@@ -86,6 +91,7 @@ export type UserCountAggregateOutputType = {
 
 export type UserAvgAggregateInputType = {
   id?: true
+  balance?: true
   currentLevel?: true
   currentStep?: true
   totalSteps?: true
@@ -93,6 +99,7 @@ export type UserAvgAggregateInputType = {
 
 export type UserSumAggregateInputType = {
   id?: true
+  balance?: true
   currentLevel?: true
   currentStep?: true
   totalSteps?: true
@@ -105,6 +112,7 @@ export type UserMinAggregateInputType = {
   email?: true
   investmentType?: true
   profileImageUrl?: true
+  balance?: true
   currentLevel?: true
   currentStep?: true
   totalSteps?: true
@@ -119,6 +127,7 @@ export type UserMaxAggregateInputType = {
   email?: true
   investmentType?: true
   profileImageUrl?: true
+  balance?: true
   currentLevel?: true
   currentStep?: true
   totalSteps?: true
@@ -133,6 +142,7 @@ export type UserCountAggregateInputType = {
   email?: true
   investmentType?: true
   profileImageUrl?: true
+  balance?: true
   currentLevel?: true
   currentStep?: true
   totalSteps?: true
@@ -234,6 +244,7 @@ export type UserGroupByOutputType = {
   email: string | null
   investmentType: $Enums.Investment_type | null
   profileImageUrl: string | null
+  balance: number
   currentLevel: number | null
   currentStep: number | null
   totalSteps: number | null
@@ -271,6 +282,7 @@ export type UserWhereInput = {
   email?: Prisma.StringNullableFilter<"User"> | string | null
   investmentType?: Prisma.EnumInvestment_typeNullableFilter<"User"> | $Enums.Investment_type | null
   profileImageUrl?: Prisma.StringNullableFilter<"User"> | string | null
+  balance?: Prisma.IntFilter<"User"> | number
   currentLevel?: Prisma.IntNullableFilter<"User"> | number | null
   currentStep?: Prisma.IntNullableFilter<"User"> | number | null
   totalSteps?: Prisma.IntNullableFilter<"User"> | number | null
@@ -285,6 +297,7 @@ export type UserOrderByWithRelationInput = {
   email?: Prisma.SortOrderInput | Prisma.SortOrder
   investmentType?: Prisma.SortOrderInput | Prisma.SortOrder
   profileImageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  balance?: Prisma.SortOrder
   currentLevel?: Prisma.SortOrderInput | Prisma.SortOrder
   currentStep?: Prisma.SortOrderInput | Prisma.SortOrder
   totalSteps?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -302,6 +315,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   email?: Prisma.StringNullableFilter<"User"> | string | null
   investmentType?: Prisma.EnumInvestment_typeNullableFilter<"User"> | $Enums.Investment_type | null
   profileImageUrl?: Prisma.StringNullableFilter<"User"> | string | null
+  balance?: Prisma.IntFilter<"User"> | number
   currentLevel?: Prisma.IntNullableFilter<"User"> | number | null
   currentStep?: Prisma.IntNullableFilter<"User"> | number | null
   totalSteps?: Prisma.IntNullableFilter<"User"> | number | null
@@ -316,6 +330,7 @@ export type UserOrderByWithAggregationInput = {
   email?: Prisma.SortOrderInput | Prisma.SortOrder
   investmentType?: Prisma.SortOrderInput | Prisma.SortOrder
   profileImageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  balance?: Prisma.SortOrder
   currentLevel?: Prisma.SortOrderInput | Prisma.SortOrder
   currentStep?: Prisma.SortOrderInput | Prisma.SortOrder
   totalSteps?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -338,6 +353,7 @@ export type UserScalarWhereWithAggregatesInput = {
   email?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   investmentType?: Prisma.EnumInvestment_typeNullableWithAggregatesFilter<"User"> | $Enums.Investment_type | null
   profileImageUrl?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  balance?: Prisma.IntWithAggregatesFilter<"User"> | number
   currentLevel?: Prisma.IntNullableWithAggregatesFilter<"User"> | number | null
   currentStep?: Prisma.IntNullableWithAggregatesFilter<"User"> | number | null
   totalSteps?: Prisma.IntNullableWithAggregatesFilter<"User"> | number | null
@@ -352,6 +368,7 @@ export type UserCreateInput = {
   email?: string | null
   investmentType?: $Enums.Investment_type | null
   profileImageUrl?: string | null
+  balance?: number
   currentLevel?: number | null
   currentStep?: number | null
   totalSteps?: number | null
@@ -366,6 +383,7 @@ export type UserUncheckedCreateInput = {
   email?: string | null
   investmentType?: $Enums.Investment_type | null
   profileImageUrl?: string | null
+  balance?: number
   currentLevel?: number | null
   currentStep?: number | null
   totalSteps?: number | null
@@ -380,6 +398,7 @@ export type UserUpdateInput = {
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   investmentType?: Prisma.NullableEnumInvestment_typeFieldUpdateOperationsInput | $Enums.Investment_type | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  balance?: Prisma.IntFieldUpdateOperationsInput | number
   currentLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currentStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   totalSteps?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -394,6 +413,7 @@ export type UserUncheckedUpdateInput = {
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   investmentType?: Prisma.NullableEnumInvestment_typeFieldUpdateOperationsInput | $Enums.Investment_type | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  balance?: Prisma.IntFieldUpdateOperationsInput | number
   currentLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currentStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   totalSteps?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -408,6 +428,7 @@ export type UserCreateManyInput = {
   email?: string | null
   investmentType?: $Enums.Investment_type | null
   profileImageUrl?: string | null
+  balance?: number
   currentLevel?: number | null
   currentStep?: number | null
   totalSteps?: number | null
@@ -422,6 +443,7 @@ export type UserUpdateManyMutationInput = {
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   investmentType?: Prisma.NullableEnumInvestment_typeFieldUpdateOperationsInput | $Enums.Investment_type | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  balance?: Prisma.IntFieldUpdateOperationsInput | number
   currentLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currentStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   totalSteps?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -436,6 +458,7 @@ export type UserUncheckedUpdateManyInput = {
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   investmentType?: Prisma.NullableEnumInvestment_typeFieldUpdateOperationsInput | $Enums.Investment_type | null
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  balance?: Prisma.IntFieldUpdateOperationsInput | number
   currentLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   currentStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   totalSteps?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
@@ -450,6 +473,7 @@ export type UserCountOrderByAggregateInput = {
   email?: Prisma.SortOrder
   investmentType?: Prisma.SortOrder
   profileImageUrl?: Prisma.SortOrder
+  balance?: Prisma.SortOrder
   currentLevel?: Prisma.SortOrder
   currentStep?: Prisma.SortOrder
   totalSteps?: Prisma.SortOrder
@@ -459,6 +483,7 @@ export type UserCountOrderByAggregateInput = {
 
 export type UserAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  balance?: Prisma.SortOrder
   currentLevel?: Prisma.SortOrder
   currentStep?: Prisma.SortOrder
   totalSteps?: Prisma.SortOrder
@@ -471,6 +496,7 @@ export type UserMaxOrderByAggregateInput = {
   email?: Prisma.SortOrder
   investmentType?: Prisma.SortOrder
   profileImageUrl?: Prisma.SortOrder
+  balance?: Prisma.SortOrder
   currentLevel?: Prisma.SortOrder
   currentStep?: Prisma.SortOrder
   totalSteps?: Prisma.SortOrder
@@ -485,6 +511,7 @@ export type UserMinOrderByAggregateInput = {
   email?: Prisma.SortOrder
   investmentType?: Prisma.SortOrder
   profileImageUrl?: Prisma.SortOrder
+  balance?: Prisma.SortOrder
   currentLevel?: Prisma.SortOrder
   currentStep?: Prisma.SortOrder
   totalSteps?: Prisma.SortOrder
@@ -494,6 +521,7 @@ export type UserMinOrderByAggregateInput = {
 
 export type UserSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
+  balance?: Prisma.SortOrder
   currentLevel?: Prisma.SortOrder
   currentStep?: Prisma.SortOrder
   totalSteps?: Prisma.SortOrder
@@ -523,6 +551,14 @@ export type NullableEnumInvestment_typeFieldUpdateOperationsInput = {
   set?: $Enums.Investment_type | null
 }
 
+export type IntFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type NullableIntFieldUpdateOperationsInput = {
   set?: number | null
   increment?: number
@@ -544,6 +580,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   email?: boolean
   investmentType?: boolean
   profileImageUrl?: boolean
+  balance?: boolean
   currentLevel?: boolean
   currentStep?: boolean
   totalSteps?: boolean
@@ -558,6 +595,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   email?: boolean
   investmentType?: boolean
   profileImageUrl?: boolean
+  balance?: boolean
   currentLevel?: boolean
   currentStep?: boolean
   totalSteps?: boolean
@@ -572,6 +610,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   email?: boolean
   investmentType?: boolean
   profileImageUrl?: boolean
+  balance?: boolean
   currentLevel?: boolean
   currentStep?: boolean
   totalSteps?: boolean
@@ -586,6 +625,7 @@ export type UserSelectScalar = {
   email?: boolean
   investmentType?: boolean
   profileImageUrl?: boolean
+  balance?: boolean
   currentLevel?: boolean
   currentStep?: boolean
   totalSteps?: boolean
@@ -593,7 +633,7 @@ export type UserSelectScalar = {
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "type" | "name" | "email" | "investmentType" | "profileImageUrl" | "currentLevel" | "currentStep" | "totalSteps" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "type" | "name" | "email" | "investmentType" | "profileImageUrl" | "balance" | "currentLevel" | "currentStep" | "totalSteps" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "User"
@@ -605,6 +645,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     email: string | null
     investmentType: $Enums.Investment_type | null
     profileImageUrl: string | null
+    balance: number
     currentLevel: number | null
     currentStep: number | null
     totalSteps: number | null
@@ -1039,6 +1080,7 @@ export interface UserFieldRefs {
   readonly email: Prisma.FieldRef<"User", 'String'>
   readonly investmentType: Prisma.FieldRef<"User", 'Investment_type'>
   readonly profileImageUrl: Prisma.FieldRef<"User", 'String'>
+  readonly balance: Prisma.FieldRef<"User", 'Int'>
   readonly currentLevel: Prisma.FieldRef<"User", 'Int'>
   readonly currentStep: Prisma.FieldRef<"User", 'Int'>
   readonly totalSteps: Prisma.FieldRef<"User", 'Int'>

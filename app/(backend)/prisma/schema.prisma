@@ -26,9 +26,11 @@ enum User_type {
 }
 
 enum Investment_type {
-  CONSERVATIVE
-  BALANCED
-  AGGRESSIVE
+  Aggressive
+  Active
+  Balanced
+  Conservative
+  Stable
 }
 
 model User {
@@ -38,6 +40,7 @@ model User {
   email           String?          @db.VarChar(255)
   investmentType  Investment_type? @map("investment_type")
   profileImageUrl String?          @map("profile_image_url") @db.VarChar(2048)
+  balance         Int              @default(0)
   currentLevel    Int?             @map("current_level")
   currentStep     Int?             @map("current_step")
   totalSteps      Int?             @map("total_steps")
