@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import EducationCard from "../../components/edu/education-card";
 import { useEducationSummariesQuery } from "../../apis/edu/queries";
+import EducationCard from "../../components/edu/education-card";
 
 const educationCardStyles = [
   {
@@ -57,6 +57,10 @@ export default function Edu() {
     [educationSummaries],
   );
 
+  const hasEducationCards = educationCards.length > 0;
+  const isEmpty = !isLoading && !isError && !hasEducationCards;
+  const shouldShowCards = !isLoading && !isError && hasEducationCards;
+
   return (
     <main
       className="min-h-[calc(100dvh-74px)] overflow-hidden bg-cover bg-center bg-no-repeat px-5"
@@ -73,15 +77,19 @@ export default function Edu() {
         </div>
 
         <div className="mt-12 flex w-full flex-col items-center gap-8 md:mt-0">
-          {isLoading ? (
+          {isLoading && (
             <p className="mt-3 rounded-lg bg-white/90 px-5 py-4 text-center text-base font-medium text-zinc-700 shadow-sm">
               학습 데이터를 불러오고 있어요.
             </p>
-          ) : isError ? (
+          )}
+
+          {isError && (
             <p className="mt-3 rounded-lg bg-white/90 px-5 py-4 text-center text-base font-medium text-zinc-700 shadow-sm">
               학습 데이터를 불러오지 못했어요. 잠시 후 다시 시도해주세요.
             </p>
-          ) : educationCards.length > 0 ? (
+          )}
+
+          {shouldShowCards &&
             educationCards.map((card) => (
               <EducationCard
                 key={card.level}
@@ -92,8 +100,9 @@ export default function Edu() {
                 className={card.className}
                 autoOpenList={openLevel === card.level}
               />
-            ))
-          ) : (
+            ))}
+
+          {isEmpty && (
             <p className="mt-3 rounded-lg bg-white/90 px-5 py-4 text-center text-base font-medium text-zinc-700 shadow-sm">
               아직 준비된 학습 데이터가 없어요.
             </p>

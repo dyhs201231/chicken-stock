@@ -1,6 +1,7 @@
 export type EducationSummaryArticle = {
   id: number;
   title: string;
+  sortOrder: number;
 };
 
 export type EducationSummary = {
@@ -17,6 +18,7 @@ export type EducationArticle = {
   title: string;
   content: string;
   imageUrl: string;
+  sortOrder: number;
   educationSummary: {
     stage: number;
     title: string;
@@ -74,5 +76,4 @@ export async function fetchEducationArticle(
 
   return result.data;
 }
-
 

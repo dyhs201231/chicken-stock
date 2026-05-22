@@ -94,6 +94,46 @@ export async function GET(request: NextRequest) {
       searchParams.get("userId") ?? searchParams.get("user_id"),
     );
 
+    if (
+      (searchParams.has("articleId") || searchParams.has("article_id")) &&
+      (searchParams.has("userId") || searchParams.has("user_id"))
+    ) {
+      if (!articleId) {
+        return NextResponse.json(
+          { ok: false, error: "INVALID_ARTICLE_ID" },
+          { status: 400 },
+        );
+      }
+
+      if (!userId) {
+        return NextResponse.json(
+          { ok: false, error: "INVALID_USER_ID" },
+          { status: 400 },
+        );
+      }
+
+      const correctSubmission = await prisma.userQuizSubmission.findFirst({
+        where: {
+          userId,
+          isCorrect: true,
+          quiz: {
+            articleId,
+          },
+        },
+        select: {
+          quizId: true,
+        },
+      });
+
+      return NextResponse.json({
+        ok: true,
+        data: {
+          source: "ARTICLE_PROGRESS",
+          isCorrect: Boolean(correctSubmission),
+        },
+      });
+    }
+
     if (searchParams.has("articleId") || searchParams.has("article_id")) {
       if (!articleId) {
         return NextResponse.json(
@@ -303,6 +343,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         ok: true,
         data: {
+          answer: quiz.answer,
           isCorrect: submission.isCorrect,
           explanation: quiz.explanation,
         },
