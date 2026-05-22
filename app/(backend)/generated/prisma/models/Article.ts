@@ -448,6 +448,14 @@ export type ArticleOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type IntFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type ArticleCreateNestedOneWithoutQuizzesInput = {
   create?: Prisma.XOR<Prisma.ArticleCreateWithoutQuizzesInput, Prisma.ArticleUncheckedCreateWithoutQuizzesInput>
   connectOrCreate?: Prisma.ArticleCreateOrConnectWithoutQuizzesInput

@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import QueryProvider from "../components/providers/query-provider";
+import Header from "../components/header";
 
 const atoz = localFont({
   src: [
@@ -74,6 +75,8 @@ export default function RootLayout({
       <body className="flex min-h-full flex-col">
         <QueryProvider>
           <ReactQueryDevtools initialIsOpen={false} />
+
+          <Header />
           {children}
         </QueryProvider>
       </body>
