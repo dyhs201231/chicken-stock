@@ -19,6 +19,8 @@ type ArticlePageProps = {
   }>;
 };
 
+const READING_CHARACTERS_PER_MINUTE = 400;
+
 function getVisibleContentBlocks(
   contentBlocks: ReturnType<typeof parseArticleContent>,
 ) {
@@ -27,6 +29,40 @@ function getVisibleContentBlocks(
   }
 
   return contentBlocks;
+}
+
+function getContentTextLength(
+  contentBlocks: ReturnType<typeof parseArticleContent>,
+) {
+  return contentBlocks.reduce((totalLength, block) => {
+    if (block.type === "list") {
+      return (
+        totalLength +
+        block.items.reduce(
+          (listTextLength, item) =>
+            listTextLength + item.replace(/\s/g, "").length,
+          0,
+        )
+      );
+    }
+
+    if (block.type === "divider") {
+      return totalLength;
+    }
+
+    return totalLength + block.text.replace(/\s/g, "").length;
+  }, 0);
+}
+
+function calculateEstimatedReadingMinutes(
+  contentBlocks: ReturnType<typeof parseArticleContent>,
+) {
+  const contentTextLength = getContentTextLength(contentBlocks);
+
+  return Math.max(
+    1,
+    Math.round(contentTextLength / READING_CHARACTERS_PER_MINUTE),
+  );
 }
 
 function getHeadingClassName(level: number) {
@@ -85,6 +121,8 @@ export default async function ArticlePage({
 
   const contentBlocks = parseArticleContent(article.content);
   const visibleContentBlocks = getVisibleContentBlocks(contentBlocks);
+  const estimatedReadingMinutes =
+    calculateEstimatedReadingMinutes(visibleContentBlocks);
   let quizProgress: Awaited<ReturnType<typeof getArticleQuizProgress>> | null =
     null;
 
@@ -122,6 +160,10 @@ export default async function ArticlePage({
         <h1 className="text-center text-4xl leading-tight font-bold tracking-normal md:text-5xl">
           {article.title}
         </h1>
+
+        <div className="mt-5 text-left text-lg font-semibold text-zinc-500 md:text-xl">
+          예상 읽기 시간 : {estimatedReadingMinutes}분
+        </div>
 
         {article.imageUrl && (
           <div className="relative mx-auto mt-14 h-72 w-full max-w-md overflow-hidden rounded-xl bg-zinc-100">
