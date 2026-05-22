@@ -32,10 +32,6 @@ export async function GET(request: NextRequest) {
       searchParams.has("educationSummaryId")
     ) {
       if (!articleId || (!educationSummaryId && !level)) {
-      searchParams.has("education_summary_id") ||
-      searchParams.has("educationSummaryId")
-    ) {
-      if (!articleId || !educationSummaryId) {
         return NextResponse.json(
           {
             ok: false,
@@ -57,10 +53,6 @@ export async function GET(request: NextRequest) {
                   stage: articleLevel,
                 },
               }),
-      const article = await prisma.article.findFirst({
-        where: {
-          id: articleId,
-          educationSummaryId,
         },
         select: {
           id: true,
@@ -119,8 +111,8 @@ export async function GET(request: NextRequest) {
       process.env.NODE_ENV === "production"
         ? "EDUCATION_CONTENT_FETCH_FAILED"
         : error instanceof Error
-        ? error.message
-        : "EDUCATION_CONTENT_FETCH_FAILED";
+          ? error.message
+          : "EDUCATION_CONTENT_FETCH_FAILED";
 
     return NextResponse.json({ ok: false, error: message }, { status: 500 });
   }
