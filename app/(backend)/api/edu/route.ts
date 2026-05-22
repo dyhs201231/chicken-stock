@@ -32,6 +32,10 @@ export async function GET(request: NextRequest) {
       searchParams.has("educationSummaryId")
     ) {
       if (!articleId || (!educationSummaryId && !level)) {
+      searchParams.has("education_summary_id") ||
+      searchParams.has("educationSummaryId")
+    ) {
+      if (!articleId || !educationSummaryId) {
         return NextResponse.json(
           {
             ok: false,
@@ -53,6 +57,10 @@ export async function GET(request: NextRequest) {
                   stage: articleLevel,
                 },
               }),
+      const article = await prisma.article.findFirst({
+        where: {
+          id: articleId,
+          educationSummaryId,
         },
         select: {
           id: true,
