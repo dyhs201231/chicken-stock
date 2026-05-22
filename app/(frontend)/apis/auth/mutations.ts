@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { postLogout, type MyInfoResponse } from "./api";
+import { deleteAccount, postLogout, type MyInfoResponse } from "./api";
 import { authQueryKeys } from "./queries";
 
 const LOGGED_OUT_MY_INFO: MyInfoResponse = {
@@ -15,5 +15,11 @@ export function usePostLogout() {
     onSuccess: () => {
       queryClient.setQueryData(authQueryKeys.myInfo, LOGGED_OUT_MY_INFO);
     },
+  });
+}
+
+export function useDeleteAccount() {
+  return useMutation({
+    mutationFn: deleteAccount,
   });
 }
