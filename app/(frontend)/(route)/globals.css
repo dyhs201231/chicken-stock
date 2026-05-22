@@ -24,3 +24,46 @@ body {
   color: var(--foreground);
   font-family: var(--font-atoz), Arial, Helvetica, sans-serif;
 }
+
+@utility row {
+  display: flex;
+  flex-direction: row;
+}
+
+@utility col {
+  display: flex;
+  flex-direction: column;
+}
+
+@utility center {
+  align-items: center;
+  justify-content: center;
+}
+
+@utility scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility scrollbar-hide-y {
+  -ms-overflow-style: auto;
+  scrollbar-width: auto;
+
+  &::-webkit-scrollbar:vertical {
+    width: 0;
+  }
+
+  &::-webkit-scrollbar:horizontal {
+    height: 8px;
+  }
+}
+
+/* 
+TODO: 테마 색상 논의 필요
+@theme {
+  --color-custom-gray: #d9d9d9;
+} 
+*/
