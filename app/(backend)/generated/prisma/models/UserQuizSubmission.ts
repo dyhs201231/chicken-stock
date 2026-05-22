@@ -485,10 +485,6 @@ export type BoolFieldUpdateOperationsInput = {
   set?: boolean
 }
 
-export type NullableDateTimeFieldUpdateOperationsInput = {
-  set?: Date | string | null
-}
-
 export type UserQuizSubmissionCreateWithoutQuizInput = {
   userId: bigint | number
   selectedAnswer: string

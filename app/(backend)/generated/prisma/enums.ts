@@ -40,5 +40,12 @@ export const Investment_type = {
   STABLE: "STABLE",
 } as const;
 
-export type Investment_type =
-  (typeof Investment_type)[keyof typeof Investment_type];
+export type InvestmentType = (typeof InvestmentType)[keyof typeof InvestmentType]
+
+
+export const UserType = {
+  NORMAL: 'NORMAL',
+  AGENT: 'AGENT'
+} as const
+
+export type UserType = (typeof UserType)[keyof typeof UserType]

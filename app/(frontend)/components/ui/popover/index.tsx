@@ -39,7 +39,10 @@ type PopoverTriggerProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   ref?: Ref<HTMLButtonElement>;
 };
 
+type PopoverContentAlign = "left" | "center" | "right";
+
 type PopoverContentProps = HTMLAttributes<HTMLDivElement> & {
+  align?: PopoverContentAlign;
   forceMount?: boolean;
   ref?: Ref<HTMLDivElement>;
 };
@@ -57,6 +60,12 @@ type PopoverComponent = typeof Popover & {
 };
 
 const PopoverContext = createContext<PopoverContextValue | null>(null);
+
+const popoverContentAlignClassName: Record<PopoverContentAlign, string> = {
+  left: "left-0",
+  center: "left-1/2 -translate-x-1/2",
+  right: "right-0 left-auto",
+};
 
 function subscribeToHydrationStore() {
   return () => {};
@@ -236,6 +245,7 @@ function PopoverTrigger({
 }
 
 function PopoverContent({
+  align = "left",
   children,
   className = "",
   forceMount = false,
@@ -256,7 +266,8 @@ function PopoverContent({
       ref={ref}
       role="dialog"
       className={twMerge(
-        "absolute top-full left-0 z-10 mt-2 rounded-md border border-zinc-300 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.08)]",
+        "absolute top-full z-10 mt-2 rounded-md border border-zinc-300 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.08)]",
+        popoverContentAlignClassName[align],
         !open ? "hidden" : undefined,
         className,
       )}
