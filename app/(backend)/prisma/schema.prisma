@@ -9,15 +9,15 @@ datasource db {
 }
 
 enum EducationSummaryLabel {
-  BEGINNER
-  INTERMEDIATE
-  ADVANCED
+  BEGINNER // 초급
+  INTERMEDIATE // 중급
+  ADVANCED // 고급
 }
 
 enum Quiz_type {
-  MULTIPLE_CHOICE
-  TRUE_FALSE
-  SHORT_ANSWER
+  MULTIPLE_CHOICE // 객관식
+  TRUE_FALSE // O/X
+  SHORT_ANSWER // 주관식
 }
 
 enum User_type {
@@ -25,12 +25,12 @@ enum User_type {
   AGENT
 }
 
-enum Investment_type {
-  Aggressive
-  Active
-  Balanced
-  Conservative
-  Stable
+enum InvestmentType {
+  AGGRESSIVE   // 공격투자형
+  ACTIVE       // 적극투자형
+  BALANCED     // 위험중립형
+  CONSERVATIVE // 안정추구형
+  STABLE       // 안정형
 }
 
 model User {
