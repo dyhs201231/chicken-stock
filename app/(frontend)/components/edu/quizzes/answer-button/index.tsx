@@ -45,16 +45,21 @@ const trueFalseIconConfig = {
   }
 >;
 
+function getTrueFalseIcon(variant: AnswerButtonVariant) {
+  if (variant === "true" || variant === "false") {
+    return trueFalseIconConfig[variant];
+  }
+
+  return null;
+}
+
 export default function AnswerButton({
   children,
   isSelected,
   variant = "default",
   onClick,
 }: AnswerButtonProps) {
-  const trueFalseIcon =
-    variant === "true" || variant === "false"
-      ? trueFalseIconConfig[variant]
-      : null;
+  const trueFalseIcon = getTrueFalseIcon(variant);
 
   return (
     <button
@@ -62,11 +67,11 @@ export default function AnswerButton({
       className={twMerge(
         "flex items-center transition",
         answerButtonVariants[variant],
-        isSelected ? selectedAnswerButtonVariants[variant] : undefined,
+        isSelected && selectedAnswerButtonVariants[variant],
       )}
       onClick={onClick}
     >
-      {trueFalseIcon ? (
+      {trueFalseIcon && (
         <>
           <span className="sr-only">{children}</span>
           <Image
@@ -77,9 +82,9 @@ export default function AnswerButton({
             width={trueFalseIcon.width}
           />
         </>
-      ) : (
-        children
       )}
+
+      {!trueFalseIcon && children}
     </button>
   );
 }

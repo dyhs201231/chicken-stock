@@ -41,7 +41,7 @@ export default function QuizContent({
           {descriptionLines.map((line, index) => (
             <span key={`${line}-${index}`}>
               {line}
-              {index < descriptionLines.length - 1 ? <br /> : null}
+              {index < descriptionLines.length - 1 && <br />}
             </span>
           ))}
         </p>

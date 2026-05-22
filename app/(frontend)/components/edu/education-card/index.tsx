@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
+import Image, { type StaticImageData } from "next/image";
 import { twMerge } from "tailwind-merge";
 import { IconInfoCircle } from "@tabler/icons-react";
 import Modal from "../../ui/modal";
@@ -34,6 +34,14 @@ function getListItemKey(item: EducationListItem, index: number) {
   return item.id ?? `${item.title}-${index}`;
 }
 
+function getVisiblePanel(openPanel: OpenPanel, autoOpenList: boolean) {
+  if (openPanel === null && autoOpenList) {
+    return "list";
+  }
+
+  return openPanel;
+}
+
 export default function EducationCard({
   level,
   title,
@@ -45,7 +53,18 @@ export default function EducationCard({
   const [openPanel, setOpenPanel] = useState<OpenPanel>(null);
   const hasSummary = data.summary.some((item) => item.trim().length > 0);
   const hasList = data.list.length > 0;
-  const visiblePanel = openPanel === null && autoOpenList ? "list" : openPanel;
+  const visiblePanel = getVisiblePanel(openPanel, autoOpenList);
+  const isSummaryPanelVisible = visiblePanel === "summary";
+  const isListPanelVisible = visiblePanel === "list";
+
+  const handleModalOpenChange = (isOpen: boolean) => {
+    if (isOpen) {
+      setOpenPanel(visiblePanel);
+      return;
+    }
+
+    setOpenPanel("closed");
+  };
 
   return (
     <>
@@ -70,6 +89,7 @@ export default function EducationCard({
             <p className="text-3xl leading-none font-medium tracking-normal">
               Level {level}
             </p>
+            
             <h2 className="mt-1 truncate text-xl leading-6 font-medium tracking-normal">
               {title}
             </h2>
@@ -95,38 +115,40 @@ export default function EducationCard({
       </article>
 
       <Modal.Root
-        isOpen={visiblePanel === "summary" || visiblePanel === "list"}
-        setIsOpen={(isOpen) => setOpenPanel(isOpen ? visiblePanel : "closed")}
+        isOpen={isSummaryPanelVisible || isListPanelVisible}
+        setIsOpen={handleModalOpenChange}
       >
         <Modal.Overlay>
           <Modal.Content className="w-[min(100%,600px)] rounded-2xl p-7">
-            {visiblePanel === "summary" ? (
+            {isSummaryPanelVisible && (
               <section>
                 <h3 className="mt-1 text-2xl font-semibold tracking-normal">
                   이런걸 배울 수 있어요
                 </h3>
 
-                {hasSummary ? (
+                {hasSummary && (
                   <ul className="mt-8 list-disc space-y-5 pl-11 text-xl leading-7">
                     {data.summary.map((item, index) => (
                       <li key={`${item}-${index}`}>{item}</li>
                     ))}
                   </ul>
-                ) : (
+                )}
+
+                {!hasSummary && (
                   <p className="mt-5 rounded-lg bg-zinc-100 px-4 py-5 text-center text-sm text-zinc-500">
                     아직 요약이 준비되지 않았어요.
                   </p>
                 )}
               </section>
-            ) : null}
+            )}
 
-            {visiblePanel === "list" ? (
+            {isListPanelVisible && (
               <section>
                 <h3 className="mt-1 text-2xl font-semibold tracking-normal">
                   Level {level} 목록
                 </h3>
 
-                {hasList ? (
+                {hasList && (
                   <ol className="mt-5 grid">
                     {data.list.map((item, index) => (
                       <li
@@ -139,9 +161,11 @@ export default function EducationCard({
                           </span>
 
                           <div className="min-w-0">
-                            {!item.id ? (
+                            {!item.id && (
                               <p className="text-xl">{item.title}</p>
-                            ) : (
+                            )}
+
+                            {item.id && (
                               <Link
                                 href={{
                                   pathname: `/edu/articles/${item.id}`,
@@ -157,13 +181,15 @@ export default function EducationCard({
                       </li>
                     ))}
                   </ol>
-                ) : (
+                )}
+
+                {!hasList && (
                   <p className="mt-5 rounded-lg bg-zinc-100 px-4 py-5 text-center text-sm text-zinc-500">
                     아직 학습 목록이 준비되지 않았어요.
                   </p>
                 )}
               </section>
-            ) : null}
+            )}
           </Modal.Content>
         </Modal.Overlay>
       </Modal.Root>

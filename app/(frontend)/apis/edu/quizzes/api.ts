@@ -1,4 +1,4 @@
-import type { QuizContentData } from "../../components/quizzes/quiz-content";
+import type { QuizContentData } from "../../../components/edu/quizzes/quiz-content";
 
 export type QuizResponse =
   | {

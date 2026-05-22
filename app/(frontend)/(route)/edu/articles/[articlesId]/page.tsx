@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { IconChevronLeft } from "@tabler/icons-react";
 import { getEducationArticle } from "@/app/(frontend)/apis/edu/queries";
-import { getArticleQuizProgress } from "@/app/(frontend)/apis/quizzes/queries";
+import { getArticleQuizProgress } from "@/app/(frontend)/apis/edu/quizzes/queries";
 import { getRequestOrigin } from "../../../../lib/server/request";
 import { parseArticleContent } from "../../../../utils/edu/article-content";
 import { isPositiveIntegerString } from "../../../../utils/number";
@@ -19,6 +19,28 @@ type ArticlePageProps = {
   }>;
 };
 
+function getVisibleContentBlocks(
+  contentBlocks: ReturnType<typeof parseArticleContent>,
+) {
+  if (contentBlocks[0]?.type === "heading" && contentBlocks[0].level === 1) {
+    return contentBlocks.slice(1);
+  }
+
+  return contentBlocks;
+}
+
+function getHeadingClassName(level: number) {
+  if (level === 1) {
+    return "text-4xl leading-tight font-bold text-zinc-950";
+  }
+
+  if (level === 2) {
+    return "pt-6 text-3xl leading-tight font-bold text-zinc-950";
+  }
+
+  return "pt-3 text-2xl leading-tight font-semibold text-zinc-950";
+}
+
 export default async function ArticlePage({
   params,
   searchParams,
@@ -26,9 +48,14 @@ export default async function ArticlePage({
   const { articlesId } = await params;
   const { level, userId, user_id } = await searchParams;
   const currentUserId = userId ?? user_id;
-  const currentUserIdParam = isPositiveIntegerString(currentUserId)
-    ? currentUserId
-    : null;
+  let currentUserIdParam: string | null = null;
+
+  if (
+    typeof currentUserId === "string" &&
+    isPositiveIntegerString(currentUserId)
+  ) {
+    currentUserIdParam = currentUserId;
+  }
 
   if (!isPositiveIntegerString(articlesId) || !isPositiveIntegerString(level)) {
     return (
@@ -57,17 +84,26 @@ export default async function ArticlePage({
   }
 
   const contentBlocks = parseArticleContent(article.content);
-  const visibleContentBlocks =
-    contentBlocks[0]?.type === "heading" && contentBlocks[0].level === 1
-      ? contentBlocks.slice(1)
-      : contentBlocks;
-  const quizProgress = currentUserIdParam
-    ? await getArticleQuizProgress(articlesId, currentUserIdParam, requestOrigin)
-    : null;
+  const visibleContentBlocks = getVisibleContentBlocks(contentBlocks);
+  let quizProgress: Awaited<ReturnType<typeof getArticleQuizProgress>> | null =
+    null;
+
+  if (currentUserIdParam) {
+    quizProgress = await getArticleQuizProgress(
+      articlesId,
+      currentUserIdParam,
+      requestOrigin,
+    );
+  }
+
   const isQuizCompleted = quizProgress?.isCorrect === true;
-  const quizLinkQuery = currentUserIdParam
-    ? { level: articleLevel, userId: currentUserIdParam }
-    : { level: articleLevel };
+  const quizLinkQuery: { level: string; userId?: string } = {
+    level: articleLevel,
+  };
+
+  if (currentUserIdParam) {
+    quizLinkQuery.userId = currentUserIdParam;
+  }
 
   return (
     <main className="relative min-h-[calc(100dvh-74px)] bg-white px-5 pt-36 pb-20 text-zinc-950">
@@ -87,7 +123,7 @@ export default async function ArticlePage({
           {article.title}
         </h1>
 
-        {article.imageUrl ? (
+        {article.imageUrl && (
           <div className="relative mx-auto mt-14 h-72 w-full max-w-md overflow-hidden rounded-xl bg-zinc-100">
             <Image
               src={article.imageUrl}
@@ -98,18 +134,13 @@ export default async function ArticlePage({
               unoptimized
             />
           </div>
-        ) : null}
+        )}
 
-        {visibleContentBlocks.length > 0 ? (
+        {visibleContentBlocks.length > 0 && (
           <div className="mx-auto mt-14 max-w-4xl space-y-8 text-zinc-950">
             {visibleContentBlocks.map((block, index) => {
               if (block.type === "heading") {
-                const headingClassName =
-                  block.level === 1
-                    ? "text-4xl leading-tight font-bold text-zinc-950"
-                    : block.level === 2
-                      ? "pt-6 text-3xl leading-tight font-bold text-zinc-950"
-                      : "pt-3 text-2xl leading-tight font-semibold text-zinc-950";
+                const headingClassName = getHeadingClassName(block.level);
 
                 const HeadingTag = `h${block.level}` as const;
 
@@ -163,14 +194,16 @@ export default async function ArticlePage({
               );
             })}
           </div>
-        ) : (
+        )}
+
+        {visibleContentBlocks.length === 0 && (
           <p className="mt-8 rounded-lg bg-white px-5 py-6 text-center text-base text-zinc-500 shadow-sm">
             아직 본문이 준비되지 않았어요.
           </p>
         )}
 
         <div className="mt-16 flex justify-center">
-          {isQuizCompleted ? (
+          {isQuizCompleted && (
             <button
               type="button"
               className="inline-flex min-h-14 cursor-not-allowed items-center justify-center rounded-lg bg-zinc-300 px-10 text-2xl font-semibold text-zinc-500"
@@ -178,7 +211,9 @@ export default async function ArticlePage({
             >
               퀴즈 완료
             </button>
-          ) : (
+          )}
+
+          {!isQuizCompleted && (
             <Link
               href={{
                 pathname: `/edu/quizzes/${articlesId}`,

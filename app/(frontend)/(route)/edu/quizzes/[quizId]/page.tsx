@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { IconChevronLeft } from "@tabler/icons-react";
 import { getEducationArticle } from "@/app/(frontend)/apis/edu/queries";
-import QuizContainer from "@/app/(frontend)/components/quizzes/quiz-container";
 import { getRequestOrigin } from "../../../../lib/server/request";
 import { isPositiveIntegerString } from "../../../../utils/number";
+import QuizContainer from "@/app/(frontend)/components/edu/quizzes/quiz-container";
 
 type QuizPageProps = {
   params: Promise<{
@@ -18,25 +18,42 @@ type QuizPageProps = {
 
 async function getQuizArticleContext(quizId: string, level?: string) {
   const parsedArticleId = Number(quizId);
-  const articleId = Number.isNaN(parsedArticleId) ? 1 : parsedArticleId;
-  const levelParam =
-    typeof level === "string" && isPositiveIntegerString(level) ? level : null;
-  const article =
-    isPositiveIntegerString(quizId) && levelParam
-      ? await getEducationArticle(quizId, levelParam, await getRequestOrigin())
-      : null;
+  let articleId = parsedArticleId;
+  let levelParam: string | null = null;
+  let article: Awaited<ReturnType<typeof getEducationArticle>> | null = null;
+
+  if (Number.isNaN(parsedArticleId)) {
+    articleId = 1;
+  }
+
+  if (typeof level === "string" && isPositiveIntegerString(level)) {
+    levelParam = level;
+  }
+
+  if (isPositiveIntegerString(quizId) && levelParam) {
+    article = await getEducationArticle(
+      quizId,
+      levelParam,
+      await getRequestOrigin(),
+    );
+  }
+
+  let articleHref: { pathname: string; query: { level: string } } | string =
+    `/edu/articles/${articleId}`;
+
+  if (levelParam) {
+    articleHref = {
+      pathname: `/edu/articles/${articleId}`,
+      query: { level: levelParam },
+    };
+  }
 
   return {
-    articleHref: levelParam
-      ? {
-          pathname: `/edu/articles/${articleId}`,
-          query: { level: levelParam },
-        }
-      : `/edu/articles/${articleId}`,
+    articleHref,
     articleId,
     label: {
       level: article?.educationSummary.stage ?? levelParam ?? "-",
-      order: article?.sortOrder ?? articleId,
+      id: article?.id,
       title: article?.title ?? "학습 주제",
     },
   };
@@ -66,7 +83,7 @@ export default async function QuizPage({
 
       <div className="mx-auto flex w-full max-w-4xl flex-col gap-16">
         <p className="w-fit bg-amber-300 px-2 py-1 text-left text-xl font-bold text-zinc-950">
-          Level {label.level} | {label.order}. {label.title}
+          Level {label.level} | {label.id}. {label.title}
         </p>
 
         <QuizContainer articleId={articleId} userId={currentUserId} />

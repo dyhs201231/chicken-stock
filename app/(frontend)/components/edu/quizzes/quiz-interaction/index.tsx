@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useSubmitQuizAnswerMutation } from "@/app/(frontend)/apis/quizzes/mutations";
-import Modal from "../../ui/modal";
+import { useSubmitQuizAnswerMutation } from "@/app/(frontend)/apis/edu/quizzes/mutations";
+import Modal from "../../../ui/modal";
 import QuizContent, { type QuizContentData } from "../quiz-content";
 
 type QuizInteractionProps = {
@@ -24,7 +24,27 @@ function getAnswerValue(
   selectedAnswer: string,
   shortAnswer: string,
 ) {
-  return quiz.quizType === "SHORT_ANSWER" ? shortAnswer.trim() : selectedAnswer;
+  if (quiz.quizType === "SHORT_ANSWER") {
+    return shortAnswer.trim();
+  }
+
+  return selectedAnswer;
+}
+
+function getSubmitButtonLabel(
+  isPending: boolean,
+  hasCorrectSubmission: boolean,
+  isAlreadySubmitted: boolean,
+) {
+  if (isPending) {
+    return "확인 중";
+  }
+
+  if (hasCorrectSubmission || isAlreadySubmitted) {
+    return "제출 완료";
+  }
+
+  return "확인";
 }
 
 export default function QuizInteraction({
@@ -81,12 +101,15 @@ export default function QuizInteraction({
           setIsResultModalOpen(true);
         },
         onError: (error) => {
+          let explanation = "잠시 후 다시 시도해 주세요.";
+
+          if (error instanceof Error) {
+            explanation = error.message;
+          }
+
           setSubmissionResult({
             answer: "제출 실패",
-            explanation:
-              error instanceof Error
-                ? error.message
-                : "잠시 후 다시 시도해 주세요.",
+            explanation,
           });
           setIsResultModalOpen(true);
         },
@@ -113,30 +136,27 @@ export default function QuizInteraction({
           disabled={!canSubmit || submitAnswer.isPending}
           onClick={handleSubmit}
         >
-          {submitAnswer.isPending
-            ? "확인 중"
-            : hasCorrectSubmission || isAlreadySubmitted
-              ? "제출 완료"
-              : "확인"}
+          {getSubmitButtonLabel(
+            submitAnswer.isPending,
+            hasCorrectSubmission,
+            isAlreadySubmitted,
+          )}
         </button>
 
-        {!isPositiveIntegerText(userId) ? (
+        {!isPositiveIntegerText(userId) && (
           <p className="text-base font-medium text-rose-600">
             사용자 정보가 없어 답안을 제출할 수 없어요.
           </p>
-        ) : null}
+        )}
       </div>
 
-      <Modal.Root
-        isOpen={isResultModalOpen}
-        setIsOpen={setIsResultModalOpen}
-      >
+      <Modal.Root isOpen={isResultModalOpen} setIsOpen={setIsResultModalOpen}>
         <Modal.Overlay className="p-0">
           <Modal.Content
             closeButtonClassName="right-5 top-5 size-9 text-zinc-300 hover:bg-transparent hover:text-zinc-400"
             className="h-88 w-162.5 max-w-[calc(100vw-32px)] rounded-lg p-10 shadow-none"
           >
-            {submissionResult ? (
+            {submissionResult && (
               <div className="flex h-full flex-col gap-4">
                 <h2 className="text-3xl leading-tight font-bold text-black">
                   정답 : {submissionResult.answer}
@@ -148,7 +168,7 @@ export default function QuizInteraction({
                   </p>
                 </div>
               </div>
-            ) : null}
+            )}
           </Modal.Content>
         </Modal.Overlay>
       </Modal.Root>

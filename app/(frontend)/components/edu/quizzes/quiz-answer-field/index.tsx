@@ -1,4 +1,4 @@
-import Input from "../../ui/input";
+import Input from "../../../ui/input";
 import AnswerButton from "../answer-button";
 
 export type QuizType = "SHORT_ANSWER" | "TRUE_FALSE" | "MULTIPLE_CHOICE";
@@ -11,6 +11,22 @@ type QuizAnswerFieldProps = {
   onSelectAnswer: (answer: string) => void;
   onShortAnswerChange: (answer: string) => void;
 };
+
+function getTrueFalseOptions(optionText: string[]) {
+  if (optionText.length > 0) {
+    return optionText;
+  }
+
+  return ["O", "X"];
+}
+
+function getTrueFalseVariant(option: string): "true" | "false" {
+  if (option === "O") {
+    return "true";
+  }
+
+  return "false";
+}
 
 export default function QuizAnswerField({
   quizType,
@@ -35,7 +51,7 @@ export default function QuizAnswerField({
   }
 
   if (quizType === "TRUE_FALSE") {
-    const trueFalseOptions = optionText.length > 0 ? optionText : ["O", "X"];
+    const trueFalseOptions = getTrueFalseOptions(optionText);
 
     return (
       <div className="grid w-full max-w-4xl grid-cols-2 gap-6">
@@ -43,7 +59,7 @@ export default function QuizAnswerField({
           <AnswerButton
             key={option}
             isSelected={selectedAnswer === option}
-            variant={option === "O" ? "true" : "false"}
+            variant={getTrueFalseVariant(option)}
             onClick={() => onSelectAnswer(option)}
           >
             {option}
