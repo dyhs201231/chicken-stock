@@ -2,7 +2,7 @@
 
 import { IconX } from "@tabler/icons-react";
 import { type KeyboardEvent, useRef, useState } from "react";
-import { Input, Popover, SearchIcon } from "../../../ui";
+import { Input, Popover, SearchIcon } from "../../ui";
 
 const RECENT_SEARCHES_STORAGE_KEY = "chicken-stock:recent-searches";
 const MAX_RECENT_SEARCHES = 10;

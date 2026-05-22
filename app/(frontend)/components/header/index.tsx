@@ -1,7 +1,7 @@
 import Link from "next/link";
-import Logo from "./_components/logo";
-import HeaderSearch from "./_components/header-search";
-import HeaderAuthStatus from "./_components/auth-status";
+import Logo from "../icons/logo";
+import HeaderSearch from "./header-search";
+import HeaderAuthStatus from "./auth-status";
 
 const NAVIGATION = [
   {

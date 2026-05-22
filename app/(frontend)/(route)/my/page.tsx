@@ -1,7 +1,6 @@
-import React from "react";
-import MyInfo from "./_components/my-info";
-import FeesBenefits from "./_components/fees-benefits";
-import DeleteAccount from "./_components/delete-account";
+import MyInfo from "../../components/my/my-info";
+import FeesBenefits from "../../components/my/fees-benefits";
+import DeleteAccount from "../../components/my/delete-account";
 
 export default function MyPage() {
   return (

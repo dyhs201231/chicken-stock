@@ -1,8 +1,8 @@
 "use client";
 
 import { useGetMyInfo } from "@/app/(frontend)/apis/auth/queries";
-import LoginButton from "./_components/login-button";
-import AvatarButton from "./_components/avatar-button";
+import LoginButton from "./login-button";
+import AvatarButton from "./avatar-button";
 
 export default function HeaderAuthStatus() {
   const { data, isPending } = useGetMyInfo();
