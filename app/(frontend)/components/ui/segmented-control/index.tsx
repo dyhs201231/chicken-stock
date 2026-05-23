@@ -14,6 +14,7 @@ import {
 import { twMerge } from "tailwind-merge";
 
 type SegmentedStyle = "panel" | "invertedPanel" | "text";
+
 type SegmentedOption = {
   label: string;
   value: string;
