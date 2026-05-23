@@ -8,8 +8,14 @@ import {
 } from "@/app/(backend)/lib/auth";
 import { rotateAuthSession } from "@/app/(backend)/lib/auth-session";
 import { prisma } from "@/app/(backend)/lib/prisma";
+import {
+  InvestmentType,
+  type InvestmentType as InvestmentTypeValue,
+} from "@/app/(backend)/generated/prisma/enums";
 
 export const runtime = "nodejs";
+
+const investmentTypeValues = new Set<string>(Object.values(InvestmentType));
 
 const userSelect = {
   createdAt: true,
@@ -31,13 +37,21 @@ type UserForMyInfo = {
   currentStep: number | null;
   email: string | null;
   id: bigint;
-  investmentType: string | null;
+  investmentType: InvestmentTypeValue | null;
   name: string;
   profileImageUrl: string | null;
   totalSteps: number | null;
   type: string;
   updatedAt: Date;
 };
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function isInvestmentType(value: unknown): value is InvestmentTypeValue {
+  return typeof value === "string" && investmentTypeValues.has(value);
+}
 
 function serializeUser(user: UserForMyInfo) {
   return {
@@ -98,6 +112,40 @@ async function getUserFromRefreshToken(
   return rotateAuthSession(refreshToken, request);
 }
 
+function getAuthenticatedUserId(request: NextRequest) {
+  const accessToken = request.cookies.get(ACCESS_TOKEN_COOKIE_NAME)?.value;
+
+  if (!accessToken) {
+    return null;
+  }
+
+  try {
+    const payload = verifyAuthToken(accessToken, "access");
+
+    return BigInt(payload.sub);
+  } catch {
+    return null;
+  }
+}
+
+async function getUpdateMyInfoPayload(request: NextRequest) {
+  let body: unknown;
+
+  try {
+    body = await request.json();
+  } catch {
+    return null;
+  }
+
+  if (!isRecord(body) || !isInvestmentType(body.investmentType)) {
+    return null;
+  }
+
+  return {
+    investmentType: body.investmentType,
+  };
+}
+
 export async function GET(request: NextRequest) {
   const accessToken = request.cookies.get(ACCESS_TOKEN_COOKIE_NAME)?.value;
   const refreshToken = request.cookies.get(REFRESH_TOKEN_COOKIE_NAME)?.value;
@@ -128,4 +176,36 @@ export async function GET(request: NextRequest) {
   } catch {
     return createLoggedOutResponse({ clearCookies: shouldClearCookies });
   }
+}
+
+export async function PATCH(request: NextRequest) {
+  const userId = getAuthenticatedUserId(request);
+
+  if (!userId) {
+    return NextResponse.json(
+      { message: "인증이 필요합니다." },
+      { status: 401 },
+    );
+  }
+
+  const payload = await getUpdateMyInfoPayload(request);
+
+  if (!payload) {
+    return NextResponse.json(
+      { message: "유효한 투자 성향이 필요합니다." },
+      { status: 400 },
+    );
+  }
+
+  const user = await prisma.user.update({
+    data: {
+      investmentType: payload.investmentType,
+    },
+    select: userSelect,
+    where: {
+      id: userId,
+    },
+  });
+
+  return createLoggedInResponse(user);
 }
