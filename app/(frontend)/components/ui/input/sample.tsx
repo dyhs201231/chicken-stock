@@ -79,6 +79,7 @@ export default function InputSample() {
             inputClassName="text-center text-xl font-semibold text-zinc-400"
             placeholder="김현수"
             variant="underline"
+            errorMessage="이름을 입력해주세요."
           />
           <label className="text-xl font-semibold" htmlFor="user-phone">
             연락처
@@ -88,6 +89,7 @@ export default function InputSample() {
             inputClassName="text-center text-xl font-semibold text-zinc-400"
             placeholder="010-1234-5678"
             variant="underline"
+            errorMessage="전화번호를 입력해주세요."
           />
         </div>
       </div>

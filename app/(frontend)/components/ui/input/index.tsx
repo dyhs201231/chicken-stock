@@ -1,9 +1,11 @@
-import { InputHTMLAttributes, ReactNode, Ref } from "react";
+import { InputHTMLAttributes, ReactNode, Ref, useId } from "react";
 import { IconSearch } from "@tabler/icons-react";
 import { twMerge } from "tailwind-merge";
 
 type InputVariant = "underline" | "pill" | "box";
+
 type InputSize = "sm" | "md";
+
 type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "size"> & {
   variant?: InputVariant;
   placeholder?: string;
@@ -12,6 +14,7 @@ type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "size"> & {
   focusable?: boolean;
   leftAddon?: ReactNode;
   rightAddon?: ReactNode;
+  errorMessage?: ReactNode;
   size?: InputSize;
   ref?: Ref<HTMLInputElement>;
 };
@@ -49,42 +52,63 @@ export default function Input({
   type = "text",
   leftAddon,
   rightAddon,
+  errorMessage,
   ref,
+  "aria-describedby": ariaDescribedBy,
+  "aria-invalid": ariaInvalid,
   ...props
 }: InputProps) {
+  const errorId = useId();
+  const canShowError = variant === "underline";
+  const showErrorMessage = canShowError && Boolean(errorMessage);
+  const describedBy = showErrorMessage
+    ? [ariaDescribedBy, errorId].filter(Boolean).join(" ")
+    : ariaDescribedBy;
+
   return (
-    <span
-      className={twMerge("relative inline-flex w-full items-center", className)}
-    >
-      {leftAddon ? (
-        <span className="pointer-events-none absolute left-1 text-zinc-400">
-          {leftAddon}
-        </span>
-      ) : null}
+    <span className={twMerge("inline-flex w-full flex-col", className)}>
+      <span className="relative inline-flex w-full items-center">
+        {leftAddon ? (
+          <span className="pointer-events-none absolute left-1 text-zinc-400">
+            {leftAddon}
+          </span>
+        ) : null}
 
-      <input
-        ref={ref}
-        type={type}
-        className={twMerge(
-          "w-full min-w-0 text-zinc-950 transition outline-none placeholder:text-zinc-400 disabled:cursor-not-allowed disabled:bg-zinc-100 disabled:text-zinc-400",
-          type === "number"
-            ? "[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-            : undefined,
-          inputVariants[variant].base,
-          focusable ? inputVariants[variant].focus : undefined,
-          sizeClassName[size],
-          leftAddon ? "pl-7" : undefined,
-          rightAddon ? "pr-8" : undefined,
-          inputClassName,
-        )}
-        {...props}
-      />
+        <input
+          ref={ref}
+          type={type}
+          aria-describedby={describedBy}
+          aria-invalid={showErrorMessage ? true : ariaInvalid}
+          className={twMerge(
+            "w-full min-w-0 text-zinc-950 transition outline-none placeholder:text-zinc-400 disabled:cursor-not-allowed disabled:bg-zinc-100 disabled:text-zinc-400",
+            type === "number"
+              ? "[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+              : undefined,
+            inputVariants[variant].base,
+            focusable ? inputVariants[variant].focus : undefined,
+            sizeClassName[size],
+            leftAddon ? "pl-7" : undefined,
+            rightAddon ? "pr-8" : undefined,
+            inputClassName,
+          )}
+          {...props}
+        />
 
-      {rightAddon ? (
-        <span className="pointer-events-none absolute right-2 text-base font-medium text-zinc-950">
-          {rightAddon}
+        {rightAddon ? (
+          <span className="pointer-events-none absolute right-2 text-base font-medium text-zinc-950">
+            {rightAddon}
+          </span>
+        ) : null}
+      </span>
+
+      {showErrorMessage && (
+        <span
+          id={errorId}
+          className="mt-1 text-center text-sm font-semibold text-red-500"
+        >
+          {errorMessage}
         </span>
-      ) : null}
+      )}
     </span>
   );
 }
