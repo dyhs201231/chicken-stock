@@ -25,14 +25,7 @@ export const Quiz_type = {
 
 export type Quiz_type = (typeof Quiz_type)[keyof typeof Quiz_type];
 
-export const User_type = {
-  NORMAL: "NORMAL",
-  AGENT: "AGENT",
-} as const;
-
-export type User_type = (typeof User_type)[keyof typeof User_type];
-
-export const Investment_type = {
+export const InvestmentType = {
   AGGRESSIVE: "AGGRESSIVE",
   ACTIVE: "ACTIVE",
   BALANCED: "BALANCED",
@@ -40,5 +33,12 @@ export const Investment_type = {
   STABLE: "STABLE",
 } as const;
 
-export type Investment_type =
-  (typeof Investment_type)[keyof typeof Investment_type];
+export type InvestmentType =
+  (typeof InvestmentType)[keyof typeof InvestmentType];
+
+export const UserType = {
+  NORMAL: "NORMAL",
+  AGENT: "AGENT",
+} as const;
+
+export type UserType = (typeof UserType)[keyof typeof UserType];

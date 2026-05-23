@@ -21,26 +21,27 @@ enum Quiz_type {
 }
 
 enum InvestmentType {
-  AGGRESSIVE   // 공격투자형
-  ACTIVE       // 적극투자형
-  BALANCED     // 위험중립형
+  AGGRESSIVE // 공격투자형
+  ACTIVE // 적극투자형
+  BALANCED // 위험중립형
   CONSERVATIVE // 안정추구형
-  STABLE       // 안정형
+  STABLE // 안정형
 }
 
 model User {
-  id              BigInt          @id @default(autoincrement())
-  type            UserType        @default(NORMAL)
-  name            String
-  email           String?         @unique
-  investmentType  InvestmentType? @map("investment_type")
-  profileImageUrl String?         @map("profile_image_url")
-  currentLevel    Int?            @default(1) @map("current_level")
-  currentStep     Int?            @default(1) @map("current_step")
-  totalSteps      Int?            @default(0) @map("total_steps")
-  createdAt       DateTime        @default(now()) @map("created_at")
-  updatedAt       DateTime        @updatedAt @map("updated_at")
-  refreshTokens   RefreshToken[]
+  id                 BigInt                  @id @default(autoincrement())
+  type               UserType                @default(NORMAL)
+  name               String                  @default("") @db.VarChar(255)
+  email              String?                 @unique @db.VarChar(255)
+  investmentType     InvestmentType?         @map("investment_type")
+  profileImageUrl    String?                 @map("profile_image_url") @db.VarChar(2048)
+  currentLevel       Int?                    @map("current_level")
+  currentStep        Int?                    @map("current_step")
+  totalSteps         Int?                    @map("total_steps")
+  createdAt          DateTime                @default(now()) @map("created_at")
+  updatedAt          DateTime                @updatedAt @map("updated_at")
+  refreshTokens      RefreshToken[]
+  articleCompletions UserArticleCompletion[]
 
   @@index([email])
   @@map("User")
@@ -66,6 +67,8 @@ model RefreshToken {
 enum UserType {
   NORMAL
   AGENT
+
+  @@map("User_type")
 }
 
 model Article {
@@ -92,9 +95,9 @@ model Quiz {
   article          Article              @relation(fields: [articleId], references: [id])
   quizType         Quiz_type            @map("quiz_type")
   question         String               @db.VarChar(255)
-  description      String               @db.Text
-  answer           String               @db.Text
-  explanation      String               @db.Text
+  description      String
+  answer           String
+  explanation      String
   optionText       String[]             @map("option_text") @db.VarChar(255)
   createdAt        DateTime             @default(now()) @map("created_at")
   updatedAt        DateTime             @updatedAt @map("updated_at")
@@ -108,7 +111,7 @@ model UserQuizSubmission {
   userId         BigInt    @map("user_id")
   quizId         Int       @map("quiz_id")
   quiz           Quiz      @relation(fields: [quizId], references: [id])
-  selectedAnswer String    @map("selected_answer") @db.Text
+  selectedAnswer String    @map("selected_answer")
   isSkip         Boolean   @map("is_skip")
   isCorrect      Boolean   @map("is_correct")
   answeredAt     DateTime? @map("answered_at")
