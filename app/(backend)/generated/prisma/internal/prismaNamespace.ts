@@ -395,7 +395,8 @@ export const ModelName = {
   Quiz: 'Quiz',
   UserQuizSubmission: 'UserQuizSubmission',
   EducationSummary: 'EducationSummary',
-  UserEducationLevelProgress: 'UserEducationLevelProgress'
+  UserEducationLevelProgress: 'UserEducationLevelProgress',
+  UserArticleCompletion: 'UserArticleCompletion'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -411,7 +412,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "article" | "quiz" | "userQuizSubmission" | "educationSummary" | "userEducationLevelProgress"
+    modelProps: "user" | "article" | "quiz" | "userQuizSubmission" | "educationSummary" | "userEducationLevelProgress" | "userArticleCompletion"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -859,6 +860,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    UserArticleCompletion: {
+      payload: Prisma.$UserArticleCompletionPayload<ExtArgs>
+      fields: Prisma.UserArticleCompletionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.UserArticleCompletionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserArticleCompletionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.UserArticleCompletionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserArticleCompletionPayload>
+        }
+        findFirst: {
+          args: Prisma.UserArticleCompletionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserArticleCompletionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.UserArticleCompletionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserArticleCompletionPayload>
+        }
+        findMany: {
+          args: Prisma.UserArticleCompletionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserArticleCompletionPayload>[]
+        }
+        create: {
+          args: Prisma.UserArticleCompletionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserArticleCompletionPayload>
+        }
+        createMany: {
+          args: Prisma.UserArticleCompletionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.UserArticleCompletionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserArticleCompletionPayload>[]
+        }
+        delete: {
+          args: Prisma.UserArticleCompletionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserArticleCompletionPayload>
+        }
+        update: {
+          args: Prisma.UserArticleCompletionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserArticleCompletionPayload>
+        }
+        deleteMany: {
+          args: Prisma.UserArticleCompletionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.UserArticleCompletionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.UserArticleCompletionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserArticleCompletionPayload>[]
+        }
+        upsert: {
+          args: Prisma.UserArticleCompletionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserArticleCompletionPayload>
+        }
+        aggregate: {
+          args: Prisma.UserArticleCompletionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateUserArticleCompletion>
+        }
+        groupBy: {
+          args: Prisma.UserArticleCompletionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserArticleCompletionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.UserArticleCompletionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserArticleCompletionCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -989,6 +1064,19 @@ export const UserEducationLevelProgressScalarFieldEnum = {
 } as const
 
 export type UserEducationLevelProgressScalarFieldEnum = (typeof UserEducationLevelProgressScalarFieldEnum)[keyof typeof UserEducationLevelProgressScalarFieldEnum]
+
+
+export const UserArticleCompletionScalarFieldEnum = {
+  userId: 'userId',
+  articleId: 'articleId',
+  progressRate: 'progressRate',
+  isCompleted: 'isCompleted',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserArticleCompletionScalarFieldEnum = (typeof UserArticleCompletionScalarFieldEnum)[keyof typeof UserArticleCompletionScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1246,6 +1334,7 @@ export type GlobalOmitConfig = {
   userQuizSubmission?: Prisma.UserQuizSubmissionOmit
   educationSummary?: Prisma.EducationSummaryOmit
   userEducationLevelProgress?: Prisma.UserEducationLevelProgressOmit
+  userArticleCompletion?: Prisma.UserArticleCompletionOmit
 }
 
 /* Types for Logging */

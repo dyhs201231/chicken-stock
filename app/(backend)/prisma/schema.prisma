@@ -25,60 +25,62 @@ enum User_type {
   AGENT
 }
 
-enum InvestmentType {
-  AGGRESSIVE   // 공격투자형
-  ACTIVE       // 적극투자형
-  BALANCED     // 위험중립형
-  CONSERVATIVE // 안정추구형
-  STABLE       // 안정형
+enum Investment_type {
+  Aggressive // 공격투자형
+  Active // 적극투자형
+  Balanced // 위험중립형
+  Conservative // 안정추구형
+  Stable // 안정형
 }
 
 model User {
-  id              BigInt           @id @default(autoincrement())
-  type            User_type        @default(NORMAL)
-  name            String           @default("") @db.VarChar(255)
-  email           String?          @db.VarChar(255)
-  investmentType  Investment_type? @map("investment_type")
-  profileImageUrl String?          @map("profile_image_url") @db.VarChar(2048)
-  balance         Int              @default(0)
-  currentLevel    Int?             @map("current_level")
-  currentStep     Int?             @map("current_step")
-  totalSteps      Int?             @map("total_steps")
-  createdAt       DateTime         @default(now()) @map("created_at")
-  updatedAt       DateTime         @updatedAt @map("updated_at")
+  id                 BigInt                  @id @default(autoincrement())
+  type               User_type               @default(NORMAL)
+  name               String                  @default("") @db.VarChar(255)
+  email              String?                 @db.VarChar(255)
+  investmentType     Investment_type?        @map("investment_type")
+  profileImageUrl    String?                 @map("profile_image_url") @db.VarChar(2048)
+  balance            Int                     @default(0)
+  currentLevel       Int?                    @map("current_level")
+  currentStep        Int?                    @map("current_step")
+  totalSteps         Int?                    @map("total_steps")
+  createdAt          DateTime                @default(now()) @map("created_at")
+  updatedAt          DateTime                @updatedAt @map("updated_at")
+  articleCompletions UserArticleCompletion[]
 
   @@index([email])
 }
 
 model Article {
-  id                 Int              @id @default(autoincrement())
-  educationSummaryId Int              @map("education_summary_id")
-  educationSummary   EducationSummary @relation(fields: [educationSummaryId], references: [id])
+  id                 Int                     @id @default(autoincrement())
+  educationSummaryId Int                     @map("education_summary_id")
+  educationSummary   EducationSummary        @relation(fields: [educationSummaryId], references: [id])
   quizzes            Quiz[]
   title              String
   content            String
-  imageUrl           String           @map("image_url")
-  sortOrder          Int              @default(0) @map("sort_order")
-  createdAt          DateTime         @default(now()) @map("created_at")
-  updatedAt          DateTime         @updatedAt @map("updated_at")
+  imageUrl           String                  @map("image_url")
+  sortOrder          Int                     @default(0) @map("sort_order")
+  createdAt          DateTime                @default(now()) @map("created_at")
+  updatedAt          DateTime                @updatedAt @map("updated_at")
+  completions        UserArticleCompletion[]
 
   @@index([educationSummaryId])
 }
 
 model Quiz {
-  id               Int              @id @default(autoincrement())
-  educationLevelId Int              @map("education_level_id")
-  educationLevel   EducationSummary @relation(fields: [educationLevelId], references: [stage])
-  articleId        Int              @map("article_id")
-  article          Article          @relation(fields: [articleId], references: [id])
-  quizType         Quiz_type        @map("quiz_type")
-  question         String           @db.VarChar(255)
-  description      String           @db.Text
-  answer           String           @db.Text
-  explanation      String           @db.Text
-  optionText       String[]         @map("option_text") @db.VarChar(255)
-  createdAt        DateTime         @default(now()) @map("created_at")
-  updatedAt        DateTime         @updatedAt @map("updated_at")
+  id               Int                  @id @default(autoincrement())
+  educationLevelId Int                  @map("education_level_id")
+  educationLevel   EducationSummary     @relation(fields: [educationLevelId], references: [stage])
+  articleId        Int                  @map("article_id")
+  article          Article              @relation(fields: [articleId], references: [id])
+  quizType         Quiz_type            @map("quiz_type")
+  question         String               @db.VarChar(255)
+  description      String               @db.Text
+  answer           String               @db.Text
+  explanation      String               @db.Text
+  optionText       String[]             @map("option_text") @db.VarChar(255)
+  createdAt        DateTime             @default(now()) @map("created_at")
+  updatedAt        DateTime             @updatedAt @map("updated_at")
   submissions      UserQuizSubmission[]
 
   @@index([educationLevelId])
@@ -86,29 +88,29 @@ model Quiz {
 }
 
 model UserQuizSubmission {
-  userId         BigInt   @map("user_id")
-  quizId         Int      @map("quiz_id")
-  quiz           Quiz     @relation(fields: [quizId], references: [id])
-  selectedAnswer String   @map("selected_answer") @db.Text
-  isSkip         Boolean  @map("is_skip")
-  isCorrect      Boolean  @map("is_correct")
+  userId         BigInt    @map("user_id")
+  quizId         Int       @map("quiz_id")
+  quiz           Quiz      @relation(fields: [quizId], references: [id])
+  selectedAnswer String    @map("selected_answer") @db.Text
+  isSkip         Boolean   @map("is_skip")
+  isCorrect      Boolean   @map("is_correct")
   answeredAt     DateTime? @map("answered_at")
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
 
   @@id([userId, quizId])
   @@map("User_quiz_submission")
 }
 
 model EducationSummary {
-  id        Int                   @id @default(autoincrement())
-  stage     Int                   @unique
+  id        Int                          @id @default(autoincrement())
+  stage     Int                          @unique
   label     EducationSummaryLabel
-  title     String                @default("")
-  imageUrl  String                @map("image_url")
+  title     String                       @default("")
+  imageUrl  String                       @map("image_url")
   summary   String[]
-  createdAt DateTime              @default(now()) @map("created_at")
-  updatedAt DateTime              @updatedAt @map("updated_at")
+  createdAt DateTime                     @default(now()) @map("created_at")
+  updatedAt DateTime                     @updatedAt @map("updated_at")
   articles  Article[]
   quizzes   Quiz[]
   progress  UserEducationLevelProgress[]
@@ -131,4 +133,19 @@ model UserEducationLevelProgress {
 
   @@id([userId, educationLevelId])
   @@map("User_education_level_progress")
+}
+
+model UserArticleCompletion {
+  userId       BigInt    @map("user_id")
+  articleId    Int       @map("article_id")
+  user         User      @relation(fields: [userId], references: [id])
+  article      Article   @relation(fields: [articleId], references: [id])
+  progressRate Int       @default(0) @map("progress_rate")
+  isCompleted  Boolean   @default(false) @map("is_completed")
+  completedAt  DateTime? @map("completed_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  @@id([userId, articleId])
+  @@map("User_article_completion")
 }

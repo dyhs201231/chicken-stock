@@ -47,3 +47,8 @@ export type EducationSummary = Prisma.EducationSummaryModel
  * 
  */
 export type UserEducationLevelProgress = Prisma.UserEducationLevelProgressModel
+/**
+ * Model UserArticleCompletion
+ * 
+ */
+export type UserArticleCompletion = Prisma.UserArticleCompletionModel

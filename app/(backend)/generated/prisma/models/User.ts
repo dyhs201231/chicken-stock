@@ -288,6 +288,7 @@ export type UserWhereInput = {
   totalSteps?: Prisma.IntNullableFilter<"User"> | number | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
+  articleCompletions?: Prisma.UserArticleCompletionListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -303,6 +304,7 @@ export type UserOrderByWithRelationInput = {
   totalSteps?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  articleCompletions?: Prisma.UserArticleCompletionOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -321,6 +323,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   totalSteps?: Prisma.IntNullableFilter<"User"> | number | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
+  articleCompletions?: Prisma.UserArticleCompletionListRelationFilter
 }, "id">
 
 export type UserOrderByWithAggregationInput = {
@@ -374,6 +377,7 @@ export type UserCreateInput = {
   totalSteps?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  articleCompletions?: Prisma.UserArticleCompletionCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -389,6 +393,7 @@ export type UserUncheckedCreateInput = {
   totalSteps?: number | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  articleCompletions?: Prisma.UserArticleCompletionUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -404,6 +409,7 @@ export type UserUpdateInput = {
   totalSteps?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  articleCompletions?: Prisma.UserArticleCompletionUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -419,6 +425,7 @@ export type UserUncheckedUpdateInput = {
   totalSteps?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  articleCompletions?: Prisma.UserArticleCompletionUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -527,6 +534,11 @@ export type UserSumOrderByAggregateInput = {
   totalSteps?: Prisma.SortOrder
 }
 
+export type UserScalarRelationFilter = {
+  is?: Prisma.UserWhereInput
+  isNot?: Prisma.UserWhereInput
+}
+
 export type BigIntFieldUpdateOperationsInput = {
   set?: bigint | number
   increment?: bigint | number
@@ -571,6 +583,125 @@ export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }
 
+export type UserCreateNestedOneWithoutArticleCompletionsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutArticleCompletionsInput, Prisma.UserUncheckedCreateWithoutArticleCompletionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutArticleCompletionsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutArticleCompletionsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutArticleCompletionsInput, Prisma.UserUncheckedCreateWithoutArticleCompletionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutArticleCompletionsInput
+  upsert?: Prisma.UserUpsertWithoutArticleCompletionsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutArticleCompletionsInput, Prisma.UserUpdateWithoutArticleCompletionsInput>, Prisma.UserUncheckedUpdateWithoutArticleCompletionsInput>
+}
+
+export type UserCreateWithoutArticleCompletionsInput = {
+  id?: bigint | number
+  type?: $Enums.User_type
+  name?: string
+  email?: string | null
+  investmentType?: $Enums.Investment_type | null
+  profileImageUrl?: string | null
+  balance?: number
+  currentLevel?: number | null
+  currentStep?: number | null
+  totalSteps?: number | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type UserUncheckedCreateWithoutArticleCompletionsInput = {
+  id?: bigint | number
+  type?: $Enums.User_type
+  name?: string
+  email?: string | null
+  investmentType?: $Enums.Investment_type | null
+  profileImageUrl?: string | null
+  balance?: number
+  currentLevel?: number | null
+  currentStep?: number | null
+  totalSteps?: number | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type UserCreateOrConnectWithoutArticleCompletionsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutArticleCompletionsInput, Prisma.UserUncheckedCreateWithoutArticleCompletionsInput>
+}
+
+export type UserUpsertWithoutArticleCompletionsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutArticleCompletionsInput, Prisma.UserUncheckedUpdateWithoutArticleCompletionsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutArticleCompletionsInput, Prisma.UserUncheckedCreateWithoutArticleCompletionsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutArticleCompletionsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutArticleCompletionsInput, Prisma.UserUncheckedUpdateWithoutArticleCompletionsInput>
+}
+
+export type UserUpdateWithoutArticleCompletionsInput = {
+  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  type?: Prisma.EnumUser_typeFieldUpdateOperationsInput | $Enums.User_type
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  investmentType?: Prisma.NullableEnumInvestment_typeFieldUpdateOperationsInput | $Enums.Investment_type | null
+  profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  balance?: Prisma.IntFieldUpdateOperationsInput | number
+  currentLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  currentStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  totalSteps?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type UserUncheckedUpdateWithoutArticleCompletionsInput = {
+  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  type?: Prisma.EnumUser_typeFieldUpdateOperationsInput | $Enums.User_type
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  investmentType?: Prisma.NullableEnumInvestment_typeFieldUpdateOperationsInput | $Enums.Investment_type | null
+  profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  balance?: Prisma.IntFieldUpdateOperationsInput | number
+  currentLevel?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  currentStep?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  totalSteps?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+
+/**
+ * Count Type UserCountOutputType
+ */
+
+export type UserCountOutputType = {
+  articleCompletions: number
+}
+
+export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  articleCompletions?: boolean | UserCountOutputTypeCountArticleCompletionsArgs
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserCountOutputType
+   */
+  select?: Prisma.UserCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountArticleCompletionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.UserArticleCompletionWhereInput
+}
 
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -586,6 +717,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   totalSteps?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  articleCompletions?: boolean | Prisma.User$articleCompletionsArgs<ExtArgs>
+  _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -634,10 +767,18 @@ export type UserSelectScalar = {
 }
 
 export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "type" | "name" | "email" | "investmentType" | "profileImageUrl" | "balance" | "currentLevel" | "currentStep" | "totalSteps" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  articleCompletions?: boolean | Prisma.User$articleCompletionsArgs<ExtArgs>
+  _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
+}
+export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
 
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "User"
-  objects: {}
+  objects: {
+    articleCompletions: Prisma.$UserArticleCompletionPayload<ExtArgs>[]
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: bigint
     type: $Enums.User_type
@@ -1045,6 +1186,7 @@ readonly fields: UserFieldRefs;
  */
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  articleCompletions<T extends Prisma.User$articleCompletionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$articleCompletionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserArticleCompletionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1103,6 +1245,10 @@ export type UserFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Internal
    */
   omit?: Prisma.UserOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  /**
    * Filter, which User to fetch.
    */
   where: Prisma.UserWhereUniqueInput
@@ -1121,6 +1267,10 @@ export type UserFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extensions.I
    */
   omit?: Prisma.UserOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  /**
    * Filter, which User to fetch.
    */
   where: Prisma.UserWhereUniqueInput
@@ -1138,6 +1288,10 @@ export type UserFindFirstArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Omit specific fields from the User
    */
   omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
   /**
    * Filter, which User to fetch.
    */
@@ -1187,6 +1341,10 @@ export type UserFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions.In
    */
   omit?: Prisma.UserOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  /**
    * Filter, which User to fetch.
    */
   where?: Prisma.UserWhereInput
@@ -1235,6 +1393,10 @@ export type UserFindManyArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
    */
   omit?: Prisma.UserOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  /**
    * Filter, which Users to fetch.
    */
   where?: Prisma.UserWhereInput
@@ -1277,6 +1439,10 @@ export type UserCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    * Omit specific fields from the User
    */
   omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
   /**
    * The data needed to create a User.
    */
@@ -1325,6 +1491,10 @@ export type UserUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    * Omit specific fields from the User
    */
   omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
   /**
    * The data needed to update a User.
    */
@@ -1392,6 +1562,10 @@ export type UserUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    */
   omit?: Prisma.UserOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  /**
    * The filter to search for the User to update in case it exists.
    */
   where: Prisma.UserWhereUniqueInput
@@ -1418,6 +1592,10 @@ export type UserDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
    */
   omit?: Prisma.UserOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  /**
    * Filter which User to delete.
    */
   where: Prisma.UserWhereUniqueInput
@@ -1438,6 +1616,30 @@ export type UserDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
 }
 
 /**
+ * User.articleCompletions
+ */
+export type User$articleCompletionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserArticleCompletion
+   */
+  select?: Prisma.UserArticleCompletionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the UserArticleCompletion
+   */
+  omit?: Prisma.UserArticleCompletionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserArticleCompletionInclude<ExtArgs> | null
+  where?: Prisma.UserArticleCompletionWhereInput
+  orderBy?: Prisma.UserArticleCompletionOrderByWithRelationInput | Prisma.UserArticleCompletionOrderByWithRelationInput[]
+  cursor?: Prisma.UserArticleCompletionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.UserArticleCompletionScalarFieldEnum | Prisma.UserArticleCompletionScalarFieldEnum[]
+}
+
+/**
  * User without action
  */
 export type UserDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1449,4 +1651,8 @@ export type UserDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
    * Omit specific fields from the User
    */
   omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
 }
