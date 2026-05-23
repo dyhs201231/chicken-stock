@@ -397,6 +397,8 @@ export const ModelName = {
   UserQuizSubmission: 'UserQuizSubmission',
   EducationSummary: 'EducationSummary',
   UserEducationLevelProgress: 'UserEducationLevelProgress',
+  UserArticleCompletion: 'UserArticleCompletion',
+  UserEducationLevelProgress: 'UserEducationLevelProgress',
   UserArticleCompletion: 'UserArticleCompletion'
 } as const
 
