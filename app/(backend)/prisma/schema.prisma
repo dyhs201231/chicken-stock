@@ -20,11 +20,6 @@ enum Quiz_type {
   SHORT_ANSWER // 주관식
 }
 
-enum User_type {
-  NORMAL
-  AGENT
-}
-
 enum InvestmentType {
   AGGRESSIVE   // 공격투자형
   ACTIVE       // 적극투자형
@@ -40,7 +35,6 @@ model User {
   email           String?         @unique
   investmentType  InvestmentType? @map("investment_type")
   profileImageUrl String?         @map("profile_image_url")
-  balance         Int             @default(0)
   currentLevel    Int?            @default(1) @map("current_level")
   currentStep     Int?            @default(1) @map("current_step")
   totalSteps      Int?            @default(0) @map("total_steps")
