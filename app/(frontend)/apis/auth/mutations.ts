@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteAccount, postLogout, type MyInfoResponse } from "./api";
 import { authQueryKeys } from "./queries";
+import { deleteAccount, MyInfoResponse, postLogout } from "./api";
 
 const LOGGED_OUT_MY_INFO: MyInfoResponse = {
   isLoggedIn: false,

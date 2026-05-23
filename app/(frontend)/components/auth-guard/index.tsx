@@ -1,6 +1,6 @@
 import { authCheck } from "@/app/(frontend)/lib/auth-check";
 import type { ReactNode } from "react";
-import AuthRequiredRedirect from "./_components/auth-required-redirect";
+import AuthRequiredRedirect from "./auth-required-redirect";
 
 type AuthGuardProps = {
   children: ReactNode;
