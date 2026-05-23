@@ -2,7 +2,13 @@ import { Button, Select } from "@/app/(frontend)/components/ui";
 import { INVESTMENT_SELECTS } from "@/app/(frontend)/constants/portfolio";
 import { usePortfolioStore } from "@/app/(frontend)/stores/portfolio";
 import type { InvestmentField } from "@/app/(frontend)/types/portfolio";
+import { useState } from "react";
 import { isInvestmentTypeSurveyComplete } from "../../../../../lib/classify-investment-type";
+
+const SELECT_TRIGGER_CLASS_NAME =
+  "h-8 rounded-[10px] border-2 border-[#D9D9D9] px-4  shadow-none hover:border-zinc-300 focus-visible:border-zinc-400 focus-visible:ring-0 [&_svg]:size-7 [&_svg]:text-[#C6C6C6]";
+const SELECT_TRIGGER_ERROR_CLASS_NAME =
+  "border-red-500 bg-red-50 hover:border-red-500 focus-visible:border-red-500";
 
 export default function InvestmentTypeCheck() {
   const {
@@ -11,6 +17,7 @@ export default function InvestmentTypeCheck() {
     createAccountInfo,
     setCreateAccountInfo,
   } = usePortfolioStore();
+  const [isValidationRequested, setIsValidationRequested] = useState(false);
 
   const handleValueChange = (field: InvestmentField, value: string) => {
     setCreateAccountInfo({
@@ -19,8 +26,15 @@ export default function InvestmentTypeCheck() {
     });
   };
 
-  const isNextButtonDisabled =
-    !isInvestmentTypeSurveyComplete(createAccountInfo);
+  const handleNextButtonClick = () => {
+    setIsValidationRequested(true);
+
+    if (!isInvestmentTypeSurveyComplete(createAccountInfo)) {
+      return;
+    }
+
+    setStep(step + 1);
+  };
 
   return (
     <>
@@ -37,7 +51,14 @@ export default function InvestmentTypeCheck() {
             <Select
               id={id}
               className="w-[200px]"
-              triggerClassName="h-8 rounded-[10px] border-2 border-[#D9D9D9] px-4  shadow-none hover:border-zinc-300 focus-visible:border-zinc-400 focus-visible:ring-0 [&_svg]:size-7 [&_svg]:text-[#C6C6C6]"
+              aria-invalid={
+                isValidationRequested && !createAccountInfo[field].trim()
+              }
+              triggerClassName={`${SELECT_TRIGGER_CLASS_NAME} ${
+                isValidationRequested && !createAccountInfo[field].trim()
+                  ? SELECT_TRIGGER_ERROR_CLASS_NAME
+                  : ""
+              }`}
               contentClassName="rounded-[10px] border-2 border-[#D9D9D9] py-1 shadow-[0_8px_24px_rgba(0,0,0,0.08)]"
               optionClassName="min-h-11 px-4 text-base"
               options={options}
@@ -53,11 +74,7 @@ export default function InvestmentTypeCheck() {
           이전
         </Button>
 
-        <Button
-          disabled={isNextButtonDisabled}
-          variant="step-controls"
-          onClick={() => setStep(step + 1)}
-        >
+        <Button variant="step-controls" onClick={handleNextButtonClick}>
           다음
         </Button>
       </div>

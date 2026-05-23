@@ -1,7 +1,9 @@
 import { Button, Input } from "@/app/(frontend)/components/ui";
 import formatPhoneNumber from "@/app/(frontend)/lib/format-phone-number";
 import { usePortfolioStore } from "@/app/(frontend)/stores/portfolio";
-import { ChangeEvent } from "react";
+import { ChangeEvent, useState } from "react";
+
+const PHONE_NUMBER_PATTERN = /^\d{3}-\d{4}-\d{4}$/;
 
 export default function PersonalInfo() {
   const {
@@ -10,19 +12,53 @@ export default function PersonalInfo() {
     createAccountInfo,
     setCreateAccountInfo,
   } = usePortfolioStore();
+  const [nameErrorMessage, setNameErrorMessage] = useState("");
+  const [phoneNumberErrorMessage, setPhoneNumberErrorMessage] = useState("");
 
   const handleNameChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const name = event.target.value;
+
     setCreateAccountInfo({
       ...createAccountInfo,
-      name: event.target.value,
+      name,
     });
+
+    if (name.trim()) {
+      setNameErrorMessage("");
+    }
   };
 
   const handlePhoneNumberChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const phoneNumber = formatPhoneNumber(event.target.value);
+
     setCreateAccountInfo({
       ...createAccountInfo,
-      phoneNumber: formatPhoneNumber(event.target.value),
+      phoneNumber,
     });
+
+    if (PHONE_NUMBER_PATTERN.test(phoneNumber)) {
+      setPhoneNumberErrorMessage("");
+    }
+  };
+
+  const handleNextButtonClick = () => {
+    const nameError = createAccountInfo.name.trim()
+      ? ""
+      : "이름은 빈문자열일 수 없습니다.";
+    const phoneNumberError = PHONE_NUMBER_PATTERN.test(
+      createAccountInfo.phoneNumber,
+    )
+      ? ""
+      : "휴대번호는 000-0000-0000 양식이어야 합니다.";
+
+    setNameErrorMessage(nameError);
+    setPhoneNumberErrorMessage(phoneNumberError);
+
+    if (nameError || phoneNumberError) {
+      return;
+    }
+
+    setStep(step + 1);
   };
 
   return (
@@ -40,6 +76,7 @@ export default function PersonalInfo() {
             onChange={handleNameChange}
             placeholder="김현수"
             variant="underline"
+            errorMessage={nameErrorMessage}
           />
         </div>
 
@@ -58,16 +95,13 @@ export default function PersonalInfo() {
             value={createAccountInfo.phoneNumber}
             onChange={handlePhoneNumberChange}
             variant="underline"
+            errorMessage={phoneNumberErrorMessage}
           />
         </div>
       </div>
 
       <div className="row justify-end gap-3">
-        {/* <Button variant="step-controls" onClick={() => setStep(step - 1)}>
-          이전
-        </Button> */}
-
-        <Button variant="step-controls" onClick={() => setStep(step + 1)}>
+        <Button variant="step-controls" onClick={handleNextButtonClick}>
           다음
         </Button>
       </div>
