@@ -3,9 +3,23 @@ import StockListRow from "../stock-list-row";
 
 type StockListTableProps = {
   stocks: StockData[];
+  selectedRanking: string;
 };
 
-export default function StockListTable({ stocks }: StockListTableProps) {
+function getRankingLabel(selectedRanking: string) {
+  if (selectedRanking === "tradingVolume") {
+    return "거래량 순";
+  }
+
+  return "거래대금 순";
+}
+
+export default function StockListTable({
+  stocks,
+  selectedRanking,
+}: StockListTableProps) {
+  const rankingLabel = getRankingLabel(selectedRanking);
+
   return (
     <>
       <div className="grid grid-cols-[2.5rem_3.25rem_minmax(16rem,1fr)_12rem_minmax(8rem,1fr)_10rem_12rem] items-center gap-4 border-b border-zinc-100 pb-3 text-sm text-zinc-400">
@@ -19,7 +33,7 @@ export default function StockListTable({ stocks }: StockListTableProps) {
           등락률
         </span>
         <span className="col-start-7 flex h-4 items-center justify-end leading-none">
-          거래대금 순
+          {rankingLabel}
         </span>
       </div>
 
@@ -32,7 +46,7 @@ export default function StockListTable({ stocks }: StockListTableProps) {
       {stocks.length > 0 && (
         <ol>
           {stocks.map((stock) => (
-            <StockListRow key={stock.rank} stock={stock} />
+            <StockListRow key={stock.id} stock={stock} />
           ))}
         </ol>
       )}
