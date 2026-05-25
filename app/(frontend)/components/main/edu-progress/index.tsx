@@ -1,17 +1,15 @@
+"use client";
+
 import Image from "next/image";
+import { useMemo } from "react";
+import { useGetMyInfo } from "../../../apis/auth/queries";
+import { useEducationSummariesQuery } from "../../../apis/edu/queries";
 
-// TODO: 추후 실제 데이터로 변경 예정
-const DUMMY_USER_LEVEL = 1;
-const DUMMY_PROGRESS_RATE = 55;
+function clampProgressRate(progressRate: number) {
+  return Math.min(100, Math.max(0, progressRate));
+}
 
-function getCharacterImages(level: number) {
-  if (level === 1) {
-    return {
-      nest: "/images/main/nest.svg",
-      egg: "/images/main/egg.svg",
-    };
-  }
-
+function getCharacterImages() {
   return {
     nest: "/images/main/nest.svg",
     egg: "/images/main/egg.svg",
@@ -19,7 +17,37 @@ function getCharacterImages(level: number) {
 }
 
 export default function EduProgress() {
-  const characterImages = getCharacterImages(DUMMY_USER_LEVEL);
+  const characterImages = getCharacterImages();
+  const { data: myInfo, isLoading: isMyInfoLoading } = useGetMyInfo();
+  const isLoggedIn = myInfo?.isLoggedIn === true;
+  const userId = isLoggedIn ? myInfo.user.id : null;
+  const userLevel = isLoggedIn ? myInfo.user.currentLevel : null;
+
+  const { data: educationSummaries = [], isLoading: isEducationLoading } =
+    useEducationSummariesQuery(userId);
+
+  const progressRate = useMemo(() => {
+    const articles = educationSummaries.flatMap((summary) => summary.articles);
+
+    if (articles.length === 0) {
+      return 0;
+    }
+
+    const totalProgressRate = articles.reduce(
+      (total, article) => total + clampProgressRate(article.progressRate),
+      0,
+    );
+
+    return Math.floor(totalProgressRate / articles.length);
+  }, [educationSummaries]);
+
+  const guestBubbleText =
+    !isMyInfoLoading && !isLoggedIn && "가입하고 주식 공부를 시작해보세요!";
+
+  const progressBubbleText =
+    isLoggedIn && !isEducationLoading && `진행중 ${progressRate}%`;
+
+  const bubbleText = guestBubbleText || progressBubbleText || null;
 
   return (
     <section className="w-full">
@@ -51,7 +79,7 @@ export default function EduProgress() {
 
             <Image
               src={characterImages.egg}
-              alt={`Level ${DUMMY_USER_LEVEL} 학습 캐릭터`}
+              alt={userLevel ? `Level ${userLevel} 학습 캐릭터` : "학습 캐릭터"}
               width={119}
               height={145}
               className="absolute bottom-12 left-1/2 w-28 -translate-x-1/2 md:bottom-16 md:w-40"
@@ -60,20 +88,22 @@ export default function EduProgress() {
           </div>
         </div>
 
-        <div className="absolute top-[13%] left-[60%] h-28 w-36 md:h-32 md:w-44">
-          <Image
-            src="/images/main/speech_bubble.png"
-            alt=""
-            fill
-            sizes="176px"
-            className="object-contain"
-            unoptimized
-          />
+        {bubbleText && (
+          <div className="absolute top-[13%] left-[60%] h-28 w-36 md:h-32 md:w-44">
+            <Image
+              src="/images/main/speech_bubble.png"
+              alt=""
+              fill
+              sizes="176px"
+              className="object-contain"
+              unoptimized
+            />
 
-          <p className="absolute top-[45%] left-1/2 -translate-x-1/2 -translate-y-1/2 text-base font-semibold whitespace-nowrap text-zinc-950 md:text-base">
-            진행중 {DUMMY_PROGRESS_RATE}%
-          </p>
-        </div>
+            <p className="absolute top-[45%] left-1/2 w-[76%] -translate-x-1/2 -translate-y-1/2 text-center text-xs leading-snug font-semibold text-zinc-950 md:text-sm">
+              {bubbleText}
+            </p>
+          </div>
+        )}
       </div>
     </section>
   );

@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { useSearchParams } from "next/navigation";
+import { useGetMyInfo } from "../../../apis/auth/queries";
 import { useEducationSummariesQuery } from "../../../apis/edu/queries";
 import EducationCard from "../education-card";
 
@@ -26,13 +27,16 @@ const educationCardStyles = [
 export default function EduContent() {
   const searchParams = useSearchParams();
   const openLevel = searchParams.get("openLevel");
+  const searchParamUserId =
+    searchParams.get("userId") ?? searchParams.get("user_id");
+  const { data: myInfo, isLoading: isMyInfoLoading } = useGetMyInfo();
   const userId =
-    searchParams.get("userId") ?? searchParams.get("user_id") ?? "1";
+    searchParamUserId ?? (myInfo?.isLoggedIn ? myInfo.user.id : null);
 
   const {
     data: educationSummaries = [],
     isError,
-    isLoading,
+    isLoading: isEducationLoading,
   } = useEducationSummariesQuery(userId);
 
   const educationCards = useMemo(
@@ -58,6 +62,7 @@ export default function EduContent() {
     [educationSummaries, userId],
   );
 
+  const isLoading = isMyInfoLoading || isEducationLoading;
   const hasEducationCards = educationCards.length > 0;
   const isEmpty = !isLoading && !isError && !hasEducationCards;
   const shouldShowCards = !isLoading && !isError && hasEducationCards;
