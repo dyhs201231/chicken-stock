@@ -1,5 +1,5 @@
-import type { QuizContentData } from "../../../components/edu/quizzes/quiz-content";
 import { requests } from "../../request";
+import type { QuizContentData } from "../../../components/edu/quizzes/quiz-content";
 
 export type QuizResponse =
   | {

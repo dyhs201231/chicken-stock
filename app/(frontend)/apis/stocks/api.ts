@@ -1,5 +1,5 @@
-import type { StockData } from "../../components/main/stock_list/types";
 import { requests } from "../request";
+import type { StockData } from "../../components/main/stock_list/types";
 
 type StocksResponse =
   | {
