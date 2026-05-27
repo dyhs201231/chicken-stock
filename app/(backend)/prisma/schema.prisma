@@ -280,6 +280,122 @@ model UserArticleCompletion {
   @@map("User_article_completion")
 }
 
+enum TradeOrderType {
+  BUY  @map("매수")
+  SELL @map("매도")
+
+  @@map("Trade_order_type")
+}
+
+enum TradeOrderStatus {
+  PENDING
+  COMPLETED
+  CANCELED
+
+  @@map("Trade_order_status")
+}
+
+enum OrderBookSide {
+  ASK @map("매도")
+  BID @map("매수")
+
+  @@map("Order_book_side")
+}
+
+enum CurrencyCode {
+  KRW
+  USD
+
+  @@map("Currency_code")
+}
+
+enum DividendStatus {
+  EXPECTED @map("expected")
+  PENDING  @map("pending")
+  RECEIVED @map("received")
+
+  @@map("Dividend_status")
+}
+
+enum TransactionType {
+  BUY        @map("buy")
+  SELL       @map("sell")
+  EXCHANGE   @map("exchange")
+  DEPOSIT    @map("deposit")
+  WITHDRAWAL @map("withdrawal")
+  DIVIDEND   @map("dividend")
+
+  @@map("Transaction_type")
+}
+
+enum AgentType {
+  AGGRESSIVE
+  CONSERVATIVE
+  MOMENTUM
+  VALUE
+  FX_FOCUSED
+
+  @@map("Agent_type")
+}
+
+enum TradeFrequency {
+  LOW
+  MEDIUM
+  HIGH
+
+  @@map("Trade_frequency")
+}
+
+enum StockSector {
+  TECH
+  BIO
+  FINANCE
+  CONSUMER
+
+  @@map("Stock_sector")
+}
+
+enum StockRiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+
+  @@map("Stock_risk_level")
+}
+
+enum StockTheme {
+  AI
+  SEMICONDUCTOR
+  BIO
+  CONTENT
+  BANK
+
+  @@map("Stock_theme")
+}
+
+enum StockMarketStatus {
+  LISTED
+  IPO
+  PRE_LISTING
+
+  @@map("Stock_market_status")
+}
+
+enum StatementType {
+  INCOME_STATEMENT
+  BALANCE_SHEET
+  CASH_FLOW
+
+  @@map("Statement_type")
+}
+
+enum PeriodType {
+  ANNUAL
+  QUARTER
+
+  @@map("Period_type")
+}
+
 model Agent {
   userId           BigInt             @id @map("user_id")
   agentType        AgentType          @map("agent_type")
@@ -448,8 +564,59 @@ model Stock {
   dividendEvents           DividendEvent[]
   candles                  StockCandle[]
   orderBookSnapshots       OrderBookSnapshot[]
+  financialMetric          StockFinancialMetric?
+  financialStatements      StockFinancialStatement[]
+  earnings                 StockEarning[]
 
   @@map("Stock")
+}
+
+model StockFinancialMetric {
+  id                    String   @id @default(cuid()) @db.VarChar(255)
+  stockId               Int      @unique @map("stock_id")
+  stock                 Stock    @relation(fields: [stockId], references: [id], onDelete: Cascade)
+  debtRatio             Float?   @map("debt_ratio")
+  currentRatio          Float?   @map("current_ratio")
+  interestCoverageRatio Float?   @map("interest_coverage_ratio")
+  per                   Float?
+  pbr                   Float?
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  @@map("Stock_financial_metric")
+}
+
+model StockFinancialStatement {
+  id            String        @id @default(cuid()) @db.VarChar(255)
+  stockId       Int           @map("stock_id")
+  stock         Stock         @relation(fields: [stockId], references: [id], onDelete: Cascade)
+  statementType StatementType @map("statement_type")
+  periodType    PeriodType    @map("period_type")
+  fiscalYear    Int           @map("fiscal_year")
+  fiscalQuarter Int?          @map("fiscal_quarter")
+  data          Json
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+
+  @@unique([stockId, statementType, periodType, fiscalYear, fiscalQuarter], map: "Stock_financial_statement_stock_id_statement_type_period_type_f")
+  @@map("Stock_financial_statement")
+}
+
+model StockEarning {
+  id                       String     @id @default(cuid()) @db.VarChar(255)
+  stockId                  Int        @map("stock_id")
+  stock                    Stock      @relation(fields: [stockId], references: [id], onDelete: Cascade)
+  announcementDate         DateTime?  @map("announcement_date")
+  periodType               PeriodType @map("period_type")
+  fiscalYear               Int        @map("fiscal_year")
+  fiscalQuarter            Int?       @map("fiscal_quarter")
+  estimatedRevenue         BigInt?    @map("estimated_revenue")
+  estimatedOperatingProfit BigInt?    @map("estimated_operating_profit")
+  createdAt                DateTime   @default(now()) @map("created_at")
+  updatedAt                DateTime   @updatedAt @map("updated_at")
+
+  @@unique([stockId, periodType, fiscalYear, fiscalQuarter], map: "Stock_earning_stock_id_period_type_fiscal_year_fiscal_quarter_k")
+  @@map("Stock_earning")
 }
 
 model TradeOrder {
