@@ -23,8 +23,12 @@ export default function ValuationChart({ data, metric }: ValuationChartProps) {
   const stroke = metric === "PER" ? "#cf54c7" : "#5ed6bb";
 
   return (
-    <div className="h-52 w-full">
-      <ResponsiveContainer height="100%" width="100%">
+    <div className="h-52 min-w-0 w-full">
+      <ResponsiveContainer
+        height="100%"
+        initialDimension={{ width: 1, height: 208 }}
+        width="100%"
+      >
         <BarChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
           <CartesianGrid stroke="#e4e4e7" />
           <XAxis

@@ -19,8 +19,12 @@ type EarningsChartProps = {
 
 export default function EarningsChart({ data }: EarningsChartProps) {
   return (
-    <div className="h-48 w-full">
-      <ResponsiveContainer height="100%" width="100%">
+    <div className="h-48 min-w-0 w-full">
+      <ResponsiveContainer
+        height="100%"
+        initialDimension={{ width: 1, height: 192 }}
+        width="100%"
+      >
         <BarChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
           <CartesianGrid stroke="#d4d4d8" vertical={false} />
           <XAxis
