@@ -137,7 +137,13 @@ export default function StockDetail({ stock, activeTab }: StockDetailProps) {
         </div>
       )}
 
-      {activeTab === "portfolio-info" && <InfoPanel stock={stock} />}
+      {activeTab === "portfolio-info" && (
+        <div className="grid grid-cols-[minmax(0,1fr)_20rem_20rem] gap-7">
+          <InfoPanel stock={stock} />
+          <OrderBookPanel stock={stock} />
+          <OrderPanel stock={stock} />
+        </div>
+      )}
     </main>
   );
 }

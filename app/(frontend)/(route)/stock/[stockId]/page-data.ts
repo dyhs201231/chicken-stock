@@ -1,5 +1,8 @@
 import { prisma } from "../../../../(backend)/lib/prisma";
-import type { StockDetailData } from "../../../types/stock/stock-detail";
+import type {
+  StockDetailData,
+  StockFinancialStatementData,
+} from "../../../types/stock/stock-detail";
 
 type DecimalLike = {
   toNumber: () => number;
@@ -7,6 +10,20 @@ type DecimalLike = {
 
 function toNumber(value: DecimalLike) {
   return value.toNumber();
+}
+
+function bigintToNullableNumber(value: bigint | null) {
+  return value === null ? null : Number(value);
+}
+
+function toStatementData(
+  value: unknown,
+): StockFinancialStatementData["data"] {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return {};
+  }
+
+  return value as StockFinancialStatementData["data"];
 }
 
 export async function getStockDetailData(
@@ -40,6 +57,30 @@ export async function getStockDetailData(
             ],
           },
         },
+      },
+      financialMetric: true,
+      financialStatements: {
+        orderBy: [
+          {
+            fiscalYear: "desc",
+          },
+          {
+            fiscalQuarter: "desc",
+          },
+          {
+            statementType: "asc",
+          },
+        ],
+      },
+      earnings: {
+        orderBy: [
+          {
+            fiscalYear: "desc",
+          },
+          {
+            fiscalQuarter: "desc",
+          },
+        ],
       },
     },
   });
@@ -108,5 +149,33 @@ export async function getStockDetailData(
           })),
         }
       : null,
+    financialMetric: stock.financialMetric
+      ? {
+          debtRatio: stock.financialMetric.debtRatio,
+          currentRatio: stock.financialMetric.currentRatio,
+          interestCoverageRatio: stock.financialMetric.interestCoverageRatio,
+          per: stock.financialMetric.per,
+          pbr: stock.financialMetric.pbr,
+        }
+      : null,
+    financialStatements: stock.financialStatements.map((statement) => ({
+      id: statement.id,
+      statementType: statement.statementType,
+      periodType: statement.periodType,
+      fiscalYear: statement.fiscalYear,
+      fiscalQuarter: statement.fiscalQuarter,
+      data: toStatementData(statement.data),
+    })),
+    earnings: stock.earnings.map((earning) => ({
+      id: earning.id,
+      announcementDate: earning.announcementDate?.toISOString() ?? null,
+      periodType: earning.periodType,
+      fiscalYear: earning.fiscalYear,
+      fiscalQuarter: earning.fiscalQuarter,
+      estimatedRevenue: bigintToNullableNumber(earning.estimatedRevenue),
+      estimatedOperatingProfit: bigintToNullableNumber(
+        earning.estimatedOperatingProfit,
+      ),
+    })),
   };
 }

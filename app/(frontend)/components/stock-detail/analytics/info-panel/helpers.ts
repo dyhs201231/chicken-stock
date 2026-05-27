@@ -1,0 +1,241 @@
+import type {
+  StockDetailData,
+  StockEarningData,
+  StockFinancialStatementData,
+} from "../../../../types/stock/stock-detail";
+import type {
+  ChartDatum,
+  EarningPeriodTab,
+  FinancialStatementTab,
+  FinancialTableRow,
+  ValuationMetricTab,
+} from "./types";
+
+const statementRows: Record<
+  FinancialStatementTab,
+  { key: string; label: string; type?: "money" | "percent" | "multiple" }[]
+> = {
+  INCOME_STATEMENT: [
+    { key: "revenue", label: "매출액", type: "money" },
+    { key: "operatingProfit", label: "영업이익", type: "money" },
+    { key: "netIncome", label: "당기순이익", type: "money" },
+    { key: "eps", label: "EPS" },
+    { key: "operatingMargin", label: "영업이익률", type: "percent" },
+    { key: "netMargin", label: "순이익률", type: "percent" },
+  ],
+  BALANCE_SHEET: [
+    { key: "assets", label: "자산총계", type: "money" },
+    { key: "liabilities", label: "부채총계", type: "money" },
+    { key: "equity", label: "자본총계", type: "money" },
+    { key: "currentAssets", label: "유동자산", type: "money" },
+    { key: "currentLiabilities", label: "유동부채", type: "money" },
+    { key: "debtRatio", label: "부채비율", type: "percent" },
+    { key: "currentRatio", label: "유동비율", type: "percent" },
+    { key: "pbr", label: "PBR", type: "multiple" },
+  ],
+  CASH_FLOW: [
+    { key: "operatingCashFlow", label: "영업활동현금흐름", type: "money" },
+    { key: "capitalExpenditure", label: "투자지출", type: "money" },
+    { key: "freeCashFlow", label: "잉여현금흐름", type: "money" },
+    { key: "interestCoverageRatio", label: "이자보상비율", type: "multiple" },
+  ],
+};
+
+function getNumber(value: unknown) {
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+function formatStatementValue(
+  value: unknown,
+  type?: "money" | "percent" | "multiple",
+) {
+  const numberValue = getNumber(value);
+
+  if (numberValue === null) {
+    return "-";
+  }
+
+  if (type === "money") {
+    return formatCompactMoney(numberValue);
+  }
+
+  if (type === "percent") {
+    return formatMetricValue(numberValue);
+  }
+
+  if (type === "multiple") {
+    return formatMultiple(numberValue);
+  }
+
+  return numberValue.toLocaleString("ko-KR", {
+    maximumFractionDigits: 2,
+  });
+}
+
+export const sectionLabels = {
+  financial: "재무",
+  earnings: "실적",
+  valuation: "가치평가",
+} as const;
+
+export const statementLabels: Record<FinancialStatementTab, string> = {
+  INCOME_STATEMENT: "손익계산서",
+  BALANCE_SHEET: "재무상태표",
+  CASH_FLOW: "현금흐름표",
+};
+
+export const periodLabels: Record<EarningPeriodTab, string> = {
+  ANNUAL: "연간",
+  QUARTER: "분기",
+};
+
+export const valuationLabels: Record<ValuationMetricTab, string> = {
+  PER: "PER",
+  PBR: "PBR",
+};
+
+export function formatCompactMoney(value: number | null | undefined) {
+  if (value === null || value === undefined || Number.isNaN(value)) {
+    return "-";
+  }
+
+  const absValue = Math.abs(value);
+
+  if (absValue >= 1_0000_0000_0000) {
+    const jo = Math.trunc(value / 1_0000_0000_0000);
+    const eok = Math.round((value % 1_0000_0000_0000) / 100_000_000);
+
+    return eok > 0 ? `${jo}조 ${eok.toLocaleString("ko-KR")}억원` : `${jo}조원`;
+  }
+
+  if (absValue >= 100_000_000) {
+    return `${Math.round(value / 100_000_000).toLocaleString("ko-KR")}억`;
+  }
+
+  return value.toLocaleString("ko-KR");
+}
+
+export function formatMetricValue(value: number | null | undefined) {
+  if (value === null || value === undefined || Number.isNaN(value)) {
+    return "-";
+  }
+
+  return `${value.toLocaleString("ko-KR", {
+    maximumFractionDigits: 2,
+  })}%`;
+}
+
+export function formatMultiple(value: number | null | undefined) {
+  if (value === null || value === undefined || Number.isNaN(value)) {
+    return "-";
+  }
+
+  return `${value.toLocaleString("ko-KR", {
+    maximumFractionDigits: 2,
+  })}배`;
+}
+
+export function getPeriodLabel(
+  statement: Pick<
+    StockFinancialStatementData | StockEarningData,
+    "periodType" | "fiscalYear" | "fiscalQuarter"
+  >,
+) {
+  if (statement.periodType === "QUARTER" && statement.fiscalQuarter) {
+    return `${String(statement.fiscalYear).slice(2)}년 ${statement.fiscalQuarter}Q`;
+  }
+
+  return `${statement.fiscalYear}`;
+}
+
+export function getFinancialTableRows(
+  statements: StockFinancialStatementData[],
+  statementType: FinancialStatementTab,
+): { columns: string[]; rows: FinancialTableRow[] } {
+  const scopedStatements = statements
+    .filter((statement) => statement.statementType === statementType)
+    .sort((a, b) => {
+      if (a.periodType !== b.periodType) {
+        return a.periodType === "ANNUAL" ? -1 : 1;
+      }
+
+      if (a.fiscalYear !== b.fiscalYear) {
+        return a.fiscalYear - b.fiscalYear;
+      }
+
+      return (a.fiscalQuarter ?? 0) - (b.fiscalQuarter ?? 0);
+    })
+    .slice(-4);
+
+  const columns = scopedStatements.map(getPeriodLabel);
+  const rows = statementRows[statementType].map((row) => ({
+    item: row.label,
+    values: Object.fromEntries(
+      scopedStatements.map((statement) => [
+        getPeriodLabel(statement),
+        formatStatementValue(statement.data[row.key], row.type),
+      ]),
+    ),
+  }));
+
+  return { columns, rows };
+}
+
+export function getLatestEarning(stock: StockDetailData) {
+  return [...stock.earnings].sort((a, b) => {
+    if (a.periodType !== b.periodType) {
+      return a.periodType === "ANNUAL" ? -1 : 1;
+    }
+
+    if (a.fiscalYear !== b.fiscalYear) {
+      return b.fiscalYear - a.fiscalYear;
+    }
+
+    return (b.fiscalQuarter ?? 0) - (a.fiscalQuarter ?? 0);
+  })[0];
+}
+
+export function getEarningChartData(
+  earnings: StockEarningData[],
+  periodType: EarningPeriodTab,
+): ChartDatum[] {
+  return earnings
+    .filter((earning) => earning.periodType === periodType)
+    .sort((a, b) => {
+      if (a.fiscalYear !== b.fiscalYear) {
+        return a.fiscalYear - b.fiscalYear;
+      }
+
+      return (a.fiscalQuarter ?? 0) - (b.fiscalQuarter ?? 0);
+    })
+    .slice(-6)
+    .map((earning) => ({
+      label: getPeriodLabel(earning),
+      revenue: earning.estimatedRevenue ?? 0,
+      operatingProfit: earning.estimatedOperatingProfit ?? 0,
+    }));
+}
+
+export function getValuationChartData(stock: StockDetailData): ChartDatum[] {
+  const per = stock.financialMetric?.per ?? stock.per;
+  const pbr = stock.financialMetric?.pbr ?? null;
+  const trendFactor = stock.marketStatus === "LISTED" ? 0.92 : 1.08;
+
+  return [
+    {
+      label: "최근 1년",
+      per: Number((per * trendFactor).toFixed(2)),
+      pbr: pbr === null ? undefined : Number((pbr * trendFactor).toFixed(2)),
+    },
+    {
+      label: stock.marketStatus === "LISTED" ? "현재" : "상장 예정",
+      per: Number(per.toFixed(2)),
+      pbr: pbr === null ? undefined : Number(pbr.toFixed(2)),
+    },
+    {
+      label: "2027(예상)",
+      per: Number((per * 0.86).toFixed(2)),
+      pbr: pbr === null ? undefined : Number((pbr * 0.9).toFixed(2)),
+    },
+  ];
+}

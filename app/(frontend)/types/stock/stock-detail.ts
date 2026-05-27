@@ -29,6 +29,40 @@ export type StockOrderBookSnapshotData = {
   levels: StockOrderBookLevelData[];
 };
 
+export type StockFinancialMetricData = {
+  debtRatio: number | null;
+  currentRatio: number | null;
+  interestCoverageRatio: number | null;
+  per: number | null;
+  pbr: number | null;
+};
+
+export type StockFinancialStatementType =
+  | "INCOME_STATEMENT"
+  | "BALANCE_SHEET"
+  | "CASH_FLOW";
+
+export type StockFinancialPeriodType = "ANNUAL" | "QUARTER";
+
+export type StockFinancialStatementData = {
+  id: string;
+  statementType: StockFinancialStatementType;
+  periodType: StockFinancialPeriodType;
+  fiscalYear: number;
+  fiscalQuarter: number | null;
+  data: Record<string, string | number | boolean | null>;
+};
+
+export type StockEarningData = {
+  id: string;
+  announcementDate: string | null;
+  periodType: StockFinancialPeriodType;
+  fiscalYear: number;
+  fiscalQuarter: number | null;
+  estimatedRevenue: number | null;
+  estimatedOperatingProfit: number | null;
+};
+
 export type StockDetailData = {
   id: number;
   ticker: string;
@@ -64,4 +98,7 @@ export type StockDetailData = {
   dividendYield: number;
   candles: StockCandleData[];
   orderBookSnapshot: StockOrderBookSnapshotData | null;
+  financialMetric: StockFinancialMetricData | null;
+  financialStatements: StockFinancialStatementData[];
+  earnings: StockEarningData[];
 };
