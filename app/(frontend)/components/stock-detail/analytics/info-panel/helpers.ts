@@ -216,26 +216,34 @@ export function getEarningChartData(
     }));
 }
 
-export function getValuationChartData(stock: StockDetailData): ChartDatum[] {
-  const per = stock.financialMetric?.per ?? stock.per;
-  const pbr = stock.financialMetric?.pbr ?? null;
-  const trendFactor = stock.marketStatus === "LISTED" ? 0.92 : 1.08;
+export function getValuationChartData(
+  stock: StockDetailData,
+  metric: ValuationMetricTab,
+): ChartDatum[] {
+  const currentPer = stock.financialMetric?.per ?? stock.per;
+  const currentPbr = stock.financialMetric?.pbr ?? null;
+  const industryPer = stock.industryFinancialMetric.per;
+  const industryPbr = stock.industryFinancialMetric.pbr;
+  const stockValue = metric === "PER" ? currentPer : currentPbr;
+  const industryValue = metric === "PER" ? industryPer : industryPbr;
+  const stockForwardFactor = metric === "PER" ? 0.86 : 0.9;
+  const industryForwardFactor = metric === "PER" ? 0.9 : 0.94;
+
+  const toMultiple = (value: number | null | undefined, factor = 1) =>
+    value === null || value === undefined
+      ? undefined
+      : Number((value * factor).toFixed(2));
 
   return [
     {
       label: "최근 1년",
-      per: Number((per * trendFactor).toFixed(2)),
-      pbr: pbr === null ? undefined : Number((pbr * trendFactor).toFixed(2)),
-    },
-    {
-      label: stock.marketStatus === "LISTED" ? "현재" : "상장 예정",
-      per: Number(per.toFixed(2)),
-      pbr: pbr === null ? undefined : Number(pbr.toFixed(2)),
+      stockValue: toMultiple(stockValue),
+      industryValue: toMultiple(industryValue),
     },
     {
       label: "2027(예상)",
-      per: Number((per * 0.86).toFixed(2)),
-      pbr: pbr === null ? undefined : Number((pbr * 0.9).toFixed(2)),
+      stockValue: toMultiple(stockValue, stockForwardFactor),
+      industryValue: toMultiple(industryValue, industryForwardFactor),
     },
   ];
 }

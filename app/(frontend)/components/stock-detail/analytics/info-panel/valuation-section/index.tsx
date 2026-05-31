@@ -1,21 +1,35 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { StockOnlyProps } from "../../../../../types/stock/stock-detail";
-import {
-  formatMultiple,
-  getValuationChartData,
-  valuationLabels,
-} from "../helpers";
-import type { ValuationMetricTab } from "../types";
-import MetricCard from "../metric-card";
 import ValuationChart from "../valuation-chart";
+import { getValuationChartData, valuationLabels } from "../helpers";
+import type { ValuationMetricTab } from "../types";
+import type { StockOnlyProps } from "../../../../../types/stock/stock-detail";
 
 const metricTabs: ValuationMetricTab[] = ["PER", "PBR"];
+const industryLabels: Record<string, string> = {
+  SEMICONDUCTOR: "반도체",
+  SOFTWARE: "소프트웨어",
+  AI: "AI",
+  HARDWARE: "하드웨어",
+  BIOTECH: "바이오테크",
+  MEDICAL_DEVICE: "의료기기",
+  BANK: "은행",
+  INSURANCE: "보험",
+  SECURITIES: "증권",
+  RETAIL: "유통",
+  FOOD: "식품",
+  LUXURY: "명품",
+};
 
 export default function ValuationSection({ stock }: StockOnlyProps) {
   const [metric, setMetric] = useState<ValuationMetricTab>("PER");
-  const chartData = useMemo(() => getValuationChartData(stock), [stock]);
+  const chartData = useMemo(
+    () => getValuationChartData(stock, metric),
+    [metric, stock],
+  );
+
+  const industryLabel = industryLabels[stock.industry] ?? stock.industry;
 
   return (
     <section>
@@ -33,19 +47,11 @@ export default function ValuationSection({ stock }: StockOnlyProps) {
         ))}
       </div>
 
-      <div className="mb-6 grid grid-cols-2 gap-4">
-        <MetricCard
-          label="PER"
-          value={formatMultiple(stock.financialMetric?.per)}
-        />
-
-        <MetricCard
-          label="PBR"
-          value={formatMultiple(stock.financialMetric?.pbr)}
-        />
-      </div>
-
-      <ValuationChart data={chartData} metric={metric} />
+      <ValuationChart
+        data={chartData}
+        industryLabel={industryLabel}
+        metric={metric}
+      />
     </section>
   );
 }

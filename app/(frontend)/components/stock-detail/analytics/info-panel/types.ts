@@ -20,6 +20,6 @@ export type ChartDatum = {
   label: string;
   revenue?: number;
   operatingProfit?: number;
-  per?: number;
-  pbr?: number;
+  stockValue?: number;
+  industryValue?: number;
 };

@@ -12,6 +12,14 @@ function toNumber(value: DecimalLike) {
   return value.toNumber();
 }
 
+function toNullableNumber(value: DecimalLike | number | null | undefined) {
+  if (value === null || value === undefined) {
+    return null;
+  }
+
+  return typeof value === "number" ? value : value.toNumber();
+}
+
 function bigintToNullableNumber(value: bigint | null) {
   return value === null ? null : Number(value);
 }
@@ -90,6 +98,45 @@ export async function getStockDetailData(
   }
 
   const [orderBookSnapshot] = stock.orderBookSnapshots;
+  const [
+    industryPeerCount,
+    industryStockAverage,
+    industryFinancialMetricAverage,
+  ] = await Promise.all([
+      prisma.stock.count({
+        where: {
+          industry: stock.industry,
+          id: {
+            not: stock.id,
+          },
+        },
+      }),
+      prisma.stock.aggregate({
+        where: {
+          industry: stock.industry,
+          id: {
+            not: stock.id,
+          },
+        },
+        _avg: {
+          per: true,
+        },
+      }),
+      prisma.stockFinancialMetric.aggregate({
+        where: {
+          stock: {
+            industry: stock.industry,
+            id: {
+              not: stock.id,
+            },
+          },
+        },
+        _avg: {
+          per: true,
+          pbr: true,
+        },
+      }),
+    ]);
 
   return {
     id: stock.id,
@@ -97,6 +144,7 @@ export async function getStockDetailData(
     name: stock.name,
     imageUrl: stock.imageUrl || null,
     sector: stock.sector,
+    industry: stock.industry,
     riskLevel: stock.riskLevel,
     theme: stock.theme,
     countryCode: stock.countryCode,
@@ -158,6 +206,13 @@ export async function getStockDetailData(
           pbr: stock.financialMetric.pbr,
         }
       : null,
+    industryFinancialMetric: {
+      per:
+        industryFinancialMetricAverage._avg.per ??
+        toNullableNumber(industryStockAverage._avg.per),
+      pbr: industryFinancialMetricAverage._avg.pbr,
+      peerCount: industryPeerCount,
+    },
     financialStatements: stock.financialStatements.map((statement) => ({
       id: statement.id,
       statementType: statement.statementType,
