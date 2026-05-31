@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { StockOnlyProps } from "../../../../../types/stock/stock-detail";
+import EarningsChart from "../earnings-chart";
+import MetricCard from "../metric-card";
 import {
   formatCompactMoney,
   getEarningChartData,
@@ -9,8 +10,7 @@ import {
   periodLabels,
 } from "../helpers";
 import type { EarningPeriodTab } from "../types";
-import EarningsChart from "../earnings-chart";
-import MetricCard from "../metric-card";
+import type { StockOnlyProps } from "../../../../../types/stock/stock-detail";
 
 const periodTabs: EarningPeriodTab[] = ["ANNUAL", "QUARTER"];
 

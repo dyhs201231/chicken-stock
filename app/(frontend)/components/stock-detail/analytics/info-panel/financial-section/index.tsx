@@ -1,15 +1,15 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { StockOnlyProps } from "../../../../../types/stock/stock-detail";
+import FinancialTable from "../financial-table";
+import MetricCard from "../metric-card";
 import {
   formatMetricValue,
   getFinancialTableRows,
   statementLabels,
 } from "../helpers";
 import type { FinancialStatementTab } from "../types";
-import FinancialTable from "../financial-table";
-import MetricCard from "../metric-card";
+import type { StockOnlyProps } from "../../../../../types/stock/stock-detail";
 
 const statementTabs: FinancialStatementTab[] = [
   "INCOME_STATEMENT",

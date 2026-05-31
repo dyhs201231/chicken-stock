@@ -1,12 +1,12 @@
 "use client";
 
+import { useMemo } from "react";
 import {
   flexRender,
   getCoreRowModel,
   useReactTable,
   type ColumnDef,
 } from "@tanstack/react-table";
-import { useMemo } from "react";
 import type { FinancialTableRow } from "../types";
 
 type FinancialTableProps = {

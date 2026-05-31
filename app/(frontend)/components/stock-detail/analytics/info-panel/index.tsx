@@ -5,9 +5,9 @@ import { Tab } from "../../../ui";
 import EarningsSection from "./earnings-section";
 import FinancialSection from "./financial-section";
 import ValuationSection from "./valuation-section";
-import type { StockOnlyProps } from "../../../../types/stock/stock-detail";
-import type { InfoSection } from "./types";
 import { sectionLabels } from "./helpers";
+import type { InfoSection } from "./types";
+import type { StockOnlyProps } from "../../../../types/stock/stock-detail";
 
 const sections: InfoSection[] = ["financial", "earnings", "valuation"];
 
