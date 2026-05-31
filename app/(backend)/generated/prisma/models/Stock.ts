@@ -80,6 +80,7 @@ export type StockMinAggregateOutputType = {
   name: string | null
   imageUrl: string | null
   sector: $Enums.StockSector | null
+  industry: $Enums.StockIndustry | null
   riskLevel: $Enums.StockRiskLevel | null
   theme: $Enums.StockTheme | null
   countryCode: string | null
@@ -117,6 +118,7 @@ export type StockMaxAggregateOutputType = {
   name: string | null
   imageUrl: string | null
   sector: $Enums.StockSector | null
+  industry: $Enums.StockIndustry | null
   riskLevel: $Enums.StockRiskLevel | null
   theme: $Enums.StockTheme | null
   countryCode: string | null
@@ -154,6 +156,7 @@ export type StockCountAggregateOutputType = {
   name: number
   imageUrl: number
   sector: number
+  industry: number
   riskLevel: number
   theme: number
   countryCode: number
@@ -241,6 +244,7 @@ export type StockMinAggregateInputType = {
   name?: true
   imageUrl?: true
   sector?: true
+  industry?: true
   riskLevel?: true
   theme?: true
   countryCode?: true
@@ -278,6 +282,7 @@ export type StockMaxAggregateInputType = {
   name?: true
   imageUrl?: true
   sector?: true
+  industry?: true
   riskLevel?: true
   theme?: true
   countryCode?: true
@@ -315,6 +320,7 @@ export type StockCountAggregateInputType = {
   name?: true
   imageUrl?: true
   sector?: true
+  industry?: true
   riskLevel?: true
   theme?: true
   countryCode?: true
@@ -439,6 +445,7 @@ export type StockGroupByOutputType = {
   name: string
   imageUrl: string
   sector: $Enums.StockSector
+  industry: $Enums.StockIndustry
   riskLevel: $Enums.StockRiskLevel
   theme: $Enums.StockTheme
   countryCode: string
@@ -499,6 +506,7 @@ export type StockWhereInput = {
   name?: Prisma.StringFilter<"Stock"> | string
   imageUrl?: Prisma.StringFilter<"Stock"> | string
   sector?: Prisma.EnumStockSectorFilter<"Stock"> | $Enums.StockSector
+  industry?: Prisma.EnumStockIndustryFilter<"Stock"> | $Enums.StockIndustry
   riskLevel?: Prisma.EnumStockRiskLevelFilter<"Stock"> | $Enums.StockRiskLevel
   theme?: Prisma.EnumStockThemeFilter<"Stock"> | $Enums.StockTheme
   countryCode?: Prisma.StringFilter<"Stock"> | string
@@ -545,6 +553,7 @@ export type StockOrderByWithRelationInput = {
   name?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   sector?: Prisma.SortOrder
+  industry?: Prisma.SortOrder
   riskLevel?: Prisma.SortOrder
   theme?: Prisma.SortOrder
   countryCode?: Prisma.SortOrder
@@ -594,6 +603,7 @@ export type StockWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"Stock"> | string
   imageUrl?: Prisma.StringFilter<"Stock"> | string
   sector?: Prisma.EnumStockSectorFilter<"Stock"> | $Enums.StockSector
+  industry?: Prisma.EnumStockIndustryFilter<"Stock"> | $Enums.StockIndustry
   riskLevel?: Prisma.EnumStockRiskLevelFilter<"Stock"> | $Enums.StockRiskLevel
   theme?: Prisma.EnumStockThemeFilter<"Stock"> | $Enums.StockTheme
   countryCode?: Prisma.StringFilter<"Stock"> | string
@@ -640,6 +650,7 @@ export type StockOrderByWithAggregationInput = {
   name?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   sector?: Prisma.SortOrder
+  industry?: Prisma.SortOrder
   riskLevel?: Prisma.SortOrder
   theme?: Prisma.SortOrder
   countryCode?: Prisma.SortOrder
@@ -685,6 +696,7 @@ export type StockScalarWhereWithAggregatesInput = {
   name?: Prisma.StringWithAggregatesFilter<"Stock"> | string
   imageUrl?: Prisma.StringWithAggregatesFilter<"Stock"> | string
   sector?: Prisma.EnumStockSectorWithAggregatesFilter<"Stock"> | $Enums.StockSector
+  industry?: Prisma.EnumStockIndustryWithAggregatesFilter<"Stock"> | $Enums.StockIndustry
   riskLevel?: Prisma.EnumStockRiskLevelWithAggregatesFilter<"Stock"> | $Enums.StockRiskLevel
   theme?: Prisma.EnumStockThemeWithAggregatesFilter<"Stock"> | $Enums.StockTheme
   countryCode?: Prisma.StringWithAggregatesFilter<"Stock"> | string
@@ -722,6 +734,7 @@ export type StockCreateInput = {
   name: string
   imageUrl: string
   sector: $Enums.StockSector
+  industry: $Enums.StockIndustry
   riskLevel: $Enums.StockRiskLevel
   theme: $Enums.StockTheme
   countryCode: string
@@ -768,6 +781,7 @@ export type StockUncheckedCreateInput = {
   name: string
   imageUrl: string
   sector: $Enums.StockSector
+  industry: $Enums.StockIndustry
   riskLevel: $Enums.StockRiskLevel
   theme: $Enums.StockTheme
   countryCode: string
@@ -814,6 +828,7 @@ export type StockUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   sector?: Prisma.EnumStockSectorFieldUpdateOperationsInput | $Enums.StockSector
+  industry?: Prisma.EnumStockIndustryFieldUpdateOperationsInput | $Enums.StockIndustry
   riskLevel?: Prisma.EnumStockRiskLevelFieldUpdateOperationsInput | $Enums.StockRiskLevel
   theme?: Prisma.EnumStockThemeFieldUpdateOperationsInput | $Enums.StockTheme
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -860,6 +875,7 @@ export type StockUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   sector?: Prisma.EnumStockSectorFieldUpdateOperationsInput | $Enums.StockSector
+  industry?: Prisma.EnumStockIndustryFieldUpdateOperationsInput | $Enums.StockIndustry
   riskLevel?: Prisma.EnumStockRiskLevelFieldUpdateOperationsInput | $Enums.StockRiskLevel
   theme?: Prisma.EnumStockThemeFieldUpdateOperationsInput | $Enums.StockTheme
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -906,6 +922,7 @@ export type StockCreateManyInput = {
   name: string
   imageUrl: string
   sector: $Enums.StockSector
+  industry: $Enums.StockIndustry
   riskLevel: $Enums.StockRiskLevel
   theme: $Enums.StockTheme
   countryCode: string
@@ -943,6 +960,7 @@ export type StockUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   sector?: Prisma.EnumStockSectorFieldUpdateOperationsInput | $Enums.StockSector
+  industry?: Prisma.EnumStockIndustryFieldUpdateOperationsInput | $Enums.StockIndustry
   riskLevel?: Prisma.EnumStockRiskLevelFieldUpdateOperationsInput | $Enums.StockRiskLevel
   theme?: Prisma.EnumStockThemeFieldUpdateOperationsInput | $Enums.StockTheme
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -980,6 +998,7 @@ export type StockUncheckedUpdateManyInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   sector?: Prisma.EnumStockSectorFieldUpdateOperationsInput | $Enums.StockSector
+  industry?: Prisma.EnumStockIndustryFieldUpdateOperationsInput | $Enums.StockIndustry
   riskLevel?: Prisma.EnumStockRiskLevelFieldUpdateOperationsInput | $Enums.StockRiskLevel
   theme?: Prisma.EnumStockThemeFieldUpdateOperationsInput | $Enums.StockTheme
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1022,6 +1041,7 @@ export type StockCountOrderByAggregateInput = {
   name?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   sector?: Prisma.SortOrder
+  industry?: Prisma.SortOrder
   riskLevel?: Prisma.SortOrder
   theme?: Prisma.SortOrder
   countryCode?: Prisma.SortOrder
@@ -1083,6 +1103,7 @@ export type StockMaxOrderByAggregateInput = {
   name?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   sector?: Prisma.SortOrder
+  industry?: Prisma.SortOrder
   riskLevel?: Prisma.SortOrder
   theme?: Prisma.SortOrder
   countryCode?: Prisma.SortOrder
@@ -1120,6 +1141,7 @@ export type StockMinOrderByAggregateInput = {
   name?: Prisma.SortOrder
   imageUrl?: Prisma.SortOrder
   sector?: Prisma.SortOrder
+  industry?: Prisma.SortOrder
   riskLevel?: Prisma.SortOrder
   theme?: Prisma.SortOrder
   countryCode?: Prisma.SortOrder
@@ -1215,6 +1237,10 @@ export type StockUpdateOneRequiredWithoutDividendEventsNestedInput = {
   upsert?: Prisma.StockUpsertWithoutDividendEventsInput
   connect?: Prisma.StockWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.StockUpdateToOneWithWhereWithoutDividendEventsInput, Prisma.StockUpdateWithoutDividendEventsInput>, Prisma.StockUncheckedUpdateWithoutDividendEventsInput>
+}
+
+export type EnumStockIndustryFieldUpdateOperationsInput = {
+  set?: $Enums.StockIndustry
 }
 
 export type EnumStockRiskLevelFieldUpdateOperationsInput = {
@@ -1319,6 +1345,7 @@ export type StockCreateWithoutTransactionsInput = {
   name: string
   imageUrl: string
   sector: $Enums.StockSector
+  industry: $Enums.StockIndustry
   riskLevel: $Enums.StockRiskLevel
   theme: $Enums.StockTheme
   countryCode: string
@@ -1364,6 +1391,7 @@ export type StockUncheckedCreateWithoutTransactionsInput = {
   name: string
   imageUrl: string
   sector: $Enums.StockSector
+  industry: $Enums.StockIndustry
   riskLevel: $Enums.StockRiskLevel
   theme: $Enums.StockTheme
   countryCode: string
@@ -1425,6 +1453,7 @@ export type StockUpdateWithoutTransactionsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   sector?: Prisma.EnumStockSectorFieldUpdateOperationsInput | $Enums.StockSector
+  industry?: Prisma.EnumStockIndustryFieldUpdateOperationsInput | $Enums.StockIndustry
   riskLevel?: Prisma.EnumStockRiskLevelFieldUpdateOperationsInput | $Enums.StockRiskLevel
   theme?: Prisma.EnumStockThemeFieldUpdateOperationsInput | $Enums.StockTheme
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1470,6 +1499,7 @@ export type StockUncheckedUpdateWithoutTransactionsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   sector?: Prisma.EnumStockSectorFieldUpdateOperationsInput | $Enums.StockSector
+  industry?: Prisma.EnumStockIndustryFieldUpdateOperationsInput | $Enums.StockIndustry
   riskLevel?: Prisma.EnumStockRiskLevelFieldUpdateOperationsInput | $Enums.StockRiskLevel
   theme?: Prisma.EnumStockThemeFieldUpdateOperationsInput | $Enums.StockTheme
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1515,6 +1545,7 @@ export type StockCreateWithoutPortfolioItemsInput = {
   name: string
   imageUrl: string
   sector: $Enums.StockSector
+  industry: $Enums.StockIndustry
   riskLevel: $Enums.StockRiskLevel
   theme: $Enums.StockTheme
   countryCode: string
@@ -1560,6 +1591,7 @@ export type StockUncheckedCreateWithoutPortfolioItemsInput = {
   name: string
   imageUrl: string
   sector: $Enums.StockSector
+  industry: $Enums.StockIndustry
   riskLevel: $Enums.StockRiskLevel
   theme: $Enums.StockTheme
   countryCode: string
@@ -1621,6 +1653,7 @@ export type StockUpdateWithoutPortfolioItemsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   sector?: Prisma.EnumStockSectorFieldUpdateOperationsInput | $Enums.StockSector
+  industry?: Prisma.EnumStockIndustryFieldUpdateOperationsInput | $Enums.StockIndustry
   riskLevel?: Prisma.EnumStockRiskLevelFieldUpdateOperationsInput | $Enums.StockRiskLevel
   theme?: Prisma.EnumStockThemeFieldUpdateOperationsInput | $Enums.StockTheme
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1666,6 +1699,7 @@ export type StockUncheckedUpdateWithoutPortfolioItemsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   sector?: Prisma.EnumStockSectorFieldUpdateOperationsInput | $Enums.StockSector
+  industry?: Prisma.EnumStockIndustryFieldUpdateOperationsInput | $Enums.StockIndustry
   riskLevel?: Prisma.EnumStockRiskLevelFieldUpdateOperationsInput | $Enums.StockRiskLevel
   theme?: Prisma.EnumStockThemeFieldUpdateOperationsInput | $Enums.StockTheme
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1711,6 +1745,7 @@ export type StockCreateWithoutDividendEventsInput = {
   name: string
   imageUrl: string
   sector: $Enums.StockSector
+  industry: $Enums.StockIndustry
   riskLevel: $Enums.StockRiskLevel
   theme: $Enums.StockTheme
   countryCode: string
@@ -1756,6 +1791,7 @@ export type StockUncheckedCreateWithoutDividendEventsInput = {
   name: string
   imageUrl: string
   sector: $Enums.StockSector
+  industry: $Enums.StockIndustry
   riskLevel: $Enums.StockRiskLevel
   theme: $Enums.StockTheme
   countryCode: string
@@ -1817,6 +1853,7 @@ export type StockUpdateWithoutDividendEventsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   sector?: Prisma.EnumStockSectorFieldUpdateOperationsInput | $Enums.StockSector
+  industry?: Prisma.EnumStockIndustryFieldUpdateOperationsInput | $Enums.StockIndustry
   riskLevel?: Prisma.EnumStockRiskLevelFieldUpdateOperationsInput | $Enums.StockRiskLevel
   theme?: Prisma.EnumStockThemeFieldUpdateOperationsInput | $Enums.StockTheme
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1862,6 +1899,7 @@ export type StockUncheckedUpdateWithoutDividendEventsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   sector?: Prisma.EnumStockSectorFieldUpdateOperationsInput | $Enums.StockSector
+  industry?: Prisma.EnumStockIndustryFieldUpdateOperationsInput | $Enums.StockIndustry
   riskLevel?: Prisma.EnumStockRiskLevelFieldUpdateOperationsInput | $Enums.StockRiskLevel
   theme?: Prisma.EnumStockThemeFieldUpdateOperationsInput | $Enums.StockTheme
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1907,6 +1945,7 @@ export type StockCreateWithoutFinancialMetricInput = {
   name: string
   imageUrl: string
   sector: $Enums.StockSector
+  industry: $Enums.StockIndustry
   riskLevel: $Enums.StockRiskLevel
   theme: $Enums.StockTheme
   countryCode: string
@@ -1952,6 +1991,7 @@ export type StockUncheckedCreateWithoutFinancialMetricInput = {
   name: string
   imageUrl: string
   sector: $Enums.StockSector
+  industry: $Enums.StockIndustry
   riskLevel: $Enums.StockRiskLevel
   theme: $Enums.StockTheme
   countryCode: string
@@ -2013,6 +2053,7 @@ export type StockUpdateWithoutFinancialMetricInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   sector?: Prisma.EnumStockSectorFieldUpdateOperationsInput | $Enums.StockSector
+  industry?: Prisma.EnumStockIndustryFieldUpdateOperationsInput | $Enums.StockIndustry
   riskLevel?: Prisma.EnumStockRiskLevelFieldUpdateOperationsInput | $Enums.StockRiskLevel
   theme?: Prisma.EnumStockThemeFieldUpdateOperationsInput | $Enums.StockTheme
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2058,6 +2099,7 @@ export type StockUncheckedUpdateWithoutFinancialMetricInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   sector?: Prisma.EnumStockSectorFieldUpdateOperationsInput | $Enums.StockSector
+  industry?: Prisma.EnumStockIndustryFieldUpdateOperationsInput | $Enums.StockIndustry
   riskLevel?: Prisma.EnumStockRiskLevelFieldUpdateOperationsInput | $Enums.StockRiskLevel
   theme?: Prisma.EnumStockThemeFieldUpdateOperationsInput | $Enums.StockTheme
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2103,6 +2145,7 @@ export type StockCreateWithoutFinancialStatementsInput = {
   name: string
   imageUrl: string
   sector: $Enums.StockSector
+  industry: $Enums.StockIndustry
   riskLevel: $Enums.StockRiskLevel
   theme: $Enums.StockTheme
   countryCode: string
@@ -2148,6 +2191,7 @@ export type StockUncheckedCreateWithoutFinancialStatementsInput = {
   name: string
   imageUrl: string
   sector: $Enums.StockSector
+  industry: $Enums.StockIndustry
   riskLevel: $Enums.StockRiskLevel
   theme: $Enums.StockTheme
   countryCode: string
@@ -2209,6 +2253,7 @@ export type StockUpdateWithoutFinancialStatementsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   sector?: Prisma.EnumStockSectorFieldUpdateOperationsInput | $Enums.StockSector
+  industry?: Prisma.EnumStockIndustryFieldUpdateOperationsInput | $Enums.StockIndustry
   riskLevel?: Prisma.EnumStockRiskLevelFieldUpdateOperationsInput | $Enums.StockRiskLevel
   theme?: Prisma.EnumStockThemeFieldUpdateOperationsInput | $Enums.StockTheme
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2254,6 +2299,7 @@ export type StockUncheckedUpdateWithoutFinancialStatementsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   sector?: Prisma.EnumStockSectorFieldUpdateOperationsInput | $Enums.StockSector
+  industry?: Prisma.EnumStockIndustryFieldUpdateOperationsInput | $Enums.StockIndustry
   riskLevel?: Prisma.EnumStockRiskLevelFieldUpdateOperationsInput | $Enums.StockRiskLevel
   theme?: Prisma.EnumStockThemeFieldUpdateOperationsInput | $Enums.StockTheme
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2299,6 +2345,7 @@ export type StockCreateWithoutEarningsInput = {
   name: string
   imageUrl: string
   sector: $Enums.StockSector
+  industry: $Enums.StockIndustry
   riskLevel: $Enums.StockRiskLevel
   theme: $Enums.StockTheme
   countryCode: string
@@ -2344,6 +2391,7 @@ export type StockUncheckedCreateWithoutEarningsInput = {
   name: string
   imageUrl: string
   sector: $Enums.StockSector
+  industry: $Enums.StockIndustry
   riskLevel: $Enums.StockRiskLevel
   theme: $Enums.StockTheme
   countryCode: string
@@ -2405,6 +2453,7 @@ export type StockUpdateWithoutEarningsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   sector?: Prisma.EnumStockSectorFieldUpdateOperationsInput | $Enums.StockSector
+  industry?: Prisma.EnumStockIndustryFieldUpdateOperationsInput | $Enums.StockIndustry
   riskLevel?: Prisma.EnumStockRiskLevelFieldUpdateOperationsInput | $Enums.StockRiskLevel
   theme?: Prisma.EnumStockThemeFieldUpdateOperationsInput | $Enums.StockTheme
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2450,6 +2499,7 @@ export type StockUncheckedUpdateWithoutEarningsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   sector?: Prisma.EnumStockSectorFieldUpdateOperationsInput | $Enums.StockSector
+  industry?: Prisma.EnumStockIndustryFieldUpdateOperationsInput | $Enums.StockIndustry
   riskLevel?: Prisma.EnumStockRiskLevelFieldUpdateOperationsInput | $Enums.StockRiskLevel
   theme?: Prisma.EnumStockThemeFieldUpdateOperationsInput | $Enums.StockTheme
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2495,6 +2545,7 @@ export type StockCreateWithoutTradeOrdersInput = {
   name: string
   imageUrl: string
   sector: $Enums.StockSector
+  industry: $Enums.StockIndustry
   riskLevel: $Enums.StockRiskLevel
   theme: $Enums.StockTheme
   countryCode: string
@@ -2540,6 +2591,7 @@ export type StockUncheckedCreateWithoutTradeOrdersInput = {
   name: string
   imageUrl: string
   sector: $Enums.StockSector
+  industry: $Enums.StockIndustry
   riskLevel: $Enums.StockRiskLevel
   theme: $Enums.StockTheme
   countryCode: string
@@ -2601,6 +2653,7 @@ export type StockUpdateWithoutTradeOrdersInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   sector?: Prisma.EnumStockSectorFieldUpdateOperationsInput | $Enums.StockSector
+  industry?: Prisma.EnumStockIndustryFieldUpdateOperationsInput | $Enums.StockIndustry
   riskLevel?: Prisma.EnumStockRiskLevelFieldUpdateOperationsInput | $Enums.StockRiskLevel
   theme?: Prisma.EnumStockThemeFieldUpdateOperationsInput | $Enums.StockTheme
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2646,6 +2699,7 @@ export type StockUncheckedUpdateWithoutTradeOrdersInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   sector?: Prisma.EnumStockSectorFieldUpdateOperationsInput | $Enums.StockSector
+  industry?: Prisma.EnumStockIndustryFieldUpdateOperationsInput | $Enums.StockIndustry
   riskLevel?: Prisma.EnumStockRiskLevelFieldUpdateOperationsInput | $Enums.StockRiskLevel
   theme?: Prisma.EnumStockThemeFieldUpdateOperationsInput | $Enums.StockTheme
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2691,6 +2745,7 @@ export type StockCreateWithoutCandlesInput = {
   name: string
   imageUrl: string
   sector: $Enums.StockSector
+  industry: $Enums.StockIndustry
   riskLevel: $Enums.StockRiskLevel
   theme: $Enums.StockTheme
   countryCode: string
@@ -2736,6 +2791,7 @@ export type StockUncheckedCreateWithoutCandlesInput = {
   name: string
   imageUrl: string
   sector: $Enums.StockSector
+  industry: $Enums.StockIndustry
   riskLevel: $Enums.StockRiskLevel
   theme: $Enums.StockTheme
   countryCode: string
@@ -2797,6 +2853,7 @@ export type StockUpdateWithoutCandlesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   sector?: Prisma.EnumStockSectorFieldUpdateOperationsInput | $Enums.StockSector
+  industry?: Prisma.EnumStockIndustryFieldUpdateOperationsInput | $Enums.StockIndustry
   riskLevel?: Prisma.EnumStockRiskLevelFieldUpdateOperationsInput | $Enums.StockRiskLevel
   theme?: Prisma.EnumStockThemeFieldUpdateOperationsInput | $Enums.StockTheme
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2842,6 +2899,7 @@ export type StockUncheckedUpdateWithoutCandlesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   sector?: Prisma.EnumStockSectorFieldUpdateOperationsInput | $Enums.StockSector
+  industry?: Prisma.EnumStockIndustryFieldUpdateOperationsInput | $Enums.StockIndustry
   riskLevel?: Prisma.EnumStockRiskLevelFieldUpdateOperationsInput | $Enums.StockRiskLevel
   theme?: Prisma.EnumStockThemeFieldUpdateOperationsInput | $Enums.StockTheme
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -2887,6 +2945,7 @@ export type StockCreateWithoutOrderBookSnapshotsInput = {
   name: string
   imageUrl: string
   sector: $Enums.StockSector
+  industry: $Enums.StockIndustry
   riskLevel: $Enums.StockRiskLevel
   theme: $Enums.StockTheme
   countryCode: string
@@ -2932,6 +2991,7 @@ export type StockUncheckedCreateWithoutOrderBookSnapshotsInput = {
   name: string
   imageUrl: string
   sector: $Enums.StockSector
+  industry: $Enums.StockIndustry
   riskLevel: $Enums.StockRiskLevel
   theme: $Enums.StockTheme
   countryCode: string
@@ -2993,6 +3053,7 @@ export type StockUpdateWithoutOrderBookSnapshotsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   sector?: Prisma.EnumStockSectorFieldUpdateOperationsInput | $Enums.StockSector
+  industry?: Prisma.EnumStockIndustryFieldUpdateOperationsInput | $Enums.StockIndustry
   riskLevel?: Prisma.EnumStockRiskLevelFieldUpdateOperationsInput | $Enums.StockRiskLevel
   theme?: Prisma.EnumStockThemeFieldUpdateOperationsInput | $Enums.StockTheme
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -3038,6 +3099,7 @@ export type StockUncheckedUpdateWithoutOrderBookSnapshotsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   imageUrl?: Prisma.StringFieldUpdateOperationsInput | string
   sector?: Prisma.EnumStockSectorFieldUpdateOperationsInput | $Enums.StockSector
+  industry?: Prisma.EnumStockIndustryFieldUpdateOperationsInput | $Enums.StockIndustry
   riskLevel?: Prisma.EnumStockRiskLevelFieldUpdateOperationsInput | $Enums.StockRiskLevel
   theme?: Prisma.EnumStockThemeFieldUpdateOperationsInput | $Enums.StockTheme
   countryCode?: Prisma.StringFieldUpdateOperationsInput | string
@@ -3177,6 +3239,7 @@ export type StockSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   name?: boolean
   imageUrl?: boolean
   sector?: boolean
+  industry?: boolean
   riskLevel?: boolean
   theme?: boolean
   countryCode?: boolean
@@ -3224,6 +3287,7 @@ export type StockSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   name?: boolean
   imageUrl?: boolean
   sector?: boolean
+  industry?: boolean
   riskLevel?: boolean
   theme?: boolean
   countryCode?: boolean
@@ -3261,6 +3325,7 @@ export type StockSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   name?: boolean
   imageUrl?: boolean
   sector?: boolean
+  industry?: boolean
   riskLevel?: boolean
   theme?: boolean
   countryCode?: boolean
@@ -3298,6 +3363,7 @@ export type StockSelectScalar = {
   name?: boolean
   imageUrl?: boolean
   sector?: boolean
+  industry?: boolean
   riskLevel?: boolean
   theme?: boolean
   countryCode?: boolean
@@ -3329,7 +3395,7 @@ export type StockSelectScalar = {
   updatedAt?: boolean
 }
 
-export type StockOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ticker" | "name" | "imageUrl" | "sector" | "riskLevel" | "theme" | "countryCode" | "currencyCode" | "currentPrice" | "previousClose" | "changeAmount" | "changeRate" | "dayHigh" | "dayLow" | "high52w" | "low52w" | "volume" | "tradingValue" | "marketCap" | "per" | "eps" | "marketStatus" | "debtRatio" | "currentRatio" | "interestCoverageRatio" | "announcementDate" | "estimatedOperatingProfit" | "estimatedRevenue" | "dividendCount" | "dividendPerShare" | "dividendYield" | "createdAt" | "updatedAt", ExtArgs["result"]["stock"]>
+export type StockOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ticker" | "name" | "imageUrl" | "sector" | "industry" | "riskLevel" | "theme" | "countryCode" | "currencyCode" | "currentPrice" | "previousClose" | "changeAmount" | "changeRate" | "dayHigh" | "dayLow" | "high52w" | "low52w" | "volume" | "tradingValue" | "marketCap" | "per" | "eps" | "marketStatus" | "debtRatio" | "currentRatio" | "interestCoverageRatio" | "announcementDate" | "estimatedOperatingProfit" | "estimatedRevenue" | "dividendCount" | "dividendPerShare" | "dividendYield" | "createdAt" | "updatedAt", ExtArgs["result"]["stock"]>
 export type StockInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   portfolioItems?: boolean | Prisma.Stock$portfolioItemsArgs<ExtArgs>
   tradeOrders?: boolean | Prisma.Stock$tradeOrdersArgs<ExtArgs>
@@ -3364,6 +3430,7 @@ export type $StockPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     name: string
     imageUrl: string
     sector: $Enums.StockSector
+    industry: $Enums.StockIndustry
     riskLevel: $Enums.StockRiskLevel
     theme: $Enums.StockTheme
     countryCode: string
@@ -3830,6 +3897,7 @@ export interface StockFieldRefs {
   readonly name: Prisma.FieldRef<"Stock", 'String'>
   readonly imageUrl: Prisma.FieldRef<"Stock", 'String'>
   readonly sector: Prisma.FieldRef<"Stock", 'StockSector'>
+  readonly industry: Prisma.FieldRef<"Stock", 'StockIndustry'>
   readonly riskLevel: Prisma.FieldRef<"Stock", 'StockRiskLevel'>
   readonly theme: Prisma.FieldRef<"Stock", 'StockTheme'>
   readonly countryCode: Prisma.FieldRef<"Stock", 'String'>

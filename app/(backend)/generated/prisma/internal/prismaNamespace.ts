@@ -2562,6 +2562,7 @@ export const StockScalarFieldEnum = {
   name: 'name',
   imageUrl: 'imageUrl',
   sector: 'sector',
+  industry: 'industry',
   riskLevel: 'riskLevel',
   theme: 'theme',
   countryCode: 'countryCode',
@@ -3004,6 +3005,20 @@ export type EnumDividendStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$P
  * Reference to a field of type 'DividendStatus[]'
  */
 export type ListEnumDividendStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DividendStatus[]'>
+    
+
+
+/**
+ * Reference to a field of type 'StockIndustry'
+ */
+export type EnumStockIndustryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StockIndustry'>
+    
+
+
+/**
+ * Reference to a field of type 'StockIndustry[]'
+ */
+export type ListEnumStockIndustryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'StockIndustry[]'>
     
 
 

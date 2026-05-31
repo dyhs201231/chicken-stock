@@ -426,6 +426,13 @@ export type EnumDividendStatusWithAggregatesFilter<$PrismaModel = never> = {
   _max?: Prisma.NestedEnumDividendStatusFilter<$PrismaModel>
 }
 
+export type EnumStockIndustryFilter<$PrismaModel = never> = {
+  equals?: $Enums.StockIndustry | Prisma.EnumStockIndustryFieldRefInput<$PrismaModel>
+  in?: $Enums.StockIndustry[] | Prisma.ListEnumStockIndustryFieldRefInput<$PrismaModel>
+  notIn?: $Enums.StockIndustry[] | Prisma.ListEnumStockIndustryFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumStockIndustryFilter<$PrismaModel> | $Enums.StockIndustry
+}
+
 export type EnumStockRiskLevelFilter<$PrismaModel = never> = {
   equals?: $Enums.StockRiskLevel | Prisma.EnumStockRiskLevelFieldRefInput<$PrismaModel>
   in?: $Enums.StockRiskLevel[] | Prisma.ListEnumStockRiskLevelFieldRefInput<$PrismaModel>
@@ -445,6 +452,16 @@ export type EnumStockMarketStatusFilter<$PrismaModel = never> = {
   in?: $Enums.StockMarketStatus[] | Prisma.ListEnumStockMarketStatusFieldRefInput<$PrismaModel>
   notIn?: $Enums.StockMarketStatus[] | Prisma.ListEnumStockMarketStatusFieldRefInput<$PrismaModel>
   not?: Prisma.NestedEnumStockMarketStatusFilter<$PrismaModel> | $Enums.StockMarketStatus
+}
+
+export type EnumStockIndustryWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.StockIndustry | Prisma.EnumStockIndustryFieldRefInput<$PrismaModel>
+  in?: $Enums.StockIndustry[] | Prisma.ListEnumStockIndustryFieldRefInput<$PrismaModel>
+  notIn?: $Enums.StockIndustry[] | Prisma.ListEnumStockIndustryFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumStockIndustryWithAggregatesFilter<$PrismaModel> | $Enums.StockIndustry
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumStockIndustryFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumStockIndustryFilter<$PrismaModel>
 }
 
 export type EnumStockRiskLevelWithAggregatesFilter<$PrismaModel = never> = {
@@ -1119,6 +1136,13 @@ export type NestedEnumDividendStatusWithAggregatesFilter<$PrismaModel = never> =
   _max?: Prisma.NestedEnumDividendStatusFilter<$PrismaModel>
 }
 
+export type NestedEnumStockIndustryFilter<$PrismaModel = never> = {
+  equals?: $Enums.StockIndustry | Prisma.EnumStockIndustryFieldRefInput<$PrismaModel>
+  in?: $Enums.StockIndustry[] | Prisma.ListEnumStockIndustryFieldRefInput<$PrismaModel>
+  notIn?: $Enums.StockIndustry[] | Prisma.ListEnumStockIndustryFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumStockIndustryFilter<$PrismaModel> | $Enums.StockIndustry
+}
+
 export type NestedEnumStockRiskLevelFilter<$PrismaModel = never> = {
   equals?: $Enums.StockRiskLevel | Prisma.EnumStockRiskLevelFieldRefInput<$PrismaModel>
   in?: $Enums.StockRiskLevel[] | Prisma.ListEnumStockRiskLevelFieldRefInput<$PrismaModel>
@@ -1138,6 +1162,16 @@ export type NestedEnumStockMarketStatusFilter<$PrismaModel = never> = {
   in?: $Enums.StockMarketStatus[] | Prisma.ListEnumStockMarketStatusFieldRefInput<$PrismaModel>
   notIn?: $Enums.StockMarketStatus[] | Prisma.ListEnumStockMarketStatusFieldRefInput<$PrismaModel>
   not?: Prisma.NestedEnumStockMarketStatusFilter<$PrismaModel> | $Enums.StockMarketStatus
+}
+
+export type NestedEnumStockIndustryWithAggregatesFilter<$PrismaModel = never> = {
+  equals?: $Enums.StockIndustry | Prisma.EnumStockIndustryFieldRefInput<$PrismaModel>
+  in?: $Enums.StockIndustry[] | Prisma.ListEnumStockIndustryFieldRefInput<$PrismaModel>
+  notIn?: $Enums.StockIndustry[] | Prisma.ListEnumStockIndustryFieldRefInput<$PrismaModel>
+  not?: Prisma.NestedEnumStockIndustryWithAggregatesFilter<$PrismaModel> | $Enums.StockIndustry
+  _count?: Prisma.NestedIntFilter<$PrismaModel>
+  _min?: Prisma.NestedEnumStockIndustryFilter<$PrismaModel>
+  _max?: Prisma.NestedEnumStockIndustryFilter<$PrismaModel>
 }
 
 export type NestedEnumStockRiskLevelWithAggregatesFilter<$PrismaModel = never> = {
