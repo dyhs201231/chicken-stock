@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import ChartPanel from "./order/chart-panel";
 import InfoPanel from "./analytics/info-panel";
@@ -9,10 +9,12 @@ import OrderBookPanel from "./order/order-book-panel";
 import OrderPanel from "./order/order-panel";
 import { SegmentedControl, Tab } from "../ui";
 import type {
+  StockCurrencyCode,
   StockDetailTab,
   StockOnlyProps,
 } from "../../types/stock/stock-detail";
 import {
+  convertStockCurrency,
   formatChange,
   formatPercent,
   formatPlainPrice,
@@ -30,18 +32,31 @@ const sideTabs: { label: string; value: StockDetailTab }[] = [
 
 export default function StockDetail({ stock, activeTab }: StockDetailProps) {
   const router = useRouter();
-  const isUp = stock.changeRate >= 0;
+  const [selectedCurrencyCode, setSelectedCurrencyCode] =
+    useState<StockCurrencyCode>(stock.currencyCode);
+
+  const displayStock = useMemo(
+    () => convertStockCurrency(stock, selectedCurrencyCode),
+    [selectedCurrencyCode, stock],
+  );
+  const isUp = displayStock.changeRate >= 0;
   const changeClassName = isUp ? "text-red-500" : "text-blue-500";
-  const marketLabel = stock.countryCode === "KR" ? "한국주식" : "미국주식";
+  const marketLabel =
+    displayStock.countryCode === "KR" ? "한국주식" : "미국주식";
 
   const rangeStats = useMemo(
     () => [
-      { label: "1일 최고", value: stock.dayHigh },
-      { label: "1일 최저", value: stock.dayLow },
-      { label: "52주 최고", value: stock.high52w },
-      { label: "52주 최저", value: stock.low52w },
+      { label: "1일 최고", value: displayStock.dayHigh },
+      { label: "1일 최저", value: displayStock.dayLow },
+      { label: "52주 최고", value: displayStock.high52w },
+      { label: "52주 최저", value: displayStock.low52w },
     ],
-    [stock.dayHigh, stock.dayLow, stock.high52w, stock.low52w],
+    [
+      displayStock.dayHigh,
+      displayStock.dayLow,
+      displayStock.high52w,
+      displayStock.low52w,
+    ],
   );
 
   const handleTabChange = (nextTab: string) => {
@@ -71,23 +86,35 @@ export default function StockDetail({ stock, activeTab }: StockDetailProps) {
             </div>
 
             <p className="text-3xl font-medium">
-              {formatPrice(stock.currentPrice, stock.currencyCode)}
+              {formatPrice(
+                displayStock.currentPrice,
+                displayStock.currencyCode,
+              )}
 
               <span className={`ml-3 text-2xl ${changeClassName}`}>
-                어제보다 {formatChange(stock.changeAmount, stock.currencyCode)}(
-                {formatPercent(stock.changeRate)})
+                어제보다{" "}
+                {formatChange(
+                  displayStock.changeAmount,
+                  displayStock.currencyCode,
+                )}
+                ({formatPercent(displayStock.changeRate)})
               </span>
             </p>
           </div>
         </div>
 
         <div className="flex flex-col items-end gap-3">
-          {stock.countryCode === "US" && (
+          {displayStock.countryCode === "US" && (
             <SegmentedControl
               aria-label="통화 선택"
               className="h-7 text-sm"
-              defaultValue="usd"
+              value={selectedCurrencyCode.toLowerCase()}
               style="invertedPanel"
+              onValueChange={(value) =>
+                setSelectedCurrencyCode(
+                  value.toUpperCase() as StockCurrencyCode,
+                )
+              }
             >
               <SegmentedControl.Item className="h-6 min-w-8 px-2" value="usd">
                 달러
@@ -104,7 +131,7 @@ export default function StockDetail({ stock, activeTab }: StockDetailProps) {
               <div key={item.label}>
                 <dt className="text-base">{item.label}</dt>
                 <dd className="text-2xl font-medium">
-                  {formatPlainPrice(item.value, stock.currencyCode)}
+                  {formatPlainPrice(item.value, displayStock.currencyCode)}
                 </dd>
               </div>
             ))}
@@ -131,17 +158,17 @@ export default function StockDetail({ stock, activeTab }: StockDetailProps) {
 
       {activeTab === "chart-orderbook" && (
         <div className="grid grid-cols-[minmax(0,1fr)_20rem_20rem] gap-7">
-          <ChartPanel stock={stock} />
-          <OrderBookPanel stock={stock} />
-          <OrderPanel stock={stock} />
+          <ChartPanel stock={displayStock} />
+          <OrderBookPanel stock={displayStock} />
+          <OrderPanel stock={displayStock} />
         </div>
       )}
 
       {activeTab === "portfolio-info" && (
         <div className="grid grid-cols-[minmax(0,1fr)_20rem_20rem] gap-7">
-          <InfoPanel stock={stock} />
-          <OrderBookPanel stock={stock} />
-          <OrderPanel stock={stock} />
+          <InfoPanel stock={displayStock} />
+          <OrderBookPanel stock={displayStock} />
+          <OrderPanel stock={displayStock} />
         </div>
       )}
     </main>

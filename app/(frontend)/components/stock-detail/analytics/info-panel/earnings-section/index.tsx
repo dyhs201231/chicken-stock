@@ -46,11 +46,17 @@ export default function EarningsSection({ stock }: StockOnlyProps) {
         />
         <MetricCard
           label="예상 영업이익"
-          value={formatCompactMoney(latestEarning?.estimatedOperatingProfit)}
+          value={formatCompactMoney(
+            latestEarning?.estimatedOperatingProfit,
+            stock.currencyCode,
+          )}
         />
         <MetricCard
           label="예상 매출"
-          value={formatCompactMoney(latestEarning?.estimatedRevenue)}
+          value={formatCompactMoney(
+            latestEarning?.estimatedRevenue,
+            stock.currencyCode,
+          )}
         />
       </div>
 
@@ -68,7 +74,7 @@ export default function EarningsSection({ stock }: StockOnlyProps) {
         ))}
       </div>
 
-      <EarningsChart data={chartData} />
+      <EarningsChart data={chartData} currencyCode={stock.currencyCode} />
     </section>
   );
 }

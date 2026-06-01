@@ -1,4 +1,5 @@
 import type {
+  StockCurrencyCode,
   StockDetailData,
   StockEarningData,
   StockFinancialStatementData,
@@ -19,7 +20,7 @@ const statementRows: Record<
     { key: "revenue", label: "매출액", type: "money" },
     { key: "operatingProfit", label: "영업이익", type: "money" },
     { key: "netIncome", label: "당기순이익", type: "money" },
-    { key: "eps", label: "EPS" },
+    { key: "eps", label: "EPS", type: "money" },
     { key: "operatingMargin", label: "영업이익률", type: "percent" },
     { key: "netMargin", label: "순이익률", type: "percent" },
   ],
@@ -47,6 +48,7 @@ function getNumber(value: unknown) {
 
 function formatStatementValue(
   value: unknown,
+  currencyCode: StockCurrencyCode,
   type?: "money" | "percent" | "multiple",
 ) {
   const numberValue = getNumber(value);
@@ -56,7 +58,7 @@ function formatStatementValue(
   }
 
   if (type === "money") {
-    return formatCompactMoney(numberValue);
+    return formatCompactMoney(numberValue, currencyCode);
   }
 
   if (type === "percent") {
@@ -94,9 +96,21 @@ export const valuationLabels: Record<ValuationMetricTab, string> = {
   PBR: "PBR",
 };
 
-export function formatCompactMoney(value: number | null | undefined) {
+export function formatCompactMoney(
+  value: number | null | undefined,
+  currencyCode: StockCurrencyCode = "KRW",
+) {
   if (value === null || value === undefined || Number.isNaN(value)) {
     return "-";
+  }
+
+  if (currencyCode === "USD") {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      notation: "compact",
+      maximumFractionDigits: 2,
+    }).format(value);
   }
 
   const absValue = Math.abs(value);
@@ -151,6 +165,7 @@ export function getPeriodLabel(
 export function getFinancialTableRows(
   statements: StockFinancialStatementData[],
   statementType: FinancialStatementTab,
+  currencyCode: StockCurrencyCode,
 ): { columns: string[]; rows: FinancialTableRow[] } {
   const scopedStatements = statements
     .filter((statement) => statement.statementType === statementType)
@@ -173,7 +188,7 @@ export function getFinancialTableRows(
     values: Object.fromEntries(
       scopedStatements.map((statement) => [
         getPeriodLabel(statement),
-        formatStatementValue(statement.data[row.key], row.type),
+        formatStatementValue(statement.data[row.key], currencyCode, row.type),
       ]),
     ),
   }));

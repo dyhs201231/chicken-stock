@@ -1,4 +1,5 @@
 export type StockDetailTab = "chart-orderbook" | "portfolio-info";
+export type StockCurrencyCode = "KRW" | "USD";
 
 export type StockOnlyProps = {
   stock: StockDetailData;
@@ -79,7 +80,7 @@ export type StockDetailData = {
   riskLevel: string;
   theme: string;
   countryCode: string;
-  currencyCode: "KRW" | "USD";
+  currencyCode: StockCurrencyCode;
   currentPrice: number;
   previousClose: number;
   changeAmount: number;

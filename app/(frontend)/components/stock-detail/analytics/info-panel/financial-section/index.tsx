@@ -22,8 +22,13 @@ export default function FinancialSection({ stock }: StockOnlyProps) {
     useState<FinancialStatementTab>("INCOME_STATEMENT");
 
   const tableData = useMemo(
-    () => getFinancialTableRows(stock.financialStatements, statementType),
-    [statementType, stock.financialStatements],
+    () =>
+      getFinancialTableRows(
+        stock.financialStatements,
+        statementType,
+        stock.currencyCode,
+      ),
+    [statementType, stock.currencyCode, stock.financialStatements],
   );
 
   return (
