@@ -163,7 +163,7 @@ export default async function ArticlePage({
           query: articleListLinkQuery,
         }}
         aria-label="학습 목록으로 돌아가기"
-        className="absolute top-20 left-6 flex size-16 items-center justify-center text-zinc-500 transition-colors hover:text-zinc-800 focus-visible:ring-2 focus-visible:ring-zinc-500 focus-visible:ring-offset-2 focus-visible:outline-none md:top-24 md:left-20"
+        className="fixed top-20 left-6 z-30 flex size-16 items-center justify-center text-zinc-500 transition-colors hover:text-zinc-800 focus-visible:ring-2 focus-visible:ring-zinc-500 focus-visible:ring-offset-2 focus-visible:outline-none md:top-24 md:left-20"
       >
         <IconChevronLeft aria-hidden="true" className="size-16" stroke={1.8} />
       </Link>
