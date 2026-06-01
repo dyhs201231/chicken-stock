@@ -99,13 +99,13 @@ export async function getStockDetailData(
 
   const [orderBookSnapshot] = stock.orderBookSnapshots;
   const [
-    industryPeerCount,
-    industryStockAverage,
-    industryFinancialMetricAverage,
+    themePeerCount,
+    themeStockAverage,
+    themeFinancialMetricAverage,
   ] = await Promise.all([
       prisma.stock.count({
         where: {
-          industry: stock.industry,
+          theme: stock.theme,
           id: {
             not: stock.id,
           },
@@ -113,7 +113,7 @@ export async function getStockDetailData(
       }),
       prisma.stock.aggregate({
         where: {
-          industry: stock.industry,
+          theme: stock.theme,
           id: {
             not: stock.id,
           },
@@ -125,7 +125,7 @@ export async function getStockDetailData(
       prisma.stockFinancialMetric.aggregate({
         where: {
           stock: {
-            industry: stock.industry,
+            theme: stock.theme,
             id: {
               not: stock.id,
             },
@@ -144,7 +144,6 @@ export async function getStockDetailData(
     name: stock.name,
     imageUrl: stock.imageUrl || null,
     sector: stock.sector,
-    industry: stock.industry,
     riskLevel: stock.riskLevel,
     theme: stock.theme,
     countryCode: stock.countryCode,
@@ -206,12 +205,12 @@ export async function getStockDetailData(
           pbr: stock.financialMetric.pbr,
         }
       : null,
-    industryFinancialMetric: {
+    themeFinancialMetric: {
       per:
-        industryFinancialMetricAverage._avg.per ??
-        toNullableNumber(industryStockAverage._avg.per),
-      pbr: industryFinancialMetricAverage._avg.pbr,
-      peerCount: industryPeerCount,
+        themeFinancialMetricAverage._avg.per ??
+        toNullableNumber(themeStockAverage._avg.per),
+      pbr: themeFinancialMetricAverage._avg.pbr,
+      peerCount: themePeerCount,
     },
     financialStatements: stock.financialStatements.map((statement) => ({
       id: statement.id,

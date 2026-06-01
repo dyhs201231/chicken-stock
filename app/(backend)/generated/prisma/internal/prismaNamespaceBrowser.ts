@@ -331,7 +331,6 @@ export const StockScalarFieldEnum = {
   name: 'name',
   imageUrl: 'imageUrl',
   sector: 'sector',
-  industry: 'industry',
   riskLevel: 'riskLevel',
   theme: 'theme',
   countryCode: 'countryCode',

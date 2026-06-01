@@ -7,19 +7,12 @@ import type { ValuationMetricTab } from "../types";
 import type { StockOnlyProps } from "../../../../../types/stock/stock-detail";
 
 const metricTabs: ValuationMetricTab[] = ["PER", "PBR"];
-const industryLabels: Record<string, string> = {
-  SEMICONDUCTOR: "반도체",
-  SOFTWARE: "소프트웨어",
+const themeLabels: Record<string, string> = {
   AI: "AI",
-  HARDWARE: "하드웨어",
-  BIOTECH: "바이오테크",
-  MEDICAL_DEVICE: "의료기기",
+  SEMICONDUCTOR: "반도체",
+  BIO: "바이오",
+  CONTENT: "콘텐츠",
   BANK: "은행",
-  INSURANCE: "보험",
-  SECURITIES: "증권",
-  RETAIL: "유통",
-  FOOD: "식품",
-  LUXURY: "명품",
 };
 
 export default function ValuationSection({ stock }: StockOnlyProps) {
@@ -29,7 +22,7 @@ export default function ValuationSection({ stock }: StockOnlyProps) {
     [metric, stock],
   );
 
-  const industryLabel = industryLabels[stock.industry] ?? stock.industry;
+  const themeLabel = themeLabels[stock.theme] ?? stock.theme;
 
   return (
     <section>
@@ -49,7 +42,7 @@ export default function ValuationSection({ stock }: StockOnlyProps) {
 
       <ValuationChart
         data={chartData}
-        industryLabel={industryLabel}
+        industryLabel={themeLabel}
         metric={metric}
       />
     </section>

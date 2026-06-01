@@ -38,7 +38,7 @@ export type StockFinancialMetricData = {
   pbr: number | null;
 };
 
-export type StockIndustryFinancialMetricData = {
+export type StockThemeFinancialMetricData = {
   per: number | null;
   pbr: number | null;
   peerCount: number;
@@ -76,7 +76,6 @@ export type StockDetailData = {
   name: string;
   imageUrl: string | null;
   sector: string;
-  industry: string;
   riskLevel: string;
   theme: string;
   countryCode: string;
@@ -107,7 +106,7 @@ export type StockDetailData = {
   candles: StockCandleData[];
   orderBookSnapshot: StockOrderBookSnapshotData | null;
   financialMetric: StockFinancialMetricData | null;
-  industryFinancialMetric: StockIndustryFinancialMetricData;
+  themeFinancialMetric: StockThemeFinancialMetricData;
   financialStatements: StockFinancialStatementData[];
   earnings: StockEarningData[];
 };

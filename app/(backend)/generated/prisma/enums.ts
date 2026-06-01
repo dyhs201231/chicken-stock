@@ -130,24 +130,6 @@ export const StockSector = {
 export type StockSector = (typeof StockSector)[keyof typeof StockSector]
 
 
-export const StockIndustry = {
-  SEMICONDUCTOR: 'SEMICONDUCTOR',
-  SOFTWARE: 'SOFTWARE',
-  AI: 'AI',
-  HARDWARE: 'HARDWARE',
-  BIOTECH: 'BIOTECH',
-  MEDICAL_DEVICE: 'MEDICAL_DEVICE',
-  BANK: 'BANK',
-  INSURANCE: 'INSURANCE',
-  SECURITIES: 'SECURITIES',
-  RETAIL: 'RETAIL',
-  FOOD: 'FOOD',
-  LUXURY: 'LUXURY'
-} as const
-
-export type StockIndustry = (typeof StockIndustry)[keyof typeof StockIndustry]
-
-
 export const StockRiskLevel = {
   LOW: 'LOW',
   MEDIUM: 'MEDIUM',

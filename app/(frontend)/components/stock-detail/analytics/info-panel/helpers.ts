@@ -237,8 +237,8 @@ export function getValuationChartData(
 ): ChartDatum[] {
   const currentPer = stock.financialMetric?.per ?? stock.per;
   const currentPbr = stock.financialMetric?.pbr ?? null;
-  const industryPer = stock.industryFinancialMetric.per;
-  const industryPbr = stock.industryFinancialMetric.pbr;
+  const industryPer = stock.themeFinancialMetric.per;
+  const industryPbr = stock.themeFinancialMetric.pbr;
   const stockValue = metric === "PER" ? currentPer : currentPbr;
   const industryValue = metric === "PER" ? industryPer : industryPbr;
   const stockForwardFactor = metric === "PER" ? 0.86 : 0.9;
