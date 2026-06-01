@@ -8,10 +8,19 @@ import type { StockOnlyProps } from "../../../../../types/stock/stock-detail";
 
 const metricTabs: ValuationMetricTab[] = ["PER", "PBR"];
 const themeLabels: Record<string, string> = {
-  AI: "AI",
+  AI: "인공지능",
   SEMICONDUCTOR: "반도체",
-  BIO: "바이오",
+  CLOUD: "클라우드",
+  PHARMACEUTICAL: "제약",
+  MEDICAL_DEVICE: "의료기기",
+  HEALTHCARE_SERVICE: "헬스케어 서비스",
+  BANKING: "은행",
+  SECURITIES: "증권",
+  PAYMENT: "결제",
+  E_COMMERCE: "전자상거래",
+  FOOD_BEVERAGE: "식음료",
   CONTENT: "콘텐츠",
+  BIO: "바이오",
   BANK: "은행",
 };
 
