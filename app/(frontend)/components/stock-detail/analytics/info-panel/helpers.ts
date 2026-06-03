@@ -32,7 +32,6 @@ const statementRows: Record<
     { key: "currentLiabilities", label: "유동부채", type: "money" },
     { key: "debtRatio", label: "부채비율", type: "percent" },
     { key: "currentRatio", label: "유동비율", type: "percent" },
-    { key: "pbr", label: "PBR", type: "multiple" },
   ],
   CASH_FLOW: [
     { key: "operatingCashFlow", label: "영업활동현금흐름", type: "money" },
@@ -93,7 +92,6 @@ export const periodLabels: Record<EarningPeriodTab, string> = {
 
 export const valuationLabels: Record<ValuationMetricTab, string> = {
   PER: "PER",
-  PBR: "PBR",
 };
 
 export function formatCompactMoney(
@@ -231,23 +229,16 @@ export function getEarningChartData(
     }));
 }
 
-export function getValuationChartData(
-  stock: StockDetailData,
-  metric: ValuationMetricTab,
-): ChartDatum[] {
-  const currentPer = stock.financialMetric?.per ?? stock.per;
-  const currentPbr = stock.financialMetric?.pbr ?? null;
-  const industryPer = stock.themeFinancialMetric.per;
-  const industryPbr = stock.themeFinancialMetric.pbr;
-  const stockValue = metric === "PER" ? currentPer : currentPbr;
-  const industryValue = metric === "PER" ? industryPer : industryPbr;
-  const stockForwardFactor = metric === "PER" ? 0.86 : 0.9;
-  const industryForwardFactor = metric === "PER" ? 0.9 : 0.94;
+export function getValuationChartData(stock: StockDetailData): ChartDatum[] {
+  const stockValue = stock.valuationMetric.per;
+  const industryValue = stock.valuationMetric.industryPer;
+  const stockForwardValue = stock.valuationMetric.forwardPer;
+  const industryForwardValue = stock.valuationMetric.industryForwardPer;
 
-  const toMultiple = (value: number | null | undefined, factor = 1) =>
+  const toMultiple = (value: number | null | undefined) =>
     value === null || value === undefined
       ? undefined
-      : Number((value * factor).toFixed(2));
+      : Number(value.toFixed(2));
 
   return [
     {
@@ -257,8 +248,8 @@ export function getValuationChartData(
     },
     {
       label: "2027(예상)",
-      stockValue: toMultiple(stockValue, stockForwardFactor),
-      industryValue: toMultiple(industryValue, industryForwardFactor),
+      stockValue: toMultiple(stockForwardValue),
+      industryValue: toMultiple(industryForwardValue),
     },
   ];
 }

@@ -4,20 +4,30 @@ import type {
   StockFinancialStatementData,
 } from "../../../types/stock/stock-detail";
 
+type ValuationSourceStock = {
+  currentPrice: DecimalLike;
+  marketCap: DecimalLike;
+  financialStatements: {
+    statementType: string;
+    periodType: string;
+    fiscalYear: number;
+    fiscalQuarter: number | null;
+    data: unknown;
+  }[];
+  earnings: {
+    periodType: string;
+    fiscalYear: number;
+    fiscalQuarter: number | null;
+    estimatedOperatingProfit: bigint | null;
+  }[];
+};
+
 type DecimalLike = {
   toNumber: () => number;
 };
 
 function toNumber(value: DecimalLike) {
   return value.toNumber();
-}
-
-function toNullableNumber(value: DecimalLike | number | null | undefined) {
-  if (value === null || value === undefined) {
-    return null;
-  }
-
-  return typeof value === "number" ? value : value.toNumber();
 }
 
 function bigintToNullableNumber(value: bigint | null) {
@@ -32,6 +42,124 @@ function toStatementData(
   }
 
   return value as StockFinancialStatementData["data"];
+}
+
+function average(values: Array<number | null>) {
+  const validValues = values.filter(
+    (value): value is number => value !== null && value > 0,
+  );
+
+  if (validValues.length === 0) {
+    return null;
+  }
+
+  return (
+    validValues.reduce((sum, value) => sum + value, 0) / validValues.length
+  );
+}
+
+function roundMultiple(value: number | null) {
+  return value === null || !Number.isFinite(value)
+    ? null
+    : Number(value.toFixed(2));
+}
+
+function getSharesOutstanding(stock: ValuationSourceStock) {
+  const currentPrice = toNumber(stock.currentPrice);
+  const marketCap = toNumber(stock.marketCap);
+
+  if (currentPrice <= 0 || marketCap <= 0) {
+    return null;
+  }
+
+  return marketCap / currentPrice;
+}
+
+function getLatestQuarterNetIncome(
+  statements: ValuationSourceStock["financialStatements"],
+) {
+  return statements
+    .filter(
+      (statement) =>
+        statement.statementType === "INCOME_STATEMENT" &&
+        statement.periodType === "QUARTER",
+    )
+    .sort((a, b) => {
+      if (a.fiscalYear !== b.fiscalYear) {
+        return b.fiscalYear - a.fiscalYear;
+      }
+
+      return (b.fiscalQuarter ?? 0) - (a.fiscalQuarter ?? 0);
+    })
+    .slice(0, 4)
+    .map((statement) => toStatementData(statement.data).netIncome)
+    .filter((value): value is number => typeof value === "number");
+}
+
+function calculateCurrentPer(stock: ValuationSourceStock) {
+  const sharesOutstanding = getSharesOutstanding(stock);
+
+  if (!sharesOutstanding || sharesOutstanding <= 0) {
+    return null;
+  }
+
+  const ttmNetIncome = getLatestQuarterNetIncome(
+    stock.financialStatements,
+  ).reduce((sum, value) => sum + value, 0);
+  const eps = ttmNetIncome / sharesOutstanding;
+
+  if (eps <= 0) {
+    return null;
+  }
+
+  const per = toNumber(stock.currentPrice) / eps;
+
+  return per > 0 ? per : null;
+}
+
+function getLatestEstimatedProfit(earnings: ValuationSourceStock["earnings"]) {
+  return [...earnings]
+    .sort((a, b) => {
+      if (a.fiscalYear !== b.fiscalYear) {
+        return b.fiscalYear - a.fiscalYear;
+      }
+
+      if (a.periodType !== b.periodType) {
+        return a.periodType === "ANNUAL" ? -1 : 1;
+      }
+
+      return (b.fiscalQuarter ?? 0) - (a.fiscalQuarter ?? 0);
+    })
+    .map((earning) => bigintToNullableNumber(earning.estimatedOperatingProfit))
+    .find((value): value is number => value !== null && value > 0);
+}
+
+function calculateForwardPer(stock: ValuationSourceStock) {
+  const sharesOutstanding = getSharesOutstanding(stock);
+  const estimatedProfit = getLatestEstimatedProfit(stock.earnings);
+
+  if (!sharesOutstanding || sharesOutstanding <= 0 || !estimatedProfit) {
+    return null;
+  }
+
+  const estimatedEps = estimatedProfit / sharesOutstanding;
+
+  if (estimatedEps <= 0) {
+    return null;
+  }
+
+  const forwardPer = toNumber(stock.currentPrice) / estimatedEps;
+
+  return forwardPer > 0 ? forwardPer : null;
+}
+
+function getLatestCandleBaseDate(candles: { timestamp: bigint }[]) {
+  const latestTimestamp = candles[0]?.timestamp;
+  const date = latestTimestamp
+    ? new Date(Number(latestTimestamp))
+    : new Date();
+
+  return date.toISOString();
 }
 
 export async function getStockDetailData(
@@ -100,7 +228,6 @@ export async function getStockDetailData(
   const [orderBookSnapshot] = stock.orderBookSnapshots;
   const [
     themePeerCount,
-    themeStockAverage,
     themeFinancialMetricAverage,
   ] = await Promise.all([
       prisma.stock.count({
@@ -109,17 +236,6 @@ export async function getStockDetailData(
           id: {
             not: stock.id,
           },
-        },
-      }),
-      prisma.stock.aggregate({
-        where: {
-          theme: stock.theme,
-          id: {
-            not: stock.id,
-          },
-        },
-        _avg: {
-          per: true,
         },
       }),
       prisma.stockFinancialMetric.aggregate({
@@ -137,6 +253,24 @@ export async function getStockDetailData(
         },
       }),
     ]);
+  const valuationPeerStocks = await prisma.stock.findMany({
+    where: {
+      theme: stock.theme,
+    },
+    include: {
+      financialStatements: true,
+      earnings: true,
+    },
+  });
+  const currentPer = roundMultiple(calculateCurrentPer(stock));
+  const forwardPer = roundMultiple(calculateForwardPer(stock));
+  const industryPer = roundMultiple(
+    average(valuationPeerStocks.map(calculateCurrentPer)),
+  );
+  const industryForwardPer = roundMultiple(
+    average(valuationPeerStocks.map(calculateForwardPer)),
+  );
+  const valuationBaseDate = getLatestCandleBaseDate(stock.candles);
 
   return {
     id: stock.id,
@@ -206,11 +340,17 @@ export async function getStockDetailData(
         }
       : null,
     themeFinancialMetric: {
-      per:
-        themeFinancialMetricAverage._avg.per ??
-        toNullableNumber(themeStockAverage._avg.per),
+      per: industryPer,
+      forwardPer: industryForwardPer,
       pbr: themeFinancialMetricAverage._avg.pbr,
       peerCount: themePeerCount,
+    },
+    valuationMetric: {
+      baseDate: valuationBaseDate,
+      per: currentPer,
+      industryPer,
+      forwardPer,
+      industryForwardPer,
     },
     financialStatements: stock.financialStatements.map((statement) => ({
       id: statement.id,

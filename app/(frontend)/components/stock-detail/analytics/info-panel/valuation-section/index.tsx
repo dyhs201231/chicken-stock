@@ -6,7 +6,7 @@ import { getValuationChartData, valuationLabels } from "../helpers";
 import type { ValuationMetricTab } from "../types";
 import type { StockOnlyProps } from "../../../../../types/stock/stock-detail";
 
-const metricTabs: ValuationMetricTab[] = ["PER", "PBR"];
+const metricTabs: ValuationMetricTab[] = ["PER"];
 const themeLabels: Record<string, string> = {
   AI: "인공지능",
   SEMICONDUCTOR: "반도체",
@@ -27,15 +27,23 @@ const themeLabels: Record<string, string> = {
 export default function ValuationSection({ stock }: StockOnlyProps) {
   const [metric, setMetric] = useState<ValuationMetricTab>("PER");
   const chartData = useMemo(
-    () => getValuationChartData(stock, metric),
-    [metric, stock],
+    () => getValuationChartData(stock),
+    [stock],
   );
 
   const themeLabel = themeLabels[stock.theme] ?? stock.theme;
+  const baseDateLabel = new Date(stock.valuationMetric.baseDate)
+    .toISOString()
+    .slice(0, 10)
+    .replaceAll("-", ".");
 
   return (
     <section>
-      <h3 className="mb-4 text-2xl font-semibold tracking-normal">가치평가</h3>
+      <div className="mb-4 flex items-center justify-between gap-4">
+        <h3 className="text-2xl font-semibold tracking-normal">가치평가</h3>
+        <span className="text-sm text-zinc-500">{baseDateLabel} 기준</span>
+      </div>
+
       <div className="mb-4 flex gap-5 text-xs">
         {metricTabs.map((tab) => (
           <button
