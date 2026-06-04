@@ -1011,6 +1011,11 @@ export type StockUncheckedUpdateManyInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+export type StockNullableScalarRelationFilter = {
+  is?: Prisma.StockWhereInput | null
+  isNot?: Prisma.StockWhereInput | null
+}
+
 export type StockScalarRelationFilter = {
   is?: Prisma.StockWhereInput
   isNot?: Prisma.StockWhereInput
@@ -1181,10 +1186,12 @@ export type StockCreateNestedOneWithoutTransactionsInput = {
   connect?: Prisma.StockWhereUniqueInput
 }
 
-export type StockUpdateOneRequiredWithoutTransactionsNestedInput = {
+export type StockUpdateOneWithoutTransactionsNestedInput = {
   create?: Prisma.XOR<Prisma.StockCreateWithoutTransactionsInput, Prisma.StockUncheckedCreateWithoutTransactionsInput>
   connectOrCreate?: Prisma.StockCreateOrConnectWithoutTransactionsInput
   upsert?: Prisma.StockUpsertWithoutTransactionsInput
+  disconnect?: Prisma.StockWhereInput | boolean
+  delete?: Prisma.StockWhereInput | boolean
   connect?: Prisma.StockWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.StockUpdateToOneWithWhereWithoutTransactionsInput, Prisma.StockUpdateWithoutTransactionsInput>, Prisma.StockUncheckedUpdateWithoutTransactionsInput>
 }

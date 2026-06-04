@@ -1,4 +1,3 @@
-import { useUpdateMyInfo } from "@/app/(frontend)/apis/auth/mutations";
 import { Button } from "@/app/(frontend)/components/ui";
 import { usePortfolioStore } from "@/app/(frontend)/stores/portfolio";
 import {
@@ -12,8 +11,6 @@ export default function InvestmentTypeResult() {
     setCreateAccountStep: setStep,
     createAccountInfo,
   } = usePortfolioStore();
-  const { mutate: updateMyInfo, isPending: isUpdateMyInfoPending } =
-    useUpdateMyInfo();
 
   const investmentType = classifyInvestmentType(createAccountInfo);
   const investmentTypeLabel = investmentType
@@ -26,14 +23,7 @@ export default function InvestmentTypeResult() {
       return;
     }
 
-    updateMyInfo(
-      { investmentType },
-      {
-        onSuccess: () => {
-          setStep(step + 1);
-        },
-      },
-    );
+    setStep(step + 1);
   };
 
   return (
@@ -44,16 +34,12 @@ export default function InvestmentTypeResult() {
       </div>
 
       <div className="row justify-end gap-3">
-        <Button
-          disabled={isUpdateMyInfoPending}
-          variant="step-controls"
-          onClick={() => setStep(step - 1)}
-        >
+        <Button variant="step-controls" onClick={() => setStep(step - 1)}>
           이전
         </Button>
 
         <Button
-          disabled={!investmentType || isUpdateMyInfoPending}
+          disabled={!investmentType}
           variant="step-controls"
           onClick={handleNextClick}
         >

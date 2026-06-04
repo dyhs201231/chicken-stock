@@ -279,7 +279,7 @@ export type UserWhereInput = {
   refreshTokens?: Prisma.RefreshTokenListRelationFilter
   articleCompletions?: Prisma.UserArticleCompletionListRelationFilter
   agent?: Prisma.XOR<Prisma.AgentNullableScalarRelationFilter, Prisma.AgentWhereInput> | null
-  portfolios?: Prisma.PortfolioListRelationFilter
+  portfolio?: Prisma.XOR<Prisma.PortfolioNullableScalarRelationFilter, Prisma.PortfolioWhereInput> | null
 }
 
 export type UserOrderByWithRelationInput = {
@@ -297,7 +297,7 @@ export type UserOrderByWithRelationInput = {
   refreshTokens?: Prisma.RefreshTokenOrderByRelationAggregateInput
   articleCompletions?: Prisma.UserArticleCompletionOrderByRelationAggregateInput
   agent?: Prisma.AgentOrderByWithRelationInput
-  portfolios?: Prisma.PortfolioOrderByRelationAggregateInput
+  portfolio?: Prisma.PortfolioOrderByWithRelationInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -318,7 +318,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   refreshTokens?: Prisma.RefreshTokenListRelationFilter
   articleCompletions?: Prisma.UserArticleCompletionListRelationFilter
   agent?: Prisma.XOR<Prisma.AgentNullableScalarRelationFilter, Prisma.AgentWhereInput> | null
-  portfolios?: Prisma.PortfolioListRelationFilter
+  portfolio?: Prisma.XOR<Prisma.PortfolioNullableScalarRelationFilter, Prisma.PortfolioWhereInput> | null
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -372,7 +372,7 @@ export type UserCreateInput = {
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   articleCompletions?: Prisma.UserArticleCompletionCreateNestedManyWithoutUserInput
   agent?: Prisma.AgentCreateNestedOneWithoutUserInput
-  portfolios?: Prisma.PortfolioCreateNestedManyWithoutUserInput
+  portfolio?: Prisma.PortfolioCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -390,7 +390,7 @@ export type UserUncheckedCreateInput = {
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   articleCompletions?: Prisma.UserArticleCompletionUncheckedCreateNestedManyWithoutUserInput
   agent?: Prisma.AgentUncheckedCreateNestedOneWithoutUserInput
-  portfolios?: Prisma.PortfolioUncheckedCreateNestedManyWithoutUserInput
+  portfolio?: Prisma.PortfolioUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -408,7 +408,7 @@ export type UserUpdateInput = {
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   articleCompletions?: Prisma.UserArticleCompletionUpdateManyWithoutUserNestedInput
   agent?: Prisma.AgentUpdateOneWithoutUserNestedInput
-  portfolios?: Prisma.PortfolioUpdateManyWithoutUserNestedInput
+  portfolio?: Prisma.PortfolioUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -426,7 +426,7 @@ export type UserUncheckedUpdateInput = {
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   articleCompletions?: Prisma.UserArticleCompletionUncheckedUpdateManyWithoutUserNestedInput
   agent?: Prisma.AgentUncheckedUpdateOneWithoutUserNestedInput
-  portfolios?: Prisma.PortfolioUncheckedUpdateManyWithoutUserNestedInput
+  portfolio?: Prisma.PortfolioUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -610,18 +610,18 @@ export type UserUpdateOneRequiredWithoutAgentNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAgentInput, Prisma.UserUpdateWithoutAgentInput>, Prisma.UserUncheckedUpdateWithoutAgentInput>
 }
 
-export type UserCreateNestedOneWithoutPortfoliosInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutPortfoliosInput, Prisma.UserUncheckedCreateWithoutPortfoliosInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPortfoliosInput
+export type UserCreateNestedOneWithoutPortfolioInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPortfolioInput, Prisma.UserUncheckedCreateWithoutPortfolioInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPortfolioInput
   connect?: Prisma.UserWhereUniqueInput
 }
 
-export type UserUpdateOneRequiredWithoutPortfoliosNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutPortfoliosInput, Prisma.UserUncheckedCreateWithoutPortfoliosInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPortfoliosInput
-  upsert?: Prisma.UserUpsertWithoutPortfoliosInput
+export type UserUpdateOneRequiredWithoutPortfolioNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPortfolioInput, Prisma.UserUncheckedCreateWithoutPortfolioInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPortfolioInput
+  upsert?: Prisma.UserUpsertWithoutPortfolioInput
   connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPortfoliosInput, Prisma.UserUpdateWithoutPortfoliosInput>, Prisma.UserUncheckedUpdateWithoutPortfoliosInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPortfolioInput, Prisma.UserUpdateWithoutPortfolioInput>, Prisma.UserUncheckedUpdateWithoutPortfolioInput>
 }
 
 export type UserCreateWithoutRefreshTokensInput = {
@@ -638,7 +638,7 @@ export type UserCreateWithoutRefreshTokensInput = {
   updatedAt?: Date | string
   articleCompletions?: Prisma.UserArticleCompletionCreateNestedManyWithoutUserInput
   agent?: Prisma.AgentCreateNestedOneWithoutUserInput
-  portfolios?: Prisma.PortfolioCreateNestedManyWithoutUserInput
+  portfolio?: Prisma.PortfolioCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRefreshTokensInput = {
@@ -655,7 +655,7 @@ export type UserUncheckedCreateWithoutRefreshTokensInput = {
   updatedAt?: Date | string
   articleCompletions?: Prisma.UserArticleCompletionUncheckedCreateNestedManyWithoutUserInput
   agent?: Prisma.AgentUncheckedCreateNestedOneWithoutUserInput
-  portfolios?: Prisma.PortfolioUncheckedCreateNestedManyWithoutUserInput
+  portfolio?: Prisma.PortfolioUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRefreshTokensInput = {
@@ -688,7 +688,7 @@ export type UserUpdateWithoutRefreshTokensInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   articleCompletions?: Prisma.UserArticleCompletionUpdateManyWithoutUserNestedInput
   agent?: Prisma.AgentUpdateOneWithoutUserNestedInput
-  portfolios?: Prisma.PortfolioUpdateManyWithoutUserNestedInput
+  portfolio?: Prisma.PortfolioUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRefreshTokensInput = {
@@ -705,7 +705,7 @@ export type UserUncheckedUpdateWithoutRefreshTokensInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   articleCompletions?: Prisma.UserArticleCompletionUncheckedUpdateManyWithoutUserNestedInput
   agent?: Prisma.AgentUncheckedUpdateOneWithoutUserNestedInput
-  portfolios?: Prisma.PortfolioUncheckedUpdateManyWithoutUserNestedInput
+  portfolio?: Prisma.PortfolioUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutArticleCompletionsInput = {
@@ -722,7 +722,7 @@ export type UserCreateWithoutArticleCompletionsInput = {
   updatedAt?: Date | string
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   agent?: Prisma.AgentCreateNestedOneWithoutUserInput
-  portfolios?: Prisma.PortfolioCreateNestedManyWithoutUserInput
+  portfolio?: Prisma.PortfolioCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutArticleCompletionsInput = {
@@ -739,7 +739,7 @@ export type UserUncheckedCreateWithoutArticleCompletionsInput = {
   updatedAt?: Date | string
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   agent?: Prisma.AgentUncheckedCreateNestedOneWithoutUserInput
-  portfolios?: Prisma.PortfolioUncheckedCreateNestedManyWithoutUserInput
+  portfolio?: Prisma.PortfolioUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutArticleCompletionsInput = {
@@ -772,7 +772,7 @@ export type UserUpdateWithoutArticleCompletionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   agent?: Prisma.AgentUpdateOneWithoutUserNestedInput
-  portfolios?: Prisma.PortfolioUpdateManyWithoutUserNestedInput
+  portfolio?: Prisma.PortfolioUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutArticleCompletionsInput = {
@@ -789,7 +789,7 @@ export type UserUncheckedUpdateWithoutArticleCompletionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   agent?: Prisma.AgentUncheckedUpdateOneWithoutUserNestedInput
-  portfolios?: Prisma.PortfolioUncheckedUpdateManyWithoutUserNestedInput
+  portfolio?: Prisma.PortfolioUncheckedUpdateOneWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAgentInput = {
@@ -806,7 +806,7 @@ export type UserCreateWithoutAgentInput = {
   updatedAt?: Date | string
   refreshTokens?: Prisma.RefreshTokenCreateNestedManyWithoutUserInput
   articleCompletions?: Prisma.UserArticleCompletionCreateNestedManyWithoutUserInput
-  portfolios?: Prisma.PortfolioCreateNestedManyWithoutUserInput
+  portfolio?: Prisma.PortfolioCreateNestedOneWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAgentInput = {
@@ -823,7 +823,7 @@ export type UserUncheckedCreateWithoutAgentInput = {
   updatedAt?: Date | string
   refreshTokens?: Prisma.RefreshTokenUncheckedCreateNestedManyWithoutUserInput
   articleCompletions?: Prisma.UserArticleCompletionUncheckedCreateNestedManyWithoutUserInput
-  portfolios?: Prisma.PortfolioUncheckedCreateNestedManyWithoutUserInput
+  portfolio?: Prisma.PortfolioUncheckedCreateNestedOneWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAgentInput = {
@@ -856,7 +856,7 @@ export type UserUpdateWithoutAgentInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   refreshTokens?: Prisma.RefreshTokenUpdateManyWithoutUserNestedInput
   articleCompletions?: Prisma.UserArticleCompletionUpdateManyWithoutUserNestedInput
-  portfolios?: Prisma.PortfolioUpdateManyWithoutUserNestedInput
+  portfolio?: Prisma.PortfolioUpdateOneWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAgentInput = {
@@ -873,10 +873,10 @@ export type UserUncheckedUpdateWithoutAgentInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   refreshTokens?: Prisma.RefreshTokenUncheckedUpdateManyWithoutUserNestedInput
   articleCompletions?: Prisma.UserArticleCompletionUncheckedUpdateManyWithoutUserNestedInput
-  portfolios?: Prisma.PortfolioUncheckedUpdateManyWithoutUserNestedInput
+  portfolio?: Prisma.PortfolioUncheckedUpdateOneWithoutUserNestedInput
 }
 
-export type UserCreateWithoutPortfoliosInput = {
+export type UserCreateWithoutPortfolioInput = {
   id?: bigint | number
   type?: $Enums.UserType
   name?: string
@@ -893,7 +893,7 @@ export type UserCreateWithoutPortfoliosInput = {
   agent?: Prisma.AgentCreateNestedOneWithoutUserInput
 }
 
-export type UserUncheckedCreateWithoutPortfoliosInput = {
+export type UserUncheckedCreateWithoutPortfolioInput = {
   id?: bigint | number
   type?: $Enums.UserType
   name?: string
@@ -910,23 +910,23 @@ export type UserUncheckedCreateWithoutPortfoliosInput = {
   agent?: Prisma.AgentUncheckedCreateNestedOneWithoutUserInput
 }
 
-export type UserCreateOrConnectWithoutPortfoliosInput = {
+export type UserCreateOrConnectWithoutPortfolioInput = {
   where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutPortfoliosInput, Prisma.UserUncheckedCreateWithoutPortfoliosInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutPortfolioInput, Prisma.UserUncheckedCreateWithoutPortfolioInput>
 }
 
-export type UserUpsertWithoutPortfoliosInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutPortfoliosInput, Prisma.UserUncheckedUpdateWithoutPortfoliosInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutPortfoliosInput, Prisma.UserUncheckedCreateWithoutPortfoliosInput>
+export type UserUpsertWithoutPortfolioInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutPortfolioInput, Prisma.UserUncheckedUpdateWithoutPortfolioInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutPortfolioInput, Prisma.UserUncheckedCreateWithoutPortfolioInput>
   where?: Prisma.UserWhereInput
 }
 
-export type UserUpdateToOneWithWhereWithoutPortfoliosInput = {
+export type UserUpdateToOneWithWhereWithoutPortfolioInput = {
   where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutPortfoliosInput, Prisma.UserUncheckedUpdateWithoutPortfoliosInput>
+  data: Prisma.XOR<Prisma.UserUpdateWithoutPortfolioInput, Prisma.UserUncheckedUpdateWithoutPortfolioInput>
 }
 
-export type UserUpdateWithoutPortfoliosInput = {
+export type UserUpdateWithoutPortfolioInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   type?: Prisma.EnumUserTypeFieldUpdateOperationsInput | $Enums.UserType
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -943,7 +943,7 @@ export type UserUpdateWithoutPortfoliosInput = {
   agent?: Prisma.AgentUpdateOneWithoutUserNestedInput
 }
 
-export type UserUncheckedUpdateWithoutPortfoliosInput = {
+export type UserUncheckedUpdateWithoutPortfolioInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   type?: Prisma.EnumUserTypeFieldUpdateOperationsInput | $Enums.UserType
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -968,13 +968,11 @@ export type UserUncheckedUpdateWithoutPortfoliosInput = {
 export type UserCountOutputType = {
   refreshTokens: number
   articleCompletions: number
-  portfolios: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   refreshTokens?: boolean | UserCountOutputTypeCountRefreshTokensArgs
   articleCompletions?: boolean | UserCountOutputTypeCountArticleCompletionsArgs
-  portfolios?: boolean | UserCountOutputTypeCountPortfoliosArgs
 }
 
 /**
@@ -1001,13 +999,6 @@ export type UserCountOutputTypeCountArticleCompletionsArgs<ExtArgs extends runti
   where?: Prisma.UserArticleCompletionWhereInput
 }
 
-/**
- * UserCountOutputType without action
- */
-export type UserCountOutputTypeCountPortfoliosArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.PortfolioWhereInput
-}
-
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -1024,7 +1015,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   refreshTokens?: boolean | Prisma.User$refreshTokensArgs<ExtArgs>
   articleCompletions?: boolean | Prisma.User$articleCompletionsArgs<ExtArgs>
   agent?: boolean | Prisma.User$agentArgs<ExtArgs>
-  portfolios?: boolean | Prisma.User$portfoliosArgs<ExtArgs>
+  portfolio?: boolean | Prisma.User$portfolioArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -1075,7 +1066,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   refreshTokens?: boolean | Prisma.User$refreshTokensArgs<ExtArgs>
   articleCompletions?: boolean | Prisma.User$articleCompletionsArgs<ExtArgs>
   agent?: boolean | Prisma.User$agentArgs<ExtArgs>
-  portfolios?: boolean | Prisma.User$portfoliosArgs<ExtArgs>
+  portfolio?: boolean | Prisma.User$portfolioArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1087,7 +1078,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     refreshTokens: Prisma.$RefreshTokenPayload<ExtArgs>[]
     articleCompletions: Prisma.$UserArticleCompletionPayload<ExtArgs>[]
     agent: Prisma.$AgentPayload<ExtArgs> | null
-    portfolios: Prisma.$PortfolioPayload<ExtArgs>[]
+    portfolio: Prisma.$PortfolioPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: bigint
@@ -1498,7 +1489,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   refreshTokens<T extends Prisma.User$refreshTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$refreshTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RefreshTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   articleCompletions<T extends Prisma.User$articleCompletionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$articleCompletionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserArticleCompletionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   agent<T extends Prisma.User$agentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$agentArgs<ExtArgs>>): Prisma.Prisma__AgentClient<runtime.Types.Result.GetResult<Prisma.$AgentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
-  portfolios<T extends Prisma.User$portfoliosArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$portfoliosArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PortfolioPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  portfolio<T extends Prisma.User$portfolioArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$portfolioArgs<ExtArgs>>): Prisma.Prisma__PortfolioClient<runtime.Types.Result.GetResult<Prisma.$PortfolioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1994,9 +1985,9 @@ export type User$agentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
 }
 
 /**
- * User.portfolios
+ * User.portfolio
  */
-export type User$portfoliosArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$portfolioArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
    * Select specific fields to fetch from the Portfolio
    */
@@ -2010,11 +2001,6 @@ export type User$portfoliosArgs<ExtArgs extends runtime.Types.Extensions.Interna
    */
   include?: Prisma.PortfolioInclude<ExtArgs> | null
   where?: Prisma.PortfolioWhereInput
-  orderBy?: Prisma.PortfolioOrderByWithRelationInput | Prisma.PortfolioOrderByWithRelationInput[]
-  cursor?: Prisma.PortfolioWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.PortfolioScalarFieldEnum | Prisma.PortfolioScalarFieldEnum[]
 }
 
 /**

@@ -1,0 +1,44 @@
+import { useGetPortfolio } from "@/app/(frontend)/apis/portfolio/queries";
+import React from "react";
+
+export default function BalanceData() {
+  const { data } = useGetPortfolio();
+
+  if (!data) {
+    return null;
+  }
+
+  return (
+    <div className="grid grid-cols-2 gap-15">
+      <div className="row justify-between rounded-3xl px-4 py-10 text-xl shadow-[3px_6px_10px_rgba(0,0,0,0.25)]">
+        <p>총 주문 가능 금액</p>
+        <p>{data.totalAvailableOrderAmount.toLocaleString()} 원</p>
+      </div>
+
+      <div className="row justify-between rounded-3xl px-4 py-10 text-xl shadow-[3px_6px_10px_rgba(0,0,0,0.25)]">
+        <p>총 투자 금액</p>
+        <p>{data.totalInvestmentAmount.toLocaleString()} 원</p>
+      </div>
+
+      <div className="row justify-between rounded-3xl px-4 py-10 text-xl shadow-[3px_6px_10px_rgba(0,0,0,0.25)]">
+        <p>원화</p>
+        <p>{data.krwBalance.toLocaleString()} 원</p>
+      </div>
+
+      <div className="row justify-between rounded-3xl px-4 py-10 text-xl shadow-[3px_6px_10px_rgba(0,0,0,0.25)]">
+        <p>국내주식</p>
+        <p>{data.domesticStockAmount.toLocaleString()} 원</p>
+      </div>
+
+      <div className="row justify-between rounded-3xl px-4 py-10 text-xl shadow-[3px_6px_10px_rgba(0,0,0,0.25)]">
+        <p>달러</p>
+        <p>{data.usdBalance.toLocaleString()} 달러</p>
+      </div>
+
+      <div className="row justify-between rounded-3xl px-4 py-10 text-xl shadow-[3px_6px_10px_rgba(0,0,0,0.25)]">
+        <p>해외주식</p>
+        <p>{data.foreignStockAmount.toLocaleString()} 달러</p>
+      </div>
+    </div>
+  );
+}

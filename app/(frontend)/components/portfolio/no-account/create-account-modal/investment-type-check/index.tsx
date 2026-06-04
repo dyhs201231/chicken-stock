@@ -3,6 +3,7 @@ import { INVESTMENT_SELECTS } from "@/app/(frontend)/constants/portfolio";
 import { usePortfolioStore } from "@/app/(frontend)/stores/portfolio";
 import type { InvestmentField } from "@/app/(frontend)/types/portfolio";
 import { useState } from "react";
+import { twMerge } from "tailwind-merge";
 import { isInvestmentTypeSurveyComplete } from "../../../../../lib/classify-investment-type";
 
 const SELECT_TRIGGER_CLASS_NAME =
@@ -54,11 +55,12 @@ export default function InvestmentTypeCheck() {
               aria-invalid={
                 isValidationRequested && !createAccountInfo[field].trim()
               }
-              triggerClassName={`${SELECT_TRIGGER_CLASS_NAME} ${
-                isValidationRequested && !createAccountInfo[field].trim()
-                  ? SELECT_TRIGGER_ERROR_CLASS_NAME
-                  : ""
-              }`}
+              triggerClassName={twMerge(
+                SELECT_TRIGGER_CLASS_NAME,
+                isValidationRequested &&
+                  !createAccountInfo[field].trim() &&
+                  SELECT_TRIGGER_ERROR_CLASS_NAME,
+              )}
               contentClassName="rounded-[10px] border-2 border-[#D9D9D9] py-1 shadow-[0_8px_24px_rgba(0,0,0,0.08)]"
               optionClassName="min-h-11 px-4 text-base"
               options={options}

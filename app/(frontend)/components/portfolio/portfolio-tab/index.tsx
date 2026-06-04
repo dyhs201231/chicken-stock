@@ -3,6 +3,7 @@
 import { Tab } from "@/app/(frontend)/components/ui";
 import { PORTFOLIO_TAB } from "@/app/(frontend)/constants/portfolio";
 import { usePortfolioStore } from "@/app/(frontend)/stores/portfolio";
+import { toast } from "sonner";
 
 export default function PortfolioTab() {
   const { selectedTab, setSelectedTab } = usePortfolioStore();
@@ -19,7 +20,13 @@ export default function PortfolioTab() {
           key={tab}
           className="px-15 py-4.5 text-xl font-semibold"
           value={tab}
-          onClick={() => setSelectedTab(tab)}
+          onClick={() => {
+            if (tab === "예상 배당금") {
+              return toast.warning("준비 중입니다.");
+            }
+
+            setSelectedTab(tab);
+          }}
         >
           {tab}
         </Tab.Item>

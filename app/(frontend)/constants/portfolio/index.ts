@@ -1,5 +1,10 @@
 import { SelectOption } from "../../components/ui";
-import { InvestmentField, PortfolioTab } from "../../types/portfolio";
+import {
+  InvestmentField,
+  PortfolioTab,
+  TransactionCurrency,
+  TransactionHistoryFilter,
+} from "../../types/portfolio";
 
 export const PORTFOLIO_TAB = [
   "기본계좌",
@@ -67,4 +72,15 @@ export const INVESTMENT_SELECTS: {
       { label: "테마주", value: "테마주" },
     ],
   },
+];
+
+export const EXCHANGE_RATE = 1500; //TODO : 지수 추가하면서 외부 API로 교체 예정
+
+export const TRANSACTION_CURRENCIES: TransactionCurrency[] = ["달러", "원화"];
+
+export const TRANSACTION_HISTORY_FILTERS: TransactionHistoryFilter[] = [
+  "전체",
+  "거래",
+  "환전",
+  "입출금",
 ];

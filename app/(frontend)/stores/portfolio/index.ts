@@ -1,6 +1,10 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
-import type { CreateAccountInfo, PortfolioTab } from "../../types/portfolio";
+import type {
+  CreateAccountInfo,
+  ExchangeData,
+  PortfolioTab,
+} from "../../types/portfolio";
 
 interface PortfolioStore {
   selectedTab: PortfolioTab;
@@ -11,6 +15,9 @@ interface PortfolioStore {
 
   createAccountInfo: CreateAccountInfo;
   setCreateAccountInfo: (info: PortfolioStore["createAccountInfo"]) => void;
+
+  exchangeData: ExchangeData;
+  setExchangeData: (data: PortfolioStore["exchangeData"]) => void;
 
   clearPortfolioStore: () => void;
 }
@@ -33,6 +40,12 @@ export const usePortfolioStore = create<PortfolioStore>()(
       interests: "",
     },
     setCreateAccountInfo: (info) => set({ createAccountInfo: info }),
+
+    exchangeData: {
+      type: "krwToUsd",
+      value: 0,
+    },
+    setExchangeData: (data) => set({ exchangeData: data }),
 
     clearPortfolioStore: () =>
       set({

@@ -23,3 +23,13 @@ export type CreateAccountInfo = {
   lossTolerance: string;
   interests: string;
 };
+
+export type ExchangeType = "usdToKrw" | "krwToUsd";
+
+export type ExchangeData = {
+  type: ExchangeType;
+  value: number;
+};
+
+export type TransactionCurrency = "달러" | "원화";
+export type TransactionHistoryFilter = "전체" | "거래" | "환전" | "입출금";

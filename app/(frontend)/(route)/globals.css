@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "react-datepicker/dist/react-datepicker.css";
 
 :root {
   --background: #ffffff;
@@ -59,6 +60,83 @@ body {
   &::-webkit-scrollbar:horizontal {
     height: 8px;
   }
+}
+
+.income-month-calendar.react-datepicker {
+  width: fit-content;
+  border: 0;
+  background: #ffffff;
+  color: #18181b;
+  font-family: var(--font-atoz), Arial, Helvetica, sans-serif;
+}
+
+.income-month-calendar .react-datepicker__month-container {
+  float: none;
+  width: fit-content;
+}
+
+.income-month-calendar .react-datepicker__header {
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+
+.income-month-calendar .react-datepicker-year-header {
+  display: none;
+}
+
+.income-month-calendar .react-datepicker__month {
+  margin: 0;
+}
+
+.income-month-calendar .react-datepicker__month-wrapper {
+  display: grid;
+  grid-template-columns: repeat(3, 60px);
+  gap: 8px;
+}
+
+.income-month-calendar
+  .react-datepicker__month-wrapper
+  + .react-datepicker__month-wrapper {
+  margin-top: 8px;
+}
+
+.income-month-calendar .react-datepicker__month-text {
+  display: inline-flex;
+  width: 60px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  border-radius: 6px;
+  color: #18181b;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
+}
+
+.income-month-calendar
+  .react-datepicker__month-text:not([aria-disabled="true"]):hover {
+  background: #f4f4f5;
+}
+
+.income-month-calendar .react-datepicker__month-text--today {
+  font-weight: 700;
+}
+
+.income-month-calendar .react-datepicker__month-text--keyboard-selected {
+  background: #f4f4f5;
+  color: #18181b;
+}
+
+.income-month-calendar .react-datepicker__month-text--selected,
+.income-month-calendar
+  .react-datepicker__month-text--selected:not([aria-disabled="true"]):hover {
+  background: #18181b;
+  color: #ffffff;
 }
 
 /* 

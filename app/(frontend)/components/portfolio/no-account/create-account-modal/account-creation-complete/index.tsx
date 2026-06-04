@@ -1,10 +1,12 @@
 import { Button } from "@/app/(frontend)/components/ui";
 
 type AccountCreationCompleteProps = {
+  isPending: boolean;
   onConfirm: () => void;
 };
 
 export default function AccountCreationComplete({
+  isPending,
   onConfirm,
 }: AccountCreationCompleteProps) {
   return (
@@ -15,8 +17,13 @@ export default function AccountCreationComplete({
       </div>
 
       <div className="row justify-end">
-        <Button variant="step-controls" onClick={onConfirm}>
-          확인
+        <Button
+          disabled={isPending}
+          variant="step-controls"
+          onClick={onConfirm}
+        >
+          {isPending && "처리 중"}
+          {!isPending && "확인"}
         </Button>
       </div>
     </>

@@ -1,5 +1,11 @@
-import React from "react";
+import AccountData from "./account-data";
+import BalanceData from "./balance-data";
 
 export default function DefaultAccount() {
-  return <div>DefaultAccount</div>;
+  return (
+    <div className="col gap-30">
+      <AccountData />
+      <BalanceData />
+    </div>
+  );
 }

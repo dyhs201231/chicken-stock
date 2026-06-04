@@ -460,16 +460,16 @@ export type PortfolioItemCreateInput = {
   assetType: string
   companyName: string
   companyLogoUrl: string
-  quantity: number
-  averagePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
-  currentPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalInvested: runtime.Decimal | runtime.DecimalJsLike | number | string
-  currentAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  evaluationAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  profit: runtime.Decimal | runtime.DecimalJsLike | number | string
-  profitRate: runtime.Decimal | runtime.DecimalJsLike | number | string
-  fee: runtime.Decimal | runtime.DecimalJsLike | number | string
-  saleTax: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: number
+  averagePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  currentPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInvested?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  currentAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  evaluationAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  profit?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  profitRate?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  saleTax?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
   portfolio: Prisma.PortfolioCreateNestedOneWithoutItemsInput
@@ -482,16 +482,16 @@ export type PortfolioItemUncheckedCreateInput = {
   assetType: string
   companyName: string
   companyLogoUrl: string
-  quantity: number
-  averagePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
-  currentPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalInvested: runtime.Decimal | runtime.DecimalJsLike | number | string
-  currentAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  evaluationAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  profit: runtime.Decimal | runtime.DecimalJsLike | number | string
-  profitRate: runtime.Decimal | runtime.DecimalJsLike | number | string
-  fee: runtime.Decimal | runtime.DecimalJsLike | number | string
-  saleTax: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: number
+  averagePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  currentPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInvested?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  currentAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  evaluationAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  profit?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  profitRate?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  saleTax?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -542,16 +542,16 @@ export type PortfolioItemCreateManyInput = {
   assetType: string
   companyName: string
   companyLogoUrl: string
-  quantity: number
-  averagePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
-  currentPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalInvested: runtime.Decimal | runtime.DecimalJsLike | number | string
-  currentAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  evaluationAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  profit: runtime.Decimal | runtime.DecimalJsLike | number | string
-  profitRate: runtime.Decimal | runtime.DecimalJsLike | number | string
-  fee: runtime.Decimal | runtime.DecimalJsLike | number | string
-  saleTax: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: number
+  averagePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  currentPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInvested?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  currentAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  evaluationAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  profit?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  profitRate?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  saleTax?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -787,16 +787,16 @@ export type PortfolioItemCreateWithoutPortfolioInput = {
   assetType: string
   companyName: string
   companyLogoUrl: string
-  quantity: number
-  averagePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
-  currentPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalInvested: runtime.Decimal | runtime.DecimalJsLike | number | string
-  currentAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  evaluationAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  profit: runtime.Decimal | runtime.DecimalJsLike | number | string
-  profitRate: runtime.Decimal | runtime.DecimalJsLike | number | string
-  fee: runtime.Decimal | runtime.DecimalJsLike | number | string
-  saleTax: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: number
+  averagePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  currentPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInvested?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  currentAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  evaluationAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  profit?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  profitRate?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  saleTax?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
   stock: Prisma.StockCreateNestedOneWithoutPortfolioItemsInput
@@ -807,16 +807,16 @@ export type PortfolioItemUncheckedCreateWithoutPortfolioInput = {
   assetType: string
   companyName: string
   companyLogoUrl: string
-  quantity: number
-  averagePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
-  currentPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalInvested: runtime.Decimal | runtime.DecimalJsLike | number | string
-  currentAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  evaluationAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  profit: runtime.Decimal | runtime.DecimalJsLike | number | string
-  profitRate: runtime.Decimal | runtime.DecimalJsLike | number | string
-  fee: runtime.Decimal | runtime.DecimalJsLike | number | string
-  saleTax: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: number
+  averagePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  currentPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInvested?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  currentAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  evaluationAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  profit?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  profitRate?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  saleTax?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -874,16 +874,16 @@ export type PortfolioItemCreateWithoutStockInput = {
   assetType: string
   companyName: string
   companyLogoUrl: string
-  quantity: number
-  averagePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
-  currentPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalInvested: runtime.Decimal | runtime.DecimalJsLike | number | string
-  currentAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  evaluationAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  profit: runtime.Decimal | runtime.DecimalJsLike | number | string
-  profitRate: runtime.Decimal | runtime.DecimalJsLike | number | string
-  fee: runtime.Decimal | runtime.DecimalJsLike | number | string
-  saleTax: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: number
+  averagePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  currentPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInvested?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  currentAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  evaluationAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  profit?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  profitRate?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  saleTax?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
   portfolio: Prisma.PortfolioCreateNestedOneWithoutItemsInput
@@ -894,16 +894,16 @@ export type PortfolioItemUncheckedCreateWithoutStockInput = {
   assetType: string
   companyName: string
   companyLogoUrl: string
-  quantity: number
-  averagePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
-  currentPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalInvested: runtime.Decimal | runtime.DecimalJsLike | number | string
-  currentAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  evaluationAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  profit: runtime.Decimal | runtime.DecimalJsLike | number | string
-  profitRate: runtime.Decimal | runtime.DecimalJsLike | number | string
-  fee: runtime.Decimal | runtime.DecimalJsLike | number | string
-  saleTax: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: number
+  averagePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  currentPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInvested?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  currentAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  evaluationAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  profit?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  profitRate?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  saleTax?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -939,16 +939,16 @@ export type PortfolioItemCreateManyPortfolioInput = {
   assetType: string
   companyName: string
   companyLogoUrl: string
-  quantity: number
-  averagePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
-  currentPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalInvested: runtime.Decimal | runtime.DecimalJsLike | number | string
-  currentAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  evaluationAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  profit: runtime.Decimal | runtime.DecimalJsLike | number | string
-  profitRate: runtime.Decimal | runtime.DecimalJsLike | number | string
-  fee: runtime.Decimal | runtime.DecimalJsLike | number | string
-  saleTax: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: number
+  averagePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  currentPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInvested?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  currentAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  evaluationAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  profit?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  profitRate?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  saleTax?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1015,16 +1015,16 @@ export type PortfolioItemCreateManyStockInput = {
   assetType: string
   companyName: string
   companyLogoUrl: string
-  quantity: number
-  averagePrice: runtime.Decimal | runtime.DecimalJsLike | number | string
-  currentPrice: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalInvested: runtime.Decimal | runtime.DecimalJsLike | number | string
-  currentAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  evaluationAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  profit: runtime.Decimal | runtime.DecimalJsLike | number | string
-  profitRate: runtime.Decimal | runtime.DecimalJsLike | number | string
-  fee: runtime.Decimal | runtime.DecimalJsLike | number | string
-  saleTax: runtime.Decimal | runtime.DecimalJsLike | number | string
+  quantity?: number
+  averagePrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  currentPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInvested?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  currentAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  evaluationAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  profit?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  profitRate?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  saleTax?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
 }

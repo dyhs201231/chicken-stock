@@ -32,7 +32,12 @@ export type PortfolioTransactionAvgAggregateOutputType = {
   tradeOrderId: number | null
   totalAmount: runtime.Decimal | null
   totalQuantity: number | null
+  purchaseAmount: runtime.Decimal | null
+  realizedProfit: runtime.Decimal | null
   fee: runtime.Decimal | null
+  paidAmount: runtime.Decimal | null
+  receivedAmount: runtime.Decimal | null
+  exchangeRate: runtime.Decimal | null
 }
 
 export type PortfolioTransactionSumAggregateOutputType = {
@@ -41,7 +46,12 @@ export type PortfolioTransactionSumAggregateOutputType = {
   tradeOrderId: bigint | null
   totalAmount: runtime.Decimal | null
   totalQuantity: number | null
+  purchaseAmount: runtime.Decimal | null
+  realizedProfit: runtime.Decimal | null
   fee: runtime.Decimal | null
+  paidAmount: runtime.Decimal | null
+  receivedAmount: runtime.Decimal | null
+  exchangeRate: runtime.Decimal | null
 }
 
 export type PortfolioTransactionMinAggregateOutputType = {
@@ -54,8 +64,14 @@ export type PortfolioTransactionMinAggregateOutputType = {
   transactionType: $Enums.TransactionType | null
   totalAmount: runtime.Decimal | null
   totalQuantity: number | null
+  purchaseAmount: runtime.Decimal | null
+  realizedProfit: runtime.Decimal | null
   withdrawalAt: Date | null
   fee: runtime.Decimal | null
+  exchangeType: string | null
+  paidAmount: runtime.Decimal | null
+  receivedAmount: runtime.Decimal | null
+  exchangeRate: runtime.Decimal | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -70,8 +86,14 @@ export type PortfolioTransactionMaxAggregateOutputType = {
   transactionType: $Enums.TransactionType | null
   totalAmount: runtime.Decimal | null
   totalQuantity: number | null
+  purchaseAmount: runtime.Decimal | null
+  realizedProfit: runtime.Decimal | null
   withdrawalAt: Date | null
   fee: runtime.Decimal | null
+  exchangeType: string | null
+  paidAmount: runtime.Decimal | null
+  receivedAmount: runtime.Decimal | null
+  exchangeRate: runtime.Decimal | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -86,8 +108,14 @@ export type PortfolioTransactionCountAggregateOutputType = {
   transactionType: number
   totalAmount: number
   totalQuantity: number
+  purchaseAmount: number
+  realizedProfit: number
   withdrawalAt: number
   fee: number
+  exchangeType: number
+  paidAmount: number
+  receivedAmount: number
+  exchangeRate: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -100,7 +128,12 @@ export type PortfolioTransactionAvgAggregateInputType = {
   tradeOrderId?: true
   totalAmount?: true
   totalQuantity?: true
+  purchaseAmount?: true
+  realizedProfit?: true
   fee?: true
+  paidAmount?: true
+  receivedAmount?: true
+  exchangeRate?: true
 }
 
 export type PortfolioTransactionSumAggregateInputType = {
@@ -109,7 +142,12 @@ export type PortfolioTransactionSumAggregateInputType = {
   tradeOrderId?: true
   totalAmount?: true
   totalQuantity?: true
+  purchaseAmount?: true
+  realizedProfit?: true
   fee?: true
+  paidAmount?: true
+  receivedAmount?: true
+  exchangeRate?: true
 }
 
 export type PortfolioTransactionMinAggregateInputType = {
@@ -122,8 +160,14 @@ export type PortfolioTransactionMinAggregateInputType = {
   transactionType?: true
   totalAmount?: true
   totalQuantity?: true
+  purchaseAmount?: true
+  realizedProfit?: true
   withdrawalAt?: true
   fee?: true
+  exchangeType?: true
+  paidAmount?: true
+  receivedAmount?: true
+  exchangeRate?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -138,8 +182,14 @@ export type PortfolioTransactionMaxAggregateInputType = {
   transactionType?: true
   totalAmount?: true
   totalQuantity?: true
+  purchaseAmount?: true
+  realizedProfit?: true
   withdrawalAt?: true
   fee?: true
+  exchangeType?: true
+  paidAmount?: true
+  receivedAmount?: true
+  exchangeRate?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -154,8 +204,14 @@ export type PortfolioTransactionCountAggregateInputType = {
   transactionType?: true
   totalAmount?: true
   totalQuantity?: true
+  purchaseAmount?: true
+  realizedProfit?: true
   withdrawalAt?: true
   fee?: true
+  exchangeType?: true
+  paidAmount?: true
+  receivedAmount?: true
+  exchangeRate?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -250,15 +306,21 @@ export type PortfolioTransactionGroupByArgs<ExtArgs extends runtime.Types.Extens
 export type PortfolioTransactionGroupByOutputType = {
   id: string
   portfolioId: bigint
-  stockId: number
-  tradeOrderId: bigint
+  stockId: number | null
+  tradeOrderId: bigint | null
   executedAt: Date
   companyName: string
   transactionType: $Enums.TransactionType
   totalAmount: runtime.Decimal
   totalQuantity: number
+  purchaseAmount: runtime.Decimal | null
+  realizedProfit: runtime.Decimal | null
   withdrawalAt: Date
   fee: runtime.Decimal
+  exchangeType: string | null
+  paidAmount: runtime.Decimal | null
+  receivedAmount: runtime.Decimal | null
+  exchangeRate: runtime.Decimal | null
   createdAt: Date
   updatedAt: Date
   _count: PortfolioTransactionCountAggregateOutputType | null
@@ -289,35 +351,47 @@ export type PortfolioTransactionWhereInput = {
   NOT?: Prisma.PortfolioTransactionWhereInput | Prisma.PortfolioTransactionWhereInput[]
   id?: Prisma.StringFilter<"PortfolioTransaction"> | string
   portfolioId?: Prisma.BigIntFilter<"PortfolioTransaction"> | bigint | number
-  stockId?: Prisma.IntFilter<"PortfolioTransaction"> | number
-  tradeOrderId?: Prisma.BigIntFilter<"PortfolioTransaction"> | bigint | number
+  stockId?: Prisma.IntNullableFilter<"PortfolioTransaction"> | number | null
+  tradeOrderId?: Prisma.BigIntNullableFilter<"PortfolioTransaction"> | bigint | number | null
   executedAt?: Prisma.DateTimeFilter<"PortfolioTransaction"> | Date | string
   companyName?: Prisma.StringFilter<"PortfolioTransaction"> | string
   transactionType?: Prisma.EnumTransactionTypeFilter<"PortfolioTransaction"> | $Enums.TransactionType
   totalAmount?: Prisma.DecimalFilter<"PortfolioTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalQuantity?: Prisma.IntFilter<"PortfolioTransaction"> | number
+  purchaseAmount?: Prisma.DecimalNullableFilter<"PortfolioTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  realizedProfit?: Prisma.DecimalNullableFilter<"PortfolioTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   withdrawalAt?: Prisma.DateTimeFilter<"PortfolioTransaction"> | Date | string
   fee?: Prisma.DecimalFilter<"PortfolioTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  exchangeType?: Prisma.StringNullableFilter<"PortfolioTransaction"> | string | null
+  paidAmount?: Prisma.DecimalNullableFilter<"PortfolioTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receivedAmount?: Prisma.DecimalNullableFilter<"PortfolioTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  exchangeRate?: Prisma.DecimalNullableFilter<"PortfolioTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFilter<"PortfolioTransaction"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PortfolioTransaction"> | Date | string
   portfolio?: Prisma.XOR<Prisma.PortfolioScalarRelationFilter, Prisma.PortfolioWhereInput>
-  stock?: Prisma.XOR<Prisma.StockScalarRelationFilter, Prisma.StockWhereInput>
-  tradeOrder?: Prisma.XOR<Prisma.TradeOrderScalarRelationFilter, Prisma.TradeOrderWhereInput>
+  stock?: Prisma.XOR<Prisma.StockNullableScalarRelationFilter, Prisma.StockWhereInput> | null
+  tradeOrder?: Prisma.XOR<Prisma.TradeOrderNullableScalarRelationFilter, Prisma.TradeOrderWhereInput> | null
   dividends?: Prisma.PortfolioDividendListRelationFilter
 }
 
 export type PortfolioTransactionOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   portfolioId?: Prisma.SortOrder
-  stockId?: Prisma.SortOrder
-  tradeOrderId?: Prisma.SortOrder
+  stockId?: Prisma.SortOrderInput | Prisma.SortOrder
+  tradeOrderId?: Prisma.SortOrderInput | Prisma.SortOrder
   executedAt?: Prisma.SortOrder
   companyName?: Prisma.SortOrder
   transactionType?: Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
   totalQuantity?: Prisma.SortOrder
+  purchaseAmount?: Prisma.SortOrderInput | Prisma.SortOrder
+  realizedProfit?: Prisma.SortOrderInput | Prisma.SortOrder
   withdrawalAt?: Prisma.SortOrder
   fee?: Prisma.SortOrder
+  exchangeType?: Prisma.SortOrderInput | Prisma.SortOrder
+  paidAmount?: Prisma.SortOrderInput | Prisma.SortOrder
+  receivedAmount?: Prisma.SortOrderInput | Prisma.SortOrder
+  exchangeRate?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   portfolio?: Prisma.PortfolioOrderByWithRelationInput
@@ -332,35 +406,47 @@ export type PortfolioTransactionWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.PortfolioTransactionWhereInput[]
   NOT?: Prisma.PortfolioTransactionWhereInput | Prisma.PortfolioTransactionWhereInput[]
   portfolioId?: Prisma.BigIntFilter<"PortfolioTransaction"> | bigint | number
-  stockId?: Prisma.IntFilter<"PortfolioTransaction"> | number
-  tradeOrderId?: Prisma.BigIntFilter<"PortfolioTransaction"> | bigint | number
+  stockId?: Prisma.IntNullableFilter<"PortfolioTransaction"> | number | null
+  tradeOrderId?: Prisma.BigIntNullableFilter<"PortfolioTransaction"> | bigint | number | null
   executedAt?: Prisma.DateTimeFilter<"PortfolioTransaction"> | Date | string
   companyName?: Prisma.StringFilter<"PortfolioTransaction"> | string
   transactionType?: Prisma.EnumTransactionTypeFilter<"PortfolioTransaction"> | $Enums.TransactionType
   totalAmount?: Prisma.DecimalFilter<"PortfolioTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalQuantity?: Prisma.IntFilter<"PortfolioTransaction"> | number
+  purchaseAmount?: Prisma.DecimalNullableFilter<"PortfolioTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  realizedProfit?: Prisma.DecimalNullableFilter<"PortfolioTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   withdrawalAt?: Prisma.DateTimeFilter<"PortfolioTransaction"> | Date | string
   fee?: Prisma.DecimalFilter<"PortfolioTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  exchangeType?: Prisma.StringNullableFilter<"PortfolioTransaction"> | string | null
+  paidAmount?: Prisma.DecimalNullableFilter<"PortfolioTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receivedAmount?: Prisma.DecimalNullableFilter<"PortfolioTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  exchangeRate?: Prisma.DecimalNullableFilter<"PortfolioTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFilter<"PortfolioTransaction"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PortfolioTransaction"> | Date | string
   portfolio?: Prisma.XOR<Prisma.PortfolioScalarRelationFilter, Prisma.PortfolioWhereInput>
-  stock?: Prisma.XOR<Prisma.StockScalarRelationFilter, Prisma.StockWhereInput>
-  tradeOrder?: Prisma.XOR<Prisma.TradeOrderScalarRelationFilter, Prisma.TradeOrderWhereInput>
+  stock?: Prisma.XOR<Prisma.StockNullableScalarRelationFilter, Prisma.StockWhereInput> | null
+  tradeOrder?: Prisma.XOR<Prisma.TradeOrderNullableScalarRelationFilter, Prisma.TradeOrderWhereInput> | null
   dividends?: Prisma.PortfolioDividendListRelationFilter
 }, "id">
 
 export type PortfolioTransactionOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   portfolioId?: Prisma.SortOrder
-  stockId?: Prisma.SortOrder
-  tradeOrderId?: Prisma.SortOrder
+  stockId?: Prisma.SortOrderInput | Prisma.SortOrder
+  tradeOrderId?: Prisma.SortOrderInput | Prisma.SortOrder
   executedAt?: Prisma.SortOrder
   companyName?: Prisma.SortOrder
   transactionType?: Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
   totalQuantity?: Prisma.SortOrder
+  purchaseAmount?: Prisma.SortOrderInput | Prisma.SortOrder
+  realizedProfit?: Prisma.SortOrderInput | Prisma.SortOrder
   withdrawalAt?: Prisma.SortOrder
   fee?: Prisma.SortOrder
+  exchangeType?: Prisma.SortOrderInput | Prisma.SortOrder
+  paidAmount?: Prisma.SortOrderInput | Prisma.SortOrder
+  receivedAmount?: Prisma.SortOrderInput | Prisma.SortOrder
+  exchangeRate?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.PortfolioTransactionCountOrderByAggregateInput
@@ -376,48 +462,66 @@ export type PortfolioTransactionScalarWhereWithAggregatesInput = {
   NOT?: Prisma.PortfolioTransactionScalarWhereWithAggregatesInput | Prisma.PortfolioTransactionScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"PortfolioTransaction"> | string
   portfolioId?: Prisma.BigIntWithAggregatesFilter<"PortfolioTransaction"> | bigint | number
-  stockId?: Prisma.IntWithAggregatesFilter<"PortfolioTransaction"> | number
-  tradeOrderId?: Prisma.BigIntWithAggregatesFilter<"PortfolioTransaction"> | bigint | number
+  stockId?: Prisma.IntNullableWithAggregatesFilter<"PortfolioTransaction"> | number | null
+  tradeOrderId?: Prisma.BigIntNullableWithAggregatesFilter<"PortfolioTransaction"> | bigint | number | null
   executedAt?: Prisma.DateTimeWithAggregatesFilter<"PortfolioTransaction"> | Date | string
   companyName?: Prisma.StringWithAggregatesFilter<"PortfolioTransaction"> | string
   transactionType?: Prisma.EnumTransactionTypeWithAggregatesFilter<"PortfolioTransaction"> | $Enums.TransactionType
   totalAmount?: Prisma.DecimalWithAggregatesFilter<"PortfolioTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalQuantity?: Prisma.IntWithAggregatesFilter<"PortfolioTransaction"> | number
+  purchaseAmount?: Prisma.DecimalNullableWithAggregatesFilter<"PortfolioTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  realizedProfit?: Prisma.DecimalNullableWithAggregatesFilter<"PortfolioTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   withdrawalAt?: Prisma.DateTimeWithAggregatesFilter<"PortfolioTransaction"> | Date | string
   fee?: Prisma.DecimalWithAggregatesFilter<"PortfolioTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  exchangeType?: Prisma.StringNullableWithAggregatesFilter<"PortfolioTransaction"> | string | null
+  paidAmount?: Prisma.DecimalNullableWithAggregatesFilter<"PortfolioTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receivedAmount?: Prisma.DecimalNullableWithAggregatesFilter<"PortfolioTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  exchangeRate?: Prisma.DecimalNullableWithAggregatesFilter<"PortfolioTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"PortfolioTransaction"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"PortfolioTransaction"> | Date | string
 }
 
 export type PortfolioTransactionCreateInput = {
-  id: string
+  id?: string
   executedAt: Date | string
   companyName: string
   transactionType: $Enums.TransactionType
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalQuantity: number
+  purchaseAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  realizedProfit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   withdrawalAt: Date | string
-  fee: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  exchangeType?: string | null
+  paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receivedAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  exchangeRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   portfolio: Prisma.PortfolioCreateNestedOneWithoutTransactionsInput
-  stock: Prisma.StockCreateNestedOneWithoutTransactionsInput
-  tradeOrder: Prisma.TradeOrderCreateNestedOneWithoutTransactionsInput
+  stock?: Prisma.StockCreateNestedOneWithoutTransactionsInput
+  tradeOrder?: Prisma.TradeOrderCreateNestedOneWithoutTransactionsInput
   dividends?: Prisma.PortfolioDividendCreateNestedManyWithoutPortfolioTransactionInput
 }
 
 export type PortfolioTransactionUncheckedCreateInput = {
-  id: string
+  id?: string
   portfolioId: bigint | number
-  stockId: number
-  tradeOrderId: bigint | number
+  stockId?: number | null
+  tradeOrderId?: bigint | number | null
   executedAt: Date | string
   companyName: string
   transactionType: $Enums.TransactionType
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalQuantity: number
+  purchaseAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  realizedProfit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   withdrawalAt: Date | string
-  fee: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  exchangeType?: string | null
+  paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receivedAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  exchangeRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   dividends?: Prisma.PortfolioDividendUncheckedCreateNestedManyWithoutPortfolioTransactionInput
@@ -430,45 +534,63 @@ export type PortfolioTransactionUpdateInput = {
   transactionType?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  purchaseAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  realizedProfit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   withdrawalAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  exchangeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paidAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receivedAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  exchangeRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   portfolio?: Prisma.PortfolioUpdateOneRequiredWithoutTransactionsNestedInput
-  stock?: Prisma.StockUpdateOneRequiredWithoutTransactionsNestedInput
-  tradeOrder?: Prisma.TradeOrderUpdateOneRequiredWithoutTransactionsNestedInput
+  stock?: Prisma.StockUpdateOneWithoutTransactionsNestedInput
+  tradeOrder?: Prisma.TradeOrderUpdateOneWithoutTransactionsNestedInput
   dividends?: Prisma.PortfolioDividendUpdateManyWithoutPortfolioTransactionNestedInput
 }
 
 export type PortfolioTransactionUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   portfolioId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  stockId?: Prisma.IntFieldUpdateOperationsInput | number
-  tradeOrderId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  stockId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tradeOrderId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   executedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companyName?: Prisma.StringFieldUpdateOperationsInput | string
   transactionType?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  purchaseAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  realizedProfit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   withdrawalAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  exchangeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paidAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receivedAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  exchangeRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dividends?: Prisma.PortfolioDividendUncheckedUpdateManyWithoutPortfolioTransactionNestedInput
 }
 
 export type PortfolioTransactionCreateManyInput = {
-  id: string
+  id?: string
   portfolioId: bigint | number
-  stockId: number
-  tradeOrderId: bigint | number
+  stockId?: number | null
+  tradeOrderId?: bigint | number | null
   executedAt: Date | string
   companyName: string
   transactionType: $Enums.TransactionType
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalQuantity: number
+  purchaseAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  realizedProfit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   withdrawalAt: Date | string
-  fee: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  exchangeType?: string | null
+  paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receivedAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  exchangeRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -480,8 +602,14 @@ export type PortfolioTransactionUpdateManyMutationInput = {
   transactionType?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  purchaseAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  realizedProfit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   withdrawalAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  exchangeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paidAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receivedAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  exchangeRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -489,15 +617,21 @@ export type PortfolioTransactionUpdateManyMutationInput = {
 export type PortfolioTransactionUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   portfolioId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  stockId?: Prisma.IntFieldUpdateOperationsInput | number
-  tradeOrderId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  stockId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tradeOrderId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   executedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companyName?: Prisma.StringFieldUpdateOperationsInput | string
   transactionType?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  purchaseAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  realizedProfit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   withdrawalAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  exchangeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paidAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receivedAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  exchangeRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -522,8 +656,14 @@ export type PortfolioTransactionCountOrderByAggregateInput = {
   transactionType?: Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
   totalQuantity?: Prisma.SortOrder
+  purchaseAmount?: Prisma.SortOrder
+  realizedProfit?: Prisma.SortOrder
   withdrawalAt?: Prisma.SortOrder
   fee?: Prisma.SortOrder
+  exchangeType?: Prisma.SortOrder
+  paidAmount?: Prisma.SortOrder
+  receivedAmount?: Prisma.SortOrder
+  exchangeRate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -534,7 +674,12 @@ export type PortfolioTransactionAvgOrderByAggregateInput = {
   tradeOrderId?: Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
   totalQuantity?: Prisma.SortOrder
+  purchaseAmount?: Prisma.SortOrder
+  realizedProfit?: Prisma.SortOrder
   fee?: Prisma.SortOrder
+  paidAmount?: Prisma.SortOrder
+  receivedAmount?: Prisma.SortOrder
+  exchangeRate?: Prisma.SortOrder
 }
 
 export type PortfolioTransactionMaxOrderByAggregateInput = {
@@ -547,8 +692,14 @@ export type PortfolioTransactionMaxOrderByAggregateInput = {
   transactionType?: Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
   totalQuantity?: Prisma.SortOrder
+  purchaseAmount?: Prisma.SortOrder
+  realizedProfit?: Prisma.SortOrder
   withdrawalAt?: Prisma.SortOrder
   fee?: Prisma.SortOrder
+  exchangeType?: Prisma.SortOrder
+  paidAmount?: Prisma.SortOrder
+  receivedAmount?: Prisma.SortOrder
+  exchangeRate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -563,8 +714,14 @@ export type PortfolioTransactionMinOrderByAggregateInput = {
   transactionType?: Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
   totalQuantity?: Prisma.SortOrder
+  purchaseAmount?: Prisma.SortOrder
+  realizedProfit?: Prisma.SortOrder
   withdrawalAt?: Prisma.SortOrder
   fee?: Prisma.SortOrder
+  exchangeType?: Prisma.SortOrder
+  paidAmount?: Prisma.SortOrder
+  receivedAmount?: Prisma.SortOrder
+  exchangeRate?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -575,7 +732,12 @@ export type PortfolioTransactionSumOrderByAggregateInput = {
   tradeOrderId?: Prisma.SortOrder
   totalAmount?: Prisma.SortOrder
   totalQuantity?: Prisma.SortOrder
+  purchaseAmount?: Prisma.SortOrder
+  realizedProfit?: Prisma.SortOrder
   fee?: Prisma.SortOrder
+  paidAmount?: Prisma.SortOrder
+  receivedAmount?: Prisma.SortOrder
+  exchangeRate?: Prisma.SortOrder
 }
 
 export type PortfolioTransactionScalarRelationFilter = {
@@ -627,6 +789,22 @@ export type PortfolioTransactionUncheckedUpdateManyWithoutPortfolioNestedInput =
 
 export type EnumTransactionTypeFieldUpdateOperationsInput = {
   set?: $Enums.TransactionType
+}
+
+export type NullableDecimalFieldUpdateOperationsInput = {
+  set?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
+}
+
+export type NullableBigIntFieldUpdateOperationsInput = {
+  set?: bigint | number | null
+  increment?: bigint | number
+  decrement?: bigint | number
+  multiply?: bigint | number
+  divide?: bigint | number
 }
 
 export type PortfolioTransactionCreateNestedOneWithoutDividendsInput = {
@@ -728,32 +906,44 @@ export type PortfolioTransactionUncheckedUpdateManyWithoutTradeOrderNestedInput 
 }
 
 export type PortfolioTransactionCreateWithoutPortfolioInput = {
-  id: string
+  id?: string
   executedAt: Date | string
   companyName: string
   transactionType: $Enums.TransactionType
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalQuantity: number
+  purchaseAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  realizedProfit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   withdrawalAt: Date | string
-  fee: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  exchangeType?: string | null
+  paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receivedAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  exchangeRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  stock: Prisma.StockCreateNestedOneWithoutTransactionsInput
-  tradeOrder: Prisma.TradeOrderCreateNestedOneWithoutTransactionsInput
+  stock?: Prisma.StockCreateNestedOneWithoutTransactionsInput
+  tradeOrder?: Prisma.TradeOrderCreateNestedOneWithoutTransactionsInput
   dividends?: Prisma.PortfolioDividendCreateNestedManyWithoutPortfolioTransactionInput
 }
 
 export type PortfolioTransactionUncheckedCreateWithoutPortfolioInput = {
-  id: string
-  stockId: number
-  tradeOrderId: bigint | number
+  id?: string
+  stockId?: number | null
+  tradeOrderId?: bigint | number | null
   executedAt: Date | string
   companyName: string
   transactionType: $Enums.TransactionType
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalQuantity: number
+  purchaseAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  realizedProfit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   withdrawalAt: Date | string
-  fee: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  exchangeType?: string | null
+  paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receivedAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  exchangeRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   dividends?: Prisma.PortfolioDividendUncheckedCreateNestedManyWithoutPortfolioTransactionInput
@@ -791,47 +981,65 @@ export type PortfolioTransactionScalarWhereInput = {
   NOT?: Prisma.PortfolioTransactionScalarWhereInput | Prisma.PortfolioTransactionScalarWhereInput[]
   id?: Prisma.StringFilter<"PortfolioTransaction"> | string
   portfolioId?: Prisma.BigIntFilter<"PortfolioTransaction"> | bigint | number
-  stockId?: Prisma.IntFilter<"PortfolioTransaction"> | number
-  tradeOrderId?: Prisma.BigIntFilter<"PortfolioTransaction"> | bigint | number
+  stockId?: Prisma.IntNullableFilter<"PortfolioTransaction"> | number | null
+  tradeOrderId?: Prisma.BigIntNullableFilter<"PortfolioTransaction"> | bigint | number | null
   executedAt?: Prisma.DateTimeFilter<"PortfolioTransaction"> | Date | string
   companyName?: Prisma.StringFilter<"PortfolioTransaction"> | string
   transactionType?: Prisma.EnumTransactionTypeFilter<"PortfolioTransaction"> | $Enums.TransactionType
   totalAmount?: Prisma.DecimalFilter<"PortfolioTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalQuantity?: Prisma.IntFilter<"PortfolioTransaction"> | number
+  purchaseAmount?: Prisma.DecimalNullableFilter<"PortfolioTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  realizedProfit?: Prisma.DecimalNullableFilter<"PortfolioTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   withdrawalAt?: Prisma.DateTimeFilter<"PortfolioTransaction"> | Date | string
   fee?: Prisma.DecimalFilter<"PortfolioTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string
+  exchangeType?: Prisma.StringNullableFilter<"PortfolioTransaction"> | string | null
+  paidAmount?: Prisma.DecimalNullableFilter<"PortfolioTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receivedAmount?: Prisma.DecimalNullableFilter<"PortfolioTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  exchangeRate?: Prisma.DecimalNullableFilter<"PortfolioTransaction"> | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFilter<"PortfolioTransaction"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PortfolioTransaction"> | Date | string
 }
 
 export type PortfolioTransactionCreateWithoutDividendsInput = {
-  id: string
+  id?: string
   executedAt: Date | string
   companyName: string
   transactionType: $Enums.TransactionType
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalQuantity: number
+  purchaseAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  realizedProfit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   withdrawalAt: Date | string
-  fee: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  exchangeType?: string | null
+  paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receivedAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  exchangeRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   portfolio: Prisma.PortfolioCreateNestedOneWithoutTransactionsInput
-  stock: Prisma.StockCreateNestedOneWithoutTransactionsInput
-  tradeOrder: Prisma.TradeOrderCreateNestedOneWithoutTransactionsInput
+  stock?: Prisma.StockCreateNestedOneWithoutTransactionsInput
+  tradeOrder?: Prisma.TradeOrderCreateNestedOneWithoutTransactionsInput
 }
 
 export type PortfolioTransactionUncheckedCreateWithoutDividendsInput = {
-  id: string
+  id?: string
   portfolioId: bigint | number
-  stockId: number
-  tradeOrderId: bigint | number
+  stockId?: number | null
+  tradeOrderId?: bigint | number | null
   executedAt: Date | string
   companyName: string
   transactionType: $Enums.TransactionType
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalQuantity: number
+  purchaseAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  realizedProfit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   withdrawalAt: Date | string
-  fee: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  exchangeType?: string | null
+  paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receivedAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  exchangeRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -859,58 +1067,82 @@ export type PortfolioTransactionUpdateWithoutDividendsInput = {
   transactionType?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  purchaseAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  realizedProfit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   withdrawalAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  exchangeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paidAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receivedAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  exchangeRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   portfolio?: Prisma.PortfolioUpdateOneRequiredWithoutTransactionsNestedInput
-  stock?: Prisma.StockUpdateOneRequiredWithoutTransactionsNestedInput
-  tradeOrder?: Prisma.TradeOrderUpdateOneRequiredWithoutTransactionsNestedInput
+  stock?: Prisma.StockUpdateOneWithoutTransactionsNestedInput
+  tradeOrder?: Prisma.TradeOrderUpdateOneWithoutTransactionsNestedInput
 }
 
 export type PortfolioTransactionUncheckedUpdateWithoutDividendsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   portfolioId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  stockId?: Prisma.IntFieldUpdateOperationsInput | number
-  tradeOrderId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  stockId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tradeOrderId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   executedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companyName?: Prisma.StringFieldUpdateOperationsInput | string
   transactionType?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  purchaseAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  realizedProfit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   withdrawalAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  exchangeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paidAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receivedAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  exchangeRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type PortfolioTransactionCreateWithoutStockInput = {
-  id: string
+  id?: string
   executedAt: Date | string
   companyName: string
   transactionType: $Enums.TransactionType
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalQuantity: number
+  purchaseAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  realizedProfit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   withdrawalAt: Date | string
-  fee: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  exchangeType?: string | null
+  paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receivedAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  exchangeRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   portfolio: Prisma.PortfolioCreateNestedOneWithoutTransactionsInput
-  tradeOrder: Prisma.TradeOrderCreateNestedOneWithoutTransactionsInput
+  tradeOrder?: Prisma.TradeOrderCreateNestedOneWithoutTransactionsInput
   dividends?: Prisma.PortfolioDividendCreateNestedManyWithoutPortfolioTransactionInput
 }
 
 export type PortfolioTransactionUncheckedCreateWithoutStockInput = {
-  id: string
+  id?: string
   portfolioId: bigint | number
-  tradeOrderId: bigint | number
+  tradeOrderId?: bigint | number | null
   executedAt: Date | string
   companyName: string
   transactionType: $Enums.TransactionType
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalQuantity: number
+  purchaseAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  realizedProfit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   withdrawalAt: Date | string
-  fee: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  exchangeType?: string | null
+  paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receivedAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  exchangeRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   dividends?: Prisma.PortfolioDividendUncheckedCreateNestedManyWithoutPortfolioTransactionInput
@@ -943,32 +1175,44 @@ export type PortfolioTransactionUpdateManyWithWhereWithoutStockInput = {
 }
 
 export type PortfolioTransactionCreateWithoutTradeOrderInput = {
-  id: string
+  id?: string
   executedAt: Date | string
   companyName: string
   transactionType: $Enums.TransactionType
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalQuantity: number
+  purchaseAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  realizedProfit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   withdrawalAt: Date | string
-  fee: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  exchangeType?: string | null
+  paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receivedAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  exchangeRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   portfolio: Prisma.PortfolioCreateNestedOneWithoutTransactionsInput
-  stock: Prisma.StockCreateNestedOneWithoutTransactionsInput
+  stock?: Prisma.StockCreateNestedOneWithoutTransactionsInput
   dividends?: Prisma.PortfolioDividendCreateNestedManyWithoutPortfolioTransactionInput
 }
 
 export type PortfolioTransactionUncheckedCreateWithoutTradeOrderInput = {
-  id: string
+  id?: string
   portfolioId: bigint | number
-  stockId: number
+  stockId?: number | null
   executedAt: Date | string
   companyName: string
   transactionType: $Enums.TransactionType
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalQuantity: number
+  purchaseAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  realizedProfit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   withdrawalAt: Date | string
-  fee: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  exchangeType?: string | null
+  paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receivedAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  exchangeRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   dividends?: Prisma.PortfolioDividendUncheckedCreateNestedManyWithoutPortfolioTransactionInput
@@ -1001,16 +1245,22 @@ export type PortfolioTransactionUpdateManyWithWhereWithoutTradeOrderInput = {
 }
 
 export type PortfolioTransactionCreateManyPortfolioInput = {
-  id: string
-  stockId: number
-  tradeOrderId: bigint | number
+  id?: string
+  stockId?: number | null
+  tradeOrderId?: bigint | number | null
   executedAt: Date | string
   companyName: string
   transactionType: $Enums.TransactionType
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalQuantity: number
+  purchaseAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  realizedProfit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   withdrawalAt: Date | string
-  fee: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  exchangeType?: string | null
+  paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receivedAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  exchangeRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1022,26 +1272,38 @@ export type PortfolioTransactionUpdateWithoutPortfolioInput = {
   transactionType?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  purchaseAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  realizedProfit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   withdrawalAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  exchangeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paidAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receivedAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  exchangeRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  stock?: Prisma.StockUpdateOneRequiredWithoutTransactionsNestedInput
-  tradeOrder?: Prisma.TradeOrderUpdateOneRequiredWithoutTransactionsNestedInput
+  stock?: Prisma.StockUpdateOneWithoutTransactionsNestedInput
+  tradeOrder?: Prisma.TradeOrderUpdateOneWithoutTransactionsNestedInput
   dividends?: Prisma.PortfolioDividendUpdateManyWithoutPortfolioTransactionNestedInput
 }
 
 export type PortfolioTransactionUncheckedUpdateWithoutPortfolioInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  stockId?: Prisma.IntFieldUpdateOperationsInput | number
-  tradeOrderId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  stockId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tradeOrderId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   executedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companyName?: Prisma.StringFieldUpdateOperationsInput | string
   transactionType?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  purchaseAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  realizedProfit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   withdrawalAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  exchangeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paidAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receivedAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  exchangeRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dividends?: Prisma.PortfolioDividendUncheckedUpdateManyWithoutPortfolioTransactionNestedInput
@@ -1049,30 +1311,42 @@ export type PortfolioTransactionUncheckedUpdateWithoutPortfolioInput = {
 
 export type PortfolioTransactionUncheckedUpdateManyWithoutPortfolioInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  stockId?: Prisma.IntFieldUpdateOperationsInput | number
-  tradeOrderId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  stockId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  tradeOrderId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   executedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companyName?: Prisma.StringFieldUpdateOperationsInput | string
   transactionType?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  purchaseAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  realizedProfit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   withdrawalAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  exchangeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paidAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receivedAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  exchangeRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type PortfolioTransactionCreateManyStockInput = {
-  id: string
+  id?: string
   portfolioId: bigint | number
-  tradeOrderId: bigint | number
+  tradeOrderId?: bigint | number | null
   executedAt: Date | string
   companyName: string
   transactionType: $Enums.TransactionType
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalQuantity: number
+  purchaseAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  realizedProfit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   withdrawalAt: Date | string
-  fee: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  exchangeType?: string | null
+  paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receivedAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  exchangeRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1084,26 +1358,38 @@ export type PortfolioTransactionUpdateWithoutStockInput = {
   transactionType?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  purchaseAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  realizedProfit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   withdrawalAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  exchangeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paidAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receivedAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  exchangeRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   portfolio?: Prisma.PortfolioUpdateOneRequiredWithoutTransactionsNestedInput
-  tradeOrder?: Prisma.TradeOrderUpdateOneRequiredWithoutTransactionsNestedInput
+  tradeOrder?: Prisma.TradeOrderUpdateOneWithoutTransactionsNestedInput
   dividends?: Prisma.PortfolioDividendUpdateManyWithoutPortfolioTransactionNestedInput
 }
 
 export type PortfolioTransactionUncheckedUpdateWithoutStockInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   portfolioId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  tradeOrderId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  tradeOrderId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   executedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companyName?: Prisma.StringFieldUpdateOperationsInput | string
   transactionType?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  purchaseAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  realizedProfit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   withdrawalAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  exchangeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paidAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receivedAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  exchangeRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dividends?: Prisma.PortfolioDividendUncheckedUpdateManyWithoutPortfolioTransactionNestedInput
@@ -1112,29 +1398,41 @@ export type PortfolioTransactionUncheckedUpdateWithoutStockInput = {
 export type PortfolioTransactionUncheckedUpdateManyWithoutStockInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   portfolioId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  tradeOrderId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  tradeOrderId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   executedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companyName?: Prisma.StringFieldUpdateOperationsInput | string
   transactionType?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  purchaseAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  realizedProfit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   withdrawalAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  exchangeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paidAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receivedAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  exchangeRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type PortfolioTransactionCreateManyTradeOrderInput = {
-  id: string
+  id?: string
   portfolioId: bigint | number
-  stockId: number
+  stockId?: number | null
   executedAt: Date | string
   companyName: string
   transactionType: $Enums.TransactionType
   totalAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
   totalQuantity: number
+  purchaseAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  realizedProfit?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   withdrawalAt: Date | string
-  fee: runtime.Decimal | runtime.DecimalJsLike | number | string
+  fee?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  exchangeType?: string | null
+  paidAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receivedAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  exchangeRate?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -1146,26 +1444,38 @@ export type PortfolioTransactionUpdateWithoutTradeOrderInput = {
   transactionType?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  purchaseAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  realizedProfit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   withdrawalAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  exchangeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paidAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receivedAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  exchangeRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   portfolio?: Prisma.PortfolioUpdateOneRequiredWithoutTransactionsNestedInput
-  stock?: Prisma.StockUpdateOneRequiredWithoutTransactionsNestedInput
+  stock?: Prisma.StockUpdateOneWithoutTransactionsNestedInput
   dividends?: Prisma.PortfolioDividendUpdateManyWithoutPortfolioTransactionNestedInput
 }
 
 export type PortfolioTransactionUncheckedUpdateWithoutTradeOrderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   portfolioId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  stockId?: Prisma.IntFieldUpdateOperationsInput | number
+  stockId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   executedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companyName?: Prisma.StringFieldUpdateOperationsInput | string
   transactionType?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  purchaseAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  realizedProfit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   withdrawalAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  exchangeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paidAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receivedAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  exchangeRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   dividends?: Prisma.PortfolioDividendUncheckedUpdateManyWithoutPortfolioTransactionNestedInput
@@ -1174,14 +1484,20 @@ export type PortfolioTransactionUncheckedUpdateWithoutTradeOrderInput = {
 export type PortfolioTransactionUncheckedUpdateManyWithoutTradeOrderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   portfolioId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  stockId?: Prisma.IntFieldUpdateOperationsInput | number
+  stockId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
   executedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   companyName?: Prisma.StringFieldUpdateOperationsInput | string
   transactionType?: Prisma.EnumTransactionTypeFieldUpdateOperationsInput | $Enums.TransactionType
   totalAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   totalQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  purchaseAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  realizedProfit?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   withdrawalAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   fee?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  exchangeType?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paidAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  receivedAmount?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  exchangeRate?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -1227,13 +1543,19 @@ export type PortfolioTransactionSelect<ExtArgs extends runtime.Types.Extensions.
   transactionType?: boolean
   totalAmount?: boolean
   totalQuantity?: boolean
+  purchaseAmount?: boolean
+  realizedProfit?: boolean
   withdrawalAt?: boolean
   fee?: boolean
+  exchangeType?: boolean
+  paidAmount?: boolean
+  receivedAmount?: boolean
+  exchangeRate?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   portfolio?: boolean | Prisma.PortfolioDefaultArgs<ExtArgs>
-  stock?: boolean | Prisma.StockDefaultArgs<ExtArgs>
-  tradeOrder?: boolean | Prisma.TradeOrderDefaultArgs<ExtArgs>
+  stock?: boolean | Prisma.PortfolioTransaction$stockArgs<ExtArgs>
+  tradeOrder?: boolean | Prisma.PortfolioTransaction$tradeOrderArgs<ExtArgs>
   dividends?: boolean | Prisma.PortfolioTransaction$dividendsArgs<ExtArgs>
   _count?: boolean | Prisma.PortfolioTransactionCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["portfolioTransaction"]>
@@ -1248,13 +1570,19 @@ export type PortfolioTransactionSelectCreateManyAndReturn<ExtArgs extends runtim
   transactionType?: boolean
   totalAmount?: boolean
   totalQuantity?: boolean
+  purchaseAmount?: boolean
+  realizedProfit?: boolean
   withdrawalAt?: boolean
   fee?: boolean
+  exchangeType?: boolean
+  paidAmount?: boolean
+  receivedAmount?: boolean
+  exchangeRate?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   portfolio?: boolean | Prisma.PortfolioDefaultArgs<ExtArgs>
-  stock?: boolean | Prisma.StockDefaultArgs<ExtArgs>
-  tradeOrder?: boolean | Prisma.TradeOrderDefaultArgs<ExtArgs>
+  stock?: boolean | Prisma.PortfolioTransaction$stockArgs<ExtArgs>
+  tradeOrder?: boolean | Prisma.PortfolioTransaction$tradeOrderArgs<ExtArgs>
 }, ExtArgs["result"]["portfolioTransaction"]>
 
 export type PortfolioTransactionSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1267,13 +1595,19 @@ export type PortfolioTransactionSelectUpdateManyAndReturn<ExtArgs extends runtim
   transactionType?: boolean
   totalAmount?: boolean
   totalQuantity?: boolean
+  purchaseAmount?: boolean
+  realizedProfit?: boolean
   withdrawalAt?: boolean
   fee?: boolean
+  exchangeType?: boolean
+  paidAmount?: boolean
+  receivedAmount?: boolean
+  exchangeRate?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   portfolio?: boolean | Prisma.PortfolioDefaultArgs<ExtArgs>
-  stock?: boolean | Prisma.StockDefaultArgs<ExtArgs>
-  tradeOrder?: boolean | Prisma.TradeOrderDefaultArgs<ExtArgs>
+  stock?: boolean | Prisma.PortfolioTransaction$stockArgs<ExtArgs>
+  tradeOrder?: boolean | Prisma.PortfolioTransaction$tradeOrderArgs<ExtArgs>
 }, ExtArgs["result"]["portfolioTransaction"]>
 
 export type PortfolioTransactionSelectScalar = {
@@ -1286,51 +1620,63 @@ export type PortfolioTransactionSelectScalar = {
   transactionType?: boolean
   totalAmount?: boolean
   totalQuantity?: boolean
+  purchaseAmount?: boolean
+  realizedProfit?: boolean
   withdrawalAt?: boolean
   fee?: boolean
+  exchangeType?: boolean
+  paidAmount?: boolean
+  receivedAmount?: boolean
+  exchangeRate?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type PortfolioTransactionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "portfolioId" | "stockId" | "tradeOrderId" | "executedAt" | "companyName" | "transactionType" | "totalAmount" | "totalQuantity" | "withdrawalAt" | "fee" | "createdAt" | "updatedAt", ExtArgs["result"]["portfolioTransaction"]>
+export type PortfolioTransactionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "portfolioId" | "stockId" | "tradeOrderId" | "executedAt" | "companyName" | "transactionType" | "totalAmount" | "totalQuantity" | "purchaseAmount" | "realizedProfit" | "withdrawalAt" | "fee" | "exchangeType" | "paidAmount" | "receivedAmount" | "exchangeRate" | "createdAt" | "updatedAt", ExtArgs["result"]["portfolioTransaction"]>
 export type PortfolioTransactionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   portfolio?: boolean | Prisma.PortfolioDefaultArgs<ExtArgs>
-  stock?: boolean | Prisma.StockDefaultArgs<ExtArgs>
-  tradeOrder?: boolean | Prisma.TradeOrderDefaultArgs<ExtArgs>
+  stock?: boolean | Prisma.PortfolioTransaction$stockArgs<ExtArgs>
+  tradeOrder?: boolean | Prisma.PortfolioTransaction$tradeOrderArgs<ExtArgs>
   dividends?: boolean | Prisma.PortfolioTransaction$dividendsArgs<ExtArgs>
   _count?: boolean | Prisma.PortfolioTransactionCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PortfolioTransactionIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   portfolio?: boolean | Prisma.PortfolioDefaultArgs<ExtArgs>
-  stock?: boolean | Prisma.StockDefaultArgs<ExtArgs>
-  tradeOrder?: boolean | Prisma.TradeOrderDefaultArgs<ExtArgs>
+  stock?: boolean | Prisma.PortfolioTransaction$stockArgs<ExtArgs>
+  tradeOrder?: boolean | Prisma.PortfolioTransaction$tradeOrderArgs<ExtArgs>
 }
 export type PortfolioTransactionIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   portfolio?: boolean | Prisma.PortfolioDefaultArgs<ExtArgs>
-  stock?: boolean | Prisma.StockDefaultArgs<ExtArgs>
-  tradeOrder?: boolean | Prisma.TradeOrderDefaultArgs<ExtArgs>
+  stock?: boolean | Prisma.PortfolioTransaction$stockArgs<ExtArgs>
+  tradeOrder?: boolean | Prisma.PortfolioTransaction$tradeOrderArgs<ExtArgs>
 }
 
 export type $PortfolioTransactionPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "PortfolioTransaction"
   objects: {
     portfolio: Prisma.$PortfolioPayload<ExtArgs>
-    stock: Prisma.$StockPayload<ExtArgs>
-    tradeOrder: Prisma.$TradeOrderPayload<ExtArgs>
+    stock: Prisma.$StockPayload<ExtArgs> | null
+    tradeOrder: Prisma.$TradeOrderPayload<ExtArgs> | null
     dividends: Prisma.$PortfolioDividendPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     portfolioId: bigint
-    stockId: number
-    tradeOrderId: bigint
+    stockId: number | null
+    tradeOrderId: bigint | null
     executedAt: Date
     companyName: string
     transactionType: $Enums.TransactionType
     totalAmount: runtime.Decimal
     totalQuantity: number
+    purchaseAmount: runtime.Decimal | null
+    realizedProfit: runtime.Decimal | null
     withdrawalAt: Date
     fee: runtime.Decimal
+    exchangeType: string | null
+    paidAmount: runtime.Decimal | null
+    receivedAmount: runtime.Decimal | null
+    exchangeRate: runtime.Decimal | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["portfolioTransaction"]>
@@ -1728,8 +2074,8 @@ readonly fields: PortfolioTransactionFieldRefs;
 export interface Prisma__PortfolioTransactionClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   portfolio<T extends Prisma.PortfolioDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PortfolioDefaultArgs<ExtArgs>>): Prisma.Prisma__PortfolioClient<runtime.Types.Result.GetResult<Prisma.$PortfolioPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  stock<T extends Prisma.StockDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StockDefaultArgs<ExtArgs>>): Prisma.Prisma__StockClient<runtime.Types.Result.GetResult<Prisma.$StockPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  tradeOrder<T extends Prisma.TradeOrderDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TradeOrderDefaultArgs<ExtArgs>>): Prisma.Prisma__TradeOrderClient<runtime.Types.Result.GetResult<Prisma.$TradeOrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  stock<T extends Prisma.PortfolioTransaction$stockArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PortfolioTransaction$stockArgs<ExtArgs>>): Prisma.Prisma__StockClient<runtime.Types.Result.GetResult<Prisma.$StockPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  tradeOrder<T extends Prisma.PortfolioTransaction$tradeOrderArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PortfolioTransaction$tradeOrderArgs<ExtArgs>>): Prisma.Prisma__TradeOrderClient<runtime.Types.Result.GetResult<Prisma.$TradeOrderPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   dividends<T extends Prisma.PortfolioTransaction$dividendsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PortfolioTransaction$dividendsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PortfolioDividendPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1769,8 +2115,14 @@ export interface PortfolioTransactionFieldRefs {
   readonly transactionType: Prisma.FieldRef<"PortfolioTransaction", 'TransactionType'>
   readonly totalAmount: Prisma.FieldRef<"PortfolioTransaction", 'Decimal'>
   readonly totalQuantity: Prisma.FieldRef<"PortfolioTransaction", 'Int'>
+  readonly purchaseAmount: Prisma.FieldRef<"PortfolioTransaction", 'Decimal'>
+  readonly realizedProfit: Prisma.FieldRef<"PortfolioTransaction", 'Decimal'>
   readonly withdrawalAt: Prisma.FieldRef<"PortfolioTransaction", 'DateTime'>
   readonly fee: Prisma.FieldRef<"PortfolioTransaction", 'Decimal'>
+  readonly exchangeType: Prisma.FieldRef<"PortfolioTransaction", 'String'>
+  readonly paidAmount: Prisma.FieldRef<"PortfolioTransaction", 'Decimal'>
+  readonly receivedAmount: Prisma.FieldRef<"PortfolioTransaction", 'Decimal'>
+  readonly exchangeRate: Prisma.FieldRef<"PortfolioTransaction", 'Decimal'>
   readonly createdAt: Prisma.FieldRef<"PortfolioTransaction", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"PortfolioTransaction", 'DateTime'>
 }
@@ -2166,6 +2518,44 @@ export type PortfolioTransactionDeleteManyArgs<ExtArgs extends runtime.Types.Ext
    * Limit how many PortfolioTransactions to delete.
    */
   limit?: number
+}
+
+/**
+ * PortfolioTransaction.stock
+ */
+export type PortfolioTransaction$stockArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Stock
+   */
+  select?: Prisma.StockSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Stock
+   */
+  omit?: Prisma.StockOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.StockInclude<ExtArgs> | null
+  where?: Prisma.StockWhereInput
+}
+
+/**
+ * PortfolioTransaction.tradeOrder
+ */
+export type PortfolioTransaction$tradeOrderArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TradeOrder
+   */
+  select?: Prisma.TradeOrderSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TradeOrder
+   */
+  omit?: Prisma.TradeOrderOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TradeOrderInclude<ExtArgs> | null
+  where?: Prisma.TradeOrderWhereInput
 }
 
 /**
