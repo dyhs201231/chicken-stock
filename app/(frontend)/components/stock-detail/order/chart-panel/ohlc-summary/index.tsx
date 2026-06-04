@@ -15,7 +15,12 @@ export function OhlcSummary({ currencyCode, items }: OhlcSummaryProps) {
   return (
     <dl className="mb-2 flex flex-wrap gap-x-2 gap-y-1 text-[11px] whitespace-nowrap text-zinc-950">
       {items.map((item) => {
-        const isPositive = item.rate >= 0;
+        const rateColor =
+          item.rate > 0
+            ? RISE_COLOR
+            : item.rate < 0
+              ? FALL_COLOR
+              : "var(--color-zinc-500)";
 
         return (
           <div key={item.label} className="flex items-center">
@@ -24,7 +29,7 @@ export function OhlcSummary({ currencyCode, items }: OhlcSummaryProps) {
               {formatPrice(item.value, currencyCode)}
               <span
                 className="ml-1"
-                style={{ color: isPositive ? RISE_COLOR : FALL_COLOR }}
+                style={{ color: rateColor }}
               >
                 ({formatPercent(item.rate)})
               </span>

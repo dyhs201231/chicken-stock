@@ -19,6 +19,7 @@ export type StockCandleSourceData = {
   highPrice: number | string;
   lowPrice: number | string;
   closePrice: number | string;
+  volume?: number | string;
 };
 
 export type ChartCandleData = CandlestickData<Time> & {
@@ -27,6 +28,7 @@ export type ChartCandleData = CandlestickData<Time> & {
   high: number;
   low: number;
   close: number;
+  volume: number;
 };
 
 export type LabelPosition = {

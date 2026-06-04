@@ -5,6 +5,7 @@ import {
   formatDayTickLabel,
   formatMonthTickLabel,
   formatTimeLabel,
+  formatWeeklyTickLabel,
   getChangeRate,
   getShortDateLabel,
   getSpacedAxisTickLabels,
@@ -19,8 +20,8 @@ import type {
 } from "./types";
 import type { StockDetailData } from "../../../../types/stock/stock-detail";
 import {
-  formatNumber,
   formatPercent,
+  formatPlainPrice,
   formatPrice,
 } from "../../../../utils/stock/stock-detail";
 
@@ -164,7 +165,8 @@ export function createChartOverlayUpdaters({
         }
 
         const isMonth =
-          selectedRange === "monthly" || monthStartTimes.has(candle.time);
+          selectedRange !== "weekly" &&
+          (selectedRange === "monthly" || monthStartTimes.has(candle.time));
 
         return {
           isMonth,
@@ -176,7 +178,9 @@ export function createChartOverlayUpdaters({
           text:
             selectedRange === "monthly" || isMonth
               ? formatMonthTickLabel(candle.time)
-              : formatDayTickLabel(candle.time),
+              : selectedRange === "weekly"
+                ? formatWeeklyTickLabel(candle.time)
+                : formatDayTickLabel(candle.time),
         };
       })
       .filter((label): label is AxisTickLabel => label !== null);
@@ -210,7 +214,7 @@ export function createChartOverlayUpdaters({
         }
 
         return {
-          text: formatNumber(price),
+          text: formatPlainPrice(price, stock.currencyCode),
           top: clampPosition(
             coordinate - 10,
             0,
@@ -234,7 +238,7 @@ export function createChartOverlayUpdaters({
               0,
               chartContainer.clientHeight - 28,
             ),
-            text: formatNumber(stock.currentPrice),
+            text: formatPlainPrice(stock.currentPrice, stock.currencyCode),
           }
         : null,
     );

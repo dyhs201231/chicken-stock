@@ -16,13 +16,15 @@ import type {
   CrosshairDateLabel,
   CrosshairPriceLabel,
 } from "./types";
-import { formatNumber } from "../../../../utils/stock/stock-detail";
+import type { StockCurrencyCode } from "../../../../types/stock/stock-detail";
+import { formatPlainPrice } from "../../../../utils/stock/stock-detail";
 
 type CrosshairHandlerParams = {
   candleSeries: ISeriesApi<"Candlestick", Time>;
   chart: IChartApi;
   chartCandles: ChartCandleData[];
   chartContainer: HTMLDivElement;
+  currencyCode: StockCurrencyCode;
   selectedRange: CandleRange;
   setCrosshairDateLabel: (label: CrosshairDateLabel | null) => void;
   setCrosshairPriceLabel: (label: CrosshairPriceLabel | null) => void;
@@ -34,6 +36,7 @@ export function createCrosshairMoveHandler({
   chart,
   chartCandles,
   chartContainer,
+  currencyCode,
   selectedRange,
   setCrosshairDateLabel,
   setCrosshairPriceLabel,
@@ -64,19 +67,22 @@ export function createCrosshairMoveHandler({
       param.time ??
       fallbackTime;
 
-    setHoveredCandle(
-      isCandlestickData(hoveredData) ? toChartCandleData(hoveredData) : null,
-    );
+    const hoveredCandle = isCandlestickData(hoveredData)
+      ? toChartCandleData(hoveredData)
+      : null;
+    const labelTime = hoveredCandle?.time ?? hoveredTime;
+
+    setHoveredCandle(hoveredCandle);
 
     setCrosshairDateLabel(
-      hoveredTime
+      labelTime
         ? {
             left: clampPosition(
               param.point.x - 45,
               8,
               chartContainer.clientWidth - 110,
             ),
-            text: formatCrosshairDateLabel(hoveredTime, selectedRange),
+            text: formatCrosshairDateLabel(labelTime, selectedRange),
           }
         : null,
     );
@@ -89,7 +95,7 @@ export function createCrosshairMoveHandler({
               0,
               chartContainer.clientHeight - 28,
             ),
-            text: formatNumber(hoveredPrice),
+            text: formatPlainPrice(hoveredPrice, currencyCode),
           }
         : null,
     );

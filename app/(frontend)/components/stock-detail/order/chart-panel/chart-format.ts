@@ -70,10 +70,50 @@ export function formatDayTickLabel(time: Time) {
   return Number.isFinite(day) ? `${day}일` : dateLabel;
 }
 
+export function formatWeeklyTickLabel(time: Time) {
+  const date = new Date(`${formatTimeLabel(time)}T00:00:00.000Z`);
+
+  if (Number.isNaN(date.getTime())) {
+    return formatTimeLabel(time);
+  }
+
+  date.setUTCDate(date.getUTCDate() + 5);
+
+  const month = date.getUTCMonth() + 1;
+  const day = date.getUTCDate();
+  const firstDayOfMonth = new Date(
+    Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1),
+  );
+  const daysUntilFirstSaturday = (6 - firstDayOfMonth.getUTCDay() + 7) % 7;
+  const firstSaturday = 1 + daysUntilFirstSaturday;
+
+  return day === firstSaturday ? `${month}월` : `${day}일`;
+}
+
+function formatWeeklyDateLabel(time: Time) {
+  const date = new Date(`${formatTimeLabel(time)}T00:00:00.000Z`);
+
+  if (Number.isNaN(date.getTime())) {
+    return formatTimeLabel(time);
+  }
+
+  date.setUTCDate(date.getUTCDate() + 5);
+
+  return date.toISOString().slice(0, 10);
+}
+
 export function formatCrosshairDateLabel(time: Time, range: CandleRange) {
   const dateLabel = formatTimeLabel(time);
 
-  return range === "monthly" ? dateLabel.slice(0, 7) : dateLabel;
+  if (range === "monthly") {
+    return dateLabel.slice(0, 7);
+  }
+
+  if (range === "weekly") {
+    return formatWeeklyDateLabel(time);
+  }
+
+  return dateLabel;
 }
 
 export function getSpacedAxisTickLabels(labels: AxisTickLabel[]) {
@@ -119,5 +159,6 @@ export function toChartCandleData(
     high: candle.high,
     low: candle.low,
     close: candle.close,
+    volume: 0,
   };
 }

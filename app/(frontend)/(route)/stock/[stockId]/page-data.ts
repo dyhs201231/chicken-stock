@@ -174,7 +174,7 @@ export async function getStockDetailData(
         orderBy: {
           timestamp: "desc",
         },
-        take: 18,
+        take: 45,
       },
       orderBookSnapshots: {
         orderBy: {
@@ -312,6 +312,7 @@ export async function getStockDetailData(
         highPrice: toNumber(candle.highPrice),
         lowPrice: toNumber(candle.lowPrice),
         closePrice: toNumber(candle.closePrice),
+        volume: toNumber(candle.volume),
       }))
       .reverse(),
     orderBookSnapshot: orderBookSnapshot

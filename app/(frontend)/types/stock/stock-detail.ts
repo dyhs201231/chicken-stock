@@ -11,6 +11,7 @@ export type StockCandleData = {
   highPrice: number;
   lowPrice: number;
   closePrice: number;
+  volume: number;
 };
 
 export type StockOrderBookLevelData = {

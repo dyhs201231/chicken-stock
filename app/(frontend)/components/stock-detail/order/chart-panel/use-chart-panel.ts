@@ -1,13 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { CandlestickSeries, createChart } from "lightweight-charts";
 import type { IRange, Time } from "lightweight-charts";
-import {
-  aggregateToMonthlyCandles,
-  aggregateToWeeklyCandles,
-  convertToDailyCandles,
-} from "./chart-data";
+import { useStockCandlesQuery } from "../../../../apis/stocks/queries";
 import { createCrosshairMoveHandler } from "./chart-crosshair";
 import { getOhlcItems } from "./chart-format";
+import { convertCurrencyValue } from "../../../../utils/stock/stock-detail";
 import {
   getCandlestickSeriesOptions,
   getChartOptions,
@@ -24,10 +21,14 @@ import type {
   HighLowLabel,
   PriceAxisTickLabel,
 } from "./types";
-import type { StockOnlyProps } from "../../../../types/stock/stock-detail";
+import type {
+  StockCurrencyCode,
+  StockOnlyProps,
+} from "../../../../types/stock/stock-detail";
 
 export function useChartPanel({ stock }: StockOnlyProps) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
+
   const [selectedRange, setSelectedRange] = useState<CandleRange>("daily");
   const [highLabelPosition, setHighLabelPosition] =
     useState<HighLowLabel | null>(null);
@@ -48,29 +49,69 @@ export function useChartPanel({ stock }: StockOnlyProps) {
     PriceAxisTickLabel[]
   >([]);
 
-  const dailyCandles = useMemo(
-    () => convertToDailyCandles(stock.candles),
-    [stock.candles],
-  );
-
-  const chartCandles = useMemo(() => {
+  const selectedInterval = useMemo(() => {
     if (selectedRange === "weekly") {
-      return aggregateToWeeklyCandles(dailyCandles);
+      return "WEEK";
     }
 
     if (selectedRange === "monthly") {
-      return aggregateToMonthlyCandles(dailyCandles);
+      return "MONTH";
     }
 
-    return dailyCandles;
-  }, [dailyCandles, selectedRange]);
+    return "DAY";
+  }, [selectedRange]);
+
+  const { data: rawChartCandles = [] } = useStockCandlesQuery(
+    stock.id,
+    selectedInterval,
+  );
+
+  const chartCandles = useMemo(() => {
+    const sourceCurrencyCode: StockCurrencyCode =
+      stock.countryCode === "US" ? "USD" : "KRW";
+
+    return rawChartCandles.map((candle) => ({
+      ...candle,
+      open: convertCurrencyValue(
+        candle.open,
+        sourceCurrencyCode,
+        stock.currencyCode,
+      ),
+      high: convertCurrencyValue(
+        candle.high,
+        sourceCurrencyCode,
+        stock.currencyCode,
+      ),
+      low: convertCurrencyValue(
+        candle.low,
+        sourceCurrencyCode,
+        stock.currencyCode,
+      ),
+      close: convertCurrencyValue(
+        candle.close,
+        sourceCurrencyCode,
+        stock.currencyCode,
+      ),
+    }));
+  }, [rawChartCandles, stock.countryCode, stock.currencyCode]);
 
   const latestCandle = chartCandles.at(-1);
   const displayCandle = hoveredCandle ?? latestCandle;
+  const displayCandleBasePrice = useMemo(() => {
+    if (!displayCandle) {
+      return 0;
+    }
+
+    const displayCandleIndex = chartCandles.findIndex(
+      (candle) => candle.time === displayCandle.time,
+    );
+
+    return chartCandles[displayCandleIndex - 1]?.close ?? displayCandle.open;
+  }, [chartCandles, displayCandle]);
 
   const ohlcItems = useMemo(
-    () => getOhlcItems(displayCandle, stock.previousClose),
-    [displayCandle, stock.previousClose],
+    () => getOhlcItems(displayCandle, displayCandleBasePrice),
+    [displayCandle, displayCandleBasePrice],
   );
 
   const monthStartTimes = useMemo(() => {
@@ -91,7 +132,11 @@ export function useChartPanel({ stock }: StockOnlyProps) {
   }, [chartCandles]);
 
   const currentPriceLabelClassName =
-    stock.changeRate >= 0 ? "bg-[#FF0505]" : "bg-[#0084FF]";
+    stock.changeRate > 0
+      ? "bg-[#FF0505]"
+      : stock.changeRate < 0
+        ? "bg-[#0084FF]"
+        : "bg-zinc-500";
 
   const handleRangeChange = (nextRange: CandleRange) => {
     setSelectedRange(nextRange);
@@ -162,6 +207,7 @@ export function useChartPanel({ stock }: StockOnlyProps) {
       chart,
       chartCandles,
       chartContainer,
+      currencyCode: stock.currencyCode,
       selectedRange,
       setCrosshairDateLabel,
       setCrosshairPriceLabel,
@@ -180,9 +226,11 @@ export function useChartPanel({ stock }: StockOnlyProps) {
     });
 
     resizeObserver.observe(chartContainer);
+
     const handleVisibleTimeRangeChange = (range: IRange<Time> | null) => {
       updateHighLowLabels(range);
     };
+    
     const handleVisibleLogicalRangeChange = () => {
       updateAxisTickLabels();
       updatePriceAxisTickLabels();
