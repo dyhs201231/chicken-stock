@@ -68,7 +68,7 @@ export default function TransactionHistory() {
           />
         </div>
 
-        <div className="min-h-[360px] rounded-lg px-10 py-9 shadow-[3px_6px_10px_rgba(0,0,0,0.25)]">
+        <div className="h-[600px] min-h-[360px] rounded-lg px-10 py-9 shadow-[3px_6px_10px_rgba(0,0,0,0.25)] xl:sticky xl:top-24 xl:max-h-[calc(100dvh-8rem)] xl:self-start xl:overflow-y-auto">
           {selectedTransaction && (
             <TransactionDetail
               item={selectedItem}
