@@ -2,10 +2,7 @@ import type {
   StockCurrencyCode,
   StockDetailData,
 } from "../../types/stock/stock-detail";
-import {
-  convertCurrencyValue,
-  USD_KRW_EXCHANGE_RATE,
-} from "../../../(shared)/utils/currency";
+import { convertCurrencyValue, USD_KRW_EXCHANGE_RATE } from "../currency";
 
 const financialStatementMoneyKeys = new Set([
   "revenue",

@@ -11,6 +11,7 @@ export type StockCandleData = {
   highPrice: number;
   lowPrice: number;
   closePrice: number;
+  volume: number;
 };
 
 export type StockOrderBookLevelData = {
@@ -40,8 +41,17 @@ export type StockFinancialMetricData = {
 
 export type StockThemeFinancialMetricData = {
   per: number | null;
+  forwardPer: number | null;
   pbr: number | null;
   peerCount: number;
+};
+
+export type StockValuationMetricData = {
+  baseDate: string;
+  per: number | null;
+  industryPer: number | null;
+  forwardPer: number | null;
+  industryForwardPer: number | null;
 };
 
 export type StockFinancialStatementType =
@@ -107,6 +117,7 @@ export type StockDetailData = {
   orderBookSnapshot: StockOrderBookSnapshotData | null;
   financialMetric: StockFinancialMetricData | null;
   themeFinancialMetric: StockThemeFinancialMetricData;
+  valuationMetric: StockValuationMetricData;
   financialStatements: StockFinancialStatementData[];
   earnings: StockEarningData[];
 };

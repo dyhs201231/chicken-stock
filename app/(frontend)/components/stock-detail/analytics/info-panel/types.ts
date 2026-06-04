@@ -9,7 +9,7 @@ export type FinancialStatementTab = StockFinancialStatementType;
 
 export type EarningPeriodTab = StockFinancialPeriodType;
 
-export type ValuationMetricTab = "PER" | "PBR";
+export type ValuationMetricTab = "PER";
 
 export type FinancialTableRow = {
   item: string;

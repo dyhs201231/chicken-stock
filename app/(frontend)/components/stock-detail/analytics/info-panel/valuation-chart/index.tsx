@@ -47,9 +47,9 @@ export default function ValuationChart({
         {hasData && (
           <>
             <div className="pointer-events-none absolute inset-x-4 top-0 bottom-7 grid grid-cols-4 border-l border-zinc-200">
+              <span />
               <span className="border-r border-zinc-200" />
-              <span className="border-r border-zinc-200" />
-              <span className="border-r border-zinc-200" />
+              <span className="border- border-zinc-200" />
               <span className="border-r border-zinc-200" />
             </div>
 
@@ -68,17 +68,25 @@ export default function ValuationChart({
                           : Math.max((value / maxValue) * 100, 4);
 
                       return (
-                        <span
-                          aria-label={`${item.label} ${bar.label} ${metric}`}
-                          className={`w-8 rounded-t-sm ${bar.className}`}
+                        <div
+                          className="flex h-full w-8 flex-col justify-end"
                           key={bar.key}
-                          style={{ height: `${height}%` }}
-                          title={
-                            value === undefined
-                              ? `${bar.label}: 데이터 없음`
-                              : `${bar.label}: ${value.toFixed(2)}배`
-                          }
-                        />
+                        >
+                          {value !== undefined && (
+                            <div className="mb-2 -translate-x-0.5 text-center text-xs whitespace-nowrap text-zinc-500">
+                              {value.toLocaleString("ko-KR", {
+                                maximumFractionDigits: 2,
+                              })}
+                              배
+                            </div>
+                          )}
+
+                          <span
+                            aria-label={`${item.label} ${bar.label} ${metric}`}
+                            className={`w-8 rounded-t-sm ${bar.className}`}
+                            style={{ height: `${height}%` }}
+                          />
+                        </div>
                       );
                     })}
                   </div>
