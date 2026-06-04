@@ -22,12 +22,14 @@ export type StockOrderBookLevelData = {
 };
 
 export type StockOrderBookSnapshotData = {
+  timestamp: number;
   totalAskSize: number;
   totalBidSize: number;
   volume: number;
   buyVolume: number;
   sellVolume: number;
   executionStrength: number;
+  lastTradeVolume: number;
   levels: StockOrderBookLevelData[];
 };
 

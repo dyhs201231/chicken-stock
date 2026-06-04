@@ -1,4 +1,5 @@
 import { prisma } from "../../../../(backend)/lib/prisma";
+import { serializeOrderBookSnapshot } from "../../../../(backend)/lib/stock-order-book";
 import type {
   StockDetailData,
   StockFinancialStatementData,
@@ -316,20 +317,7 @@ export async function getStockDetailData(
       }))
       .reverse(),
     orderBookSnapshot: orderBookSnapshot
-      ? {
-          totalAskSize: toNumber(orderBookSnapshot.totalAskSize),
-          totalBidSize: toNumber(orderBookSnapshot.totalBidSize),
-          volume: toNumber(orderBookSnapshot.volume),
-          buyVolume: toNumber(orderBookSnapshot.buyVolume),
-          sellVolume: toNumber(orderBookSnapshot.sellVolume),
-          executionStrength: toNumber(orderBookSnapshot.executionStrength),
-          levels: orderBookSnapshot.levels.map((level) => ({
-            side: level.side,
-            levelRank: level.levelRank,
-            price: toNumber(level.price),
-            quantity: toNumber(level.quantity),
-          })),
-        }
+      ? serializeOrderBookSnapshot(orderBookSnapshot)
       : null,
     financialMetric: stock.financialMetric
       ? {

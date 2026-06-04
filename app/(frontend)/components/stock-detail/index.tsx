@@ -159,7 +159,11 @@ export default function StockDetail({ stock, activeTab }: StockDetailProps) {
       {activeTab === "chart-orderbook" && (
         <div className="grid grid-cols-[minmax(0,1fr)_20rem_20rem] gap-7">
           <ChartPanel stock={displayStock} />
-          <OrderBookPanel stock={displayStock} />
+          <OrderBookPanel
+            initialOrderBookSnapshot={stock.orderBookSnapshot}
+            sourceCurrencyCode={stock.currencyCode}
+            stock={displayStock}
+          />
           <OrderPanel stock={displayStock} />
         </div>
       )}
@@ -167,7 +171,11 @@ export default function StockDetail({ stock, activeTab }: StockDetailProps) {
       {activeTab === "portfolio-info" && (
         <div className="grid grid-cols-[minmax(0,1fr)_20rem_20rem] gap-7">
           <InfoPanel stock={displayStock} />
-          <OrderBookPanel stock={displayStock} />
+          <OrderBookPanel
+            initialOrderBookSnapshot={stock.orderBookSnapshot}
+            sourceCurrencyCode={stock.currencyCode}
+            stock={displayStock}
+          />
           <OrderPanel stock={displayStock} />
         </div>
       )}
