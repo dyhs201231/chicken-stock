@@ -7,8 +7,6 @@ import {
   USD_KRW_EXCHANGE_RATE,
 } from "../../../(shared)/utils/currency";
 
-export { convertCurrencyValue, USD_KRW_EXCHANGE_RATE };
-
 const financialStatementMoneyKeys = new Set([
   "revenue",
   "operatingProfit",
@@ -281,3 +279,5 @@ export function formatDateLabel(timestamp: number) {
 
   return `${date.getMonth() + 1}월`;
 }
+
+export { convertCurrencyValue, USD_KRW_EXCHANGE_RATE };
