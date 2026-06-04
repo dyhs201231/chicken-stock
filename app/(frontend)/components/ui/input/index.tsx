@@ -66,7 +66,7 @@ export default function Input({
     : ariaDescribedBy;
 
   return (
-    <span className={twMerge("inline-flex w-full flex-col", className)}>
+    <span className={twMerge("relative inline-flex w-full", className)}>
       <span className="relative inline-flex w-full items-center">
         {leftAddon ? (
           <span className="pointer-events-none absolute left-1 text-zinc-400">
@@ -104,7 +104,7 @@ export default function Input({
       {showErrorMessage && (
         <span
           id={errorId}
-          className="mt-1 text-center text-sm font-semibold text-red-500"
+          className="absolute top-full right-0 left-0 mt-1 text-center text-sm font-semibold text-red-500"
         >
           {errorMessage}
         </span>

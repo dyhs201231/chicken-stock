@@ -333,11 +333,11 @@ export type PortfolioOrderByWithRelationInput = {
 
 export type PortfolioWhereUniqueInput = Prisma.AtLeast<{
   id?: bigint | number
+  accountNumber?: string
+  userId?: bigint | number
   AND?: Prisma.PortfolioWhereInput | Prisma.PortfolioWhereInput[]
   OR?: Prisma.PortfolioWhereInput[]
   NOT?: Prisma.PortfolioWhereInput | Prisma.PortfolioWhereInput[]
-  accountNumber?: Prisma.StringFilter<"Portfolio"> | string
-  userId?: Prisma.BigIntFilter<"Portfolio"> | bigint | number
   totalBalance?: Prisma.DecimalFilter<"Portfolio"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   krwBalance?: Prisma.DecimalFilter<"Portfolio"> | runtime.Decimal | runtime.DecimalJsLike | number | string
   usdBalance?: Prisma.DecimalFilter<"Portfolio"> | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -352,7 +352,7 @@ export type PortfolioWhereUniqueInput = Prisma.AtLeast<{
   tradeOrders?: Prisma.TradeOrderListRelationFilter
   transactions?: Prisma.PortfolioTransactionListRelationFilter
   dividends?: Prisma.PortfolioDividendListRelationFilter
-}, "id">
+}, "id" | "accountNumber" | "userId">
 
 export type PortfolioOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -393,18 +393,18 @@ export type PortfolioScalarWhereWithAggregatesInput = {
 }
 
 export type PortfolioCreateInput = {
-  id: bigint | number
+  id?: bigint | number
   accountNumber: string
-  totalBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  krwBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  usdBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalAvailableOrderAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalInvestmentAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  domesticStockAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  foreignStockAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  krwBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  usdBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAvailableOrderAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInvestmentAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  domesticStockAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  foreignStockAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
-  user: Prisma.UserCreateNestedOneWithoutPortfoliosInput
+  user: Prisma.UserCreateNestedOneWithoutPortfolioInput
   items?: Prisma.PortfolioItemCreateNestedManyWithoutPortfolioInput
   tradeOrders?: Prisma.TradeOrderCreateNestedManyWithoutPortfolioInput
   transactions?: Prisma.PortfolioTransactionCreateNestedManyWithoutPortfolioInput
@@ -412,16 +412,16 @@ export type PortfolioCreateInput = {
 }
 
 export type PortfolioUncheckedCreateInput = {
-  id: bigint | number
+  id?: bigint | number
   accountNumber: string
   userId: bigint | number
-  totalBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  krwBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  usdBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalAvailableOrderAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalInvestmentAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  domesticStockAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  foreignStockAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  krwBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  usdBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAvailableOrderAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInvestmentAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  domesticStockAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  foreignStockAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.PortfolioItemUncheckedCreateNestedManyWithoutPortfolioInput
@@ -442,7 +442,7 @@ export type PortfolioUpdateInput = {
   foreignStockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  user?: Prisma.UserUpdateOneRequiredWithoutPortfoliosNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutPortfolioNestedInput
   items?: Prisma.PortfolioItemUpdateManyWithoutPortfolioNestedInput
   tradeOrders?: Prisma.TradeOrderUpdateManyWithoutPortfolioNestedInput
   transactions?: Prisma.PortfolioTransactionUpdateManyWithoutPortfolioNestedInput
@@ -469,16 +469,16 @@ export type PortfolioUncheckedUpdateInput = {
 }
 
 export type PortfolioCreateManyInput = {
-  id: bigint | number
+  id?: bigint | number
   accountNumber: string
   userId: bigint | number
-  totalBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  krwBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  usdBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalAvailableOrderAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalInvestmentAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  domesticStockAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  foreignStockAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  krwBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  usdBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAvailableOrderAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInvestmentAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  domesticStockAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  foreignStockAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -512,14 +512,9 @@ export type PortfolioUncheckedUpdateManyInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type PortfolioListRelationFilter = {
-  every?: Prisma.PortfolioWhereInput
-  some?: Prisma.PortfolioWhereInput
-  none?: Prisma.PortfolioWhereInput
-}
-
-export type PortfolioOrderByRelationAggregateInput = {
-  _count?: Prisma.SortOrder
+export type PortfolioNullableScalarRelationFilter = {
+  is?: Prisma.PortfolioWhereInput | null
+  isNot?: Prisma.PortfolioWhereInput | null
 }
 
 export type PortfolioCountOrderByAggregateInput = {
@@ -596,46 +591,36 @@ export type PortfolioScalarRelationFilter = {
   isNot?: Prisma.PortfolioWhereInput
 }
 
-export type PortfolioCreateNestedManyWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.PortfolioCreateWithoutUserInput, Prisma.PortfolioUncheckedCreateWithoutUserInput> | Prisma.PortfolioCreateWithoutUserInput[] | Prisma.PortfolioUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.PortfolioCreateOrConnectWithoutUserInput | Prisma.PortfolioCreateOrConnectWithoutUserInput[]
-  createMany?: Prisma.PortfolioCreateManyUserInputEnvelope
-  connect?: Prisma.PortfolioWhereUniqueInput | Prisma.PortfolioWhereUniqueInput[]
+export type PortfolioCreateNestedOneWithoutUserInput = {
+  create?: Prisma.XOR<Prisma.PortfolioCreateWithoutUserInput, Prisma.PortfolioUncheckedCreateWithoutUserInput>
+  connectOrCreate?: Prisma.PortfolioCreateOrConnectWithoutUserInput
+  connect?: Prisma.PortfolioWhereUniqueInput
 }
 
-export type PortfolioUncheckedCreateNestedManyWithoutUserInput = {
-  create?: Prisma.XOR<Prisma.PortfolioCreateWithoutUserInput, Prisma.PortfolioUncheckedCreateWithoutUserInput> | Prisma.PortfolioCreateWithoutUserInput[] | Prisma.PortfolioUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.PortfolioCreateOrConnectWithoutUserInput | Prisma.PortfolioCreateOrConnectWithoutUserInput[]
-  createMany?: Prisma.PortfolioCreateManyUserInputEnvelope
-  connect?: Prisma.PortfolioWhereUniqueInput | Prisma.PortfolioWhereUniqueInput[]
+export type PortfolioUncheckedCreateNestedOneWithoutUserInput = {
+  create?: Prisma.XOR<Prisma.PortfolioCreateWithoutUserInput, Prisma.PortfolioUncheckedCreateWithoutUserInput>
+  connectOrCreate?: Prisma.PortfolioCreateOrConnectWithoutUserInput
+  connect?: Prisma.PortfolioWhereUniqueInput
 }
 
-export type PortfolioUpdateManyWithoutUserNestedInput = {
-  create?: Prisma.XOR<Prisma.PortfolioCreateWithoutUserInput, Prisma.PortfolioUncheckedCreateWithoutUserInput> | Prisma.PortfolioCreateWithoutUserInput[] | Prisma.PortfolioUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.PortfolioCreateOrConnectWithoutUserInput | Prisma.PortfolioCreateOrConnectWithoutUserInput[]
-  upsert?: Prisma.PortfolioUpsertWithWhereUniqueWithoutUserInput | Prisma.PortfolioUpsertWithWhereUniqueWithoutUserInput[]
-  createMany?: Prisma.PortfolioCreateManyUserInputEnvelope
-  set?: Prisma.PortfolioWhereUniqueInput | Prisma.PortfolioWhereUniqueInput[]
-  disconnect?: Prisma.PortfolioWhereUniqueInput | Prisma.PortfolioWhereUniqueInput[]
-  delete?: Prisma.PortfolioWhereUniqueInput | Prisma.PortfolioWhereUniqueInput[]
-  connect?: Prisma.PortfolioWhereUniqueInput | Prisma.PortfolioWhereUniqueInput[]
-  update?: Prisma.PortfolioUpdateWithWhereUniqueWithoutUserInput | Prisma.PortfolioUpdateWithWhereUniqueWithoutUserInput[]
-  updateMany?: Prisma.PortfolioUpdateManyWithWhereWithoutUserInput | Prisma.PortfolioUpdateManyWithWhereWithoutUserInput[]
-  deleteMany?: Prisma.PortfolioScalarWhereInput | Prisma.PortfolioScalarWhereInput[]
+export type PortfolioUpdateOneWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.PortfolioCreateWithoutUserInput, Prisma.PortfolioUncheckedCreateWithoutUserInput>
+  connectOrCreate?: Prisma.PortfolioCreateOrConnectWithoutUserInput
+  upsert?: Prisma.PortfolioUpsertWithoutUserInput
+  disconnect?: Prisma.PortfolioWhereInput | boolean
+  delete?: Prisma.PortfolioWhereInput | boolean
+  connect?: Prisma.PortfolioWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PortfolioUpdateToOneWithWhereWithoutUserInput, Prisma.PortfolioUpdateWithoutUserInput>, Prisma.PortfolioUncheckedUpdateWithoutUserInput>
 }
 
-export type PortfolioUncheckedUpdateManyWithoutUserNestedInput = {
-  create?: Prisma.XOR<Prisma.PortfolioCreateWithoutUserInput, Prisma.PortfolioUncheckedCreateWithoutUserInput> | Prisma.PortfolioCreateWithoutUserInput[] | Prisma.PortfolioUncheckedCreateWithoutUserInput[]
-  connectOrCreate?: Prisma.PortfolioCreateOrConnectWithoutUserInput | Prisma.PortfolioCreateOrConnectWithoutUserInput[]
-  upsert?: Prisma.PortfolioUpsertWithWhereUniqueWithoutUserInput | Prisma.PortfolioUpsertWithWhereUniqueWithoutUserInput[]
-  createMany?: Prisma.PortfolioCreateManyUserInputEnvelope
-  set?: Prisma.PortfolioWhereUniqueInput | Prisma.PortfolioWhereUniqueInput[]
-  disconnect?: Prisma.PortfolioWhereUniqueInput | Prisma.PortfolioWhereUniqueInput[]
-  delete?: Prisma.PortfolioWhereUniqueInput | Prisma.PortfolioWhereUniqueInput[]
-  connect?: Prisma.PortfolioWhereUniqueInput | Prisma.PortfolioWhereUniqueInput[]
-  update?: Prisma.PortfolioUpdateWithWhereUniqueWithoutUserInput | Prisma.PortfolioUpdateWithWhereUniqueWithoutUserInput[]
-  updateMany?: Prisma.PortfolioUpdateManyWithWhereWithoutUserInput | Prisma.PortfolioUpdateManyWithWhereWithoutUserInput[]
-  deleteMany?: Prisma.PortfolioScalarWhereInput | Prisma.PortfolioScalarWhereInput[]
+export type PortfolioUncheckedUpdateOneWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.PortfolioCreateWithoutUserInput, Prisma.PortfolioUncheckedCreateWithoutUserInput>
+  connectOrCreate?: Prisma.PortfolioCreateOrConnectWithoutUserInput
+  upsert?: Prisma.PortfolioUpsertWithoutUserInput
+  disconnect?: Prisma.PortfolioWhereInput | boolean
+  delete?: Prisma.PortfolioWhereInput | boolean
+  connect?: Prisma.PortfolioWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.PortfolioUpdateToOneWithWhereWithoutUserInput, Prisma.PortfolioUpdateWithoutUserInput>, Prisma.PortfolioUncheckedUpdateWithoutUserInput>
 }
 
 export type PortfolioCreateNestedOneWithoutTransactionsInput = {
@@ -695,15 +680,15 @@ export type PortfolioUpdateOneRequiredWithoutTradeOrdersNestedInput = {
 }
 
 export type PortfolioCreateWithoutUserInput = {
-  id: bigint | number
+  id?: bigint | number
   accountNumber: string
-  totalBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  krwBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  usdBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalAvailableOrderAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalInvestmentAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  domesticStockAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  foreignStockAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  krwBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  usdBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAvailableOrderAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInvestmentAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  domesticStockAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  foreignStockAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.PortfolioItemCreateNestedManyWithoutPortfolioInput
@@ -713,15 +698,15 @@ export type PortfolioCreateWithoutUserInput = {
 }
 
 export type PortfolioUncheckedCreateWithoutUserInput = {
-  id: bigint | number
+  id?: bigint | number
   accountNumber: string
-  totalBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  krwBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  usdBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalAvailableOrderAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalInvestmentAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  domesticStockAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  foreignStockAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  krwBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  usdBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAvailableOrderAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInvestmentAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  domesticStockAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  foreignStockAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Date | string
   updatedAt?: Date | string
   items?: Prisma.PortfolioItemUncheckedCreateNestedManyWithoutPortfolioInput
@@ -735,409 +720,15 @@ export type PortfolioCreateOrConnectWithoutUserInput = {
   create: Prisma.XOR<Prisma.PortfolioCreateWithoutUserInput, Prisma.PortfolioUncheckedCreateWithoutUserInput>
 }
 
-export type PortfolioCreateManyUserInputEnvelope = {
-  data: Prisma.PortfolioCreateManyUserInput | Prisma.PortfolioCreateManyUserInput[]
-  skipDuplicates?: boolean
-}
-
-export type PortfolioUpsertWithWhereUniqueWithoutUserInput = {
-  where: Prisma.PortfolioWhereUniqueInput
+export type PortfolioUpsertWithoutUserInput = {
   update: Prisma.XOR<Prisma.PortfolioUpdateWithoutUserInput, Prisma.PortfolioUncheckedUpdateWithoutUserInput>
   create: Prisma.XOR<Prisma.PortfolioCreateWithoutUserInput, Prisma.PortfolioUncheckedCreateWithoutUserInput>
+  where?: Prisma.PortfolioWhereInput
 }
 
-export type PortfolioUpdateWithWhereUniqueWithoutUserInput = {
-  where: Prisma.PortfolioWhereUniqueInput
+export type PortfolioUpdateToOneWithWhereWithoutUserInput = {
+  where?: Prisma.PortfolioWhereInput
   data: Prisma.XOR<Prisma.PortfolioUpdateWithoutUserInput, Prisma.PortfolioUncheckedUpdateWithoutUserInput>
-}
-
-export type PortfolioUpdateManyWithWhereWithoutUserInput = {
-  where: Prisma.PortfolioScalarWhereInput
-  data: Prisma.XOR<Prisma.PortfolioUpdateManyMutationInput, Prisma.PortfolioUncheckedUpdateManyWithoutUserInput>
-}
-
-export type PortfolioScalarWhereInput = {
-  AND?: Prisma.PortfolioScalarWhereInput | Prisma.PortfolioScalarWhereInput[]
-  OR?: Prisma.PortfolioScalarWhereInput[]
-  NOT?: Prisma.PortfolioScalarWhereInput | Prisma.PortfolioScalarWhereInput[]
-  id?: Prisma.BigIntFilter<"Portfolio"> | bigint | number
-  accountNumber?: Prisma.StringFilter<"Portfolio"> | string
-  userId?: Prisma.BigIntFilter<"Portfolio"> | bigint | number
-  totalBalance?: Prisma.DecimalFilter<"Portfolio"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  krwBalance?: Prisma.DecimalFilter<"Portfolio"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  usdBalance?: Prisma.DecimalFilter<"Portfolio"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalAvailableOrderAmount?: Prisma.DecimalFilter<"Portfolio"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalInvestmentAmount?: Prisma.DecimalFilter<"Portfolio"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  domesticStockAmount?: Prisma.DecimalFilter<"Portfolio"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  foreignStockAmount?: Prisma.DecimalFilter<"Portfolio"> | runtime.Decimal | runtime.DecimalJsLike | number | string
-  createdAt?: Prisma.DateTimeFilter<"Portfolio"> | Date | string
-  updatedAt?: Prisma.DateTimeFilter<"Portfolio"> | Date | string
-}
-
-export type PortfolioCreateWithoutTransactionsInput = {
-  id: bigint | number
-  accountNumber: string
-  totalBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  krwBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  usdBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalAvailableOrderAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalInvestmentAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  domesticStockAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  foreignStockAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  user: Prisma.UserCreateNestedOneWithoutPortfoliosInput
-  items?: Prisma.PortfolioItemCreateNestedManyWithoutPortfolioInput
-  tradeOrders?: Prisma.TradeOrderCreateNestedManyWithoutPortfolioInput
-  dividends?: Prisma.PortfolioDividendCreateNestedManyWithoutPortfolioInput
-}
-
-export type PortfolioUncheckedCreateWithoutTransactionsInput = {
-  id: bigint | number
-  accountNumber: string
-  userId: bigint | number
-  totalBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  krwBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  usdBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalAvailableOrderAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalInvestmentAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  domesticStockAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  foreignStockAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  items?: Prisma.PortfolioItemUncheckedCreateNestedManyWithoutPortfolioInput
-  tradeOrders?: Prisma.TradeOrderUncheckedCreateNestedManyWithoutPortfolioInput
-  dividends?: Prisma.PortfolioDividendUncheckedCreateNestedManyWithoutPortfolioInput
-}
-
-export type PortfolioCreateOrConnectWithoutTransactionsInput = {
-  where: Prisma.PortfolioWhereUniqueInput
-  create: Prisma.XOR<Prisma.PortfolioCreateWithoutTransactionsInput, Prisma.PortfolioUncheckedCreateWithoutTransactionsInput>
-}
-
-export type PortfolioUpsertWithoutTransactionsInput = {
-  update: Prisma.XOR<Prisma.PortfolioUpdateWithoutTransactionsInput, Prisma.PortfolioUncheckedUpdateWithoutTransactionsInput>
-  create: Prisma.XOR<Prisma.PortfolioCreateWithoutTransactionsInput, Prisma.PortfolioUncheckedCreateWithoutTransactionsInput>
-  where?: Prisma.PortfolioWhereInput
-}
-
-export type PortfolioUpdateToOneWithWhereWithoutTransactionsInput = {
-  where?: Prisma.PortfolioWhereInput
-  data: Prisma.XOR<Prisma.PortfolioUpdateWithoutTransactionsInput, Prisma.PortfolioUncheckedUpdateWithoutTransactionsInput>
-}
-
-export type PortfolioUpdateWithoutTransactionsInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
-  totalBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  krwBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  usdBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalAvailableOrderAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalInvestmentAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  domesticStockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  foreignStockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  user?: Prisma.UserUpdateOneRequiredWithoutPortfoliosNestedInput
-  items?: Prisma.PortfolioItemUpdateManyWithoutPortfolioNestedInput
-  tradeOrders?: Prisma.TradeOrderUpdateManyWithoutPortfolioNestedInput
-  dividends?: Prisma.PortfolioDividendUpdateManyWithoutPortfolioNestedInput
-}
-
-export type PortfolioUncheckedUpdateWithoutTransactionsInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  totalBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  krwBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  usdBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalAvailableOrderAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalInvestmentAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  domesticStockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  foreignStockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  items?: Prisma.PortfolioItemUncheckedUpdateManyWithoutPortfolioNestedInput
-  tradeOrders?: Prisma.TradeOrderUncheckedUpdateManyWithoutPortfolioNestedInput
-  dividends?: Prisma.PortfolioDividendUncheckedUpdateManyWithoutPortfolioNestedInput
-}
-
-export type PortfolioCreateWithoutItemsInput = {
-  id: bigint | number
-  accountNumber: string
-  totalBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  krwBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  usdBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalAvailableOrderAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalInvestmentAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  domesticStockAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  foreignStockAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  user: Prisma.UserCreateNestedOneWithoutPortfoliosInput
-  tradeOrders?: Prisma.TradeOrderCreateNestedManyWithoutPortfolioInput
-  transactions?: Prisma.PortfolioTransactionCreateNestedManyWithoutPortfolioInput
-  dividends?: Prisma.PortfolioDividendCreateNestedManyWithoutPortfolioInput
-}
-
-export type PortfolioUncheckedCreateWithoutItemsInput = {
-  id: bigint | number
-  accountNumber: string
-  userId: bigint | number
-  totalBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  krwBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  usdBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalAvailableOrderAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalInvestmentAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  domesticStockAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  foreignStockAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  tradeOrders?: Prisma.TradeOrderUncheckedCreateNestedManyWithoutPortfolioInput
-  transactions?: Prisma.PortfolioTransactionUncheckedCreateNestedManyWithoutPortfolioInput
-  dividends?: Prisma.PortfolioDividendUncheckedCreateNestedManyWithoutPortfolioInput
-}
-
-export type PortfolioCreateOrConnectWithoutItemsInput = {
-  where: Prisma.PortfolioWhereUniqueInput
-  create: Prisma.XOR<Prisma.PortfolioCreateWithoutItemsInput, Prisma.PortfolioUncheckedCreateWithoutItemsInput>
-}
-
-export type PortfolioUpsertWithoutItemsInput = {
-  update: Prisma.XOR<Prisma.PortfolioUpdateWithoutItemsInput, Prisma.PortfolioUncheckedUpdateWithoutItemsInput>
-  create: Prisma.XOR<Prisma.PortfolioCreateWithoutItemsInput, Prisma.PortfolioUncheckedCreateWithoutItemsInput>
-  where?: Prisma.PortfolioWhereInput
-}
-
-export type PortfolioUpdateToOneWithWhereWithoutItemsInput = {
-  where?: Prisma.PortfolioWhereInput
-  data: Prisma.XOR<Prisma.PortfolioUpdateWithoutItemsInput, Prisma.PortfolioUncheckedUpdateWithoutItemsInput>
-}
-
-export type PortfolioUpdateWithoutItemsInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
-  totalBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  krwBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  usdBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalAvailableOrderAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalInvestmentAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  domesticStockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  foreignStockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  user?: Prisma.UserUpdateOneRequiredWithoutPortfoliosNestedInput
-  tradeOrders?: Prisma.TradeOrderUpdateManyWithoutPortfolioNestedInput
-  transactions?: Prisma.PortfolioTransactionUpdateManyWithoutPortfolioNestedInput
-  dividends?: Prisma.PortfolioDividendUpdateManyWithoutPortfolioNestedInput
-}
-
-export type PortfolioUncheckedUpdateWithoutItemsInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  totalBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  krwBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  usdBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalAvailableOrderAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalInvestmentAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  domesticStockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  foreignStockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  tradeOrders?: Prisma.TradeOrderUncheckedUpdateManyWithoutPortfolioNestedInput
-  transactions?: Prisma.PortfolioTransactionUncheckedUpdateManyWithoutPortfolioNestedInput
-  dividends?: Prisma.PortfolioDividendUncheckedUpdateManyWithoutPortfolioNestedInput
-}
-
-export type PortfolioCreateWithoutDividendsInput = {
-  id: bigint | number
-  accountNumber: string
-  totalBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  krwBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  usdBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalAvailableOrderAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalInvestmentAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  domesticStockAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  foreignStockAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  user: Prisma.UserCreateNestedOneWithoutPortfoliosInput
-  items?: Prisma.PortfolioItemCreateNestedManyWithoutPortfolioInput
-  tradeOrders?: Prisma.TradeOrderCreateNestedManyWithoutPortfolioInput
-  transactions?: Prisma.PortfolioTransactionCreateNestedManyWithoutPortfolioInput
-}
-
-export type PortfolioUncheckedCreateWithoutDividendsInput = {
-  id: bigint | number
-  accountNumber: string
-  userId: bigint | number
-  totalBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  krwBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  usdBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalAvailableOrderAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalInvestmentAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  domesticStockAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  foreignStockAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  items?: Prisma.PortfolioItemUncheckedCreateNestedManyWithoutPortfolioInput
-  tradeOrders?: Prisma.TradeOrderUncheckedCreateNestedManyWithoutPortfolioInput
-  transactions?: Prisma.PortfolioTransactionUncheckedCreateNestedManyWithoutPortfolioInput
-}
-
-export type PortfolioCreateOrConnectWithoutDividendsInput = {
-  where: Prisma.PortfolioWhereUniqueInput
-  create: Prisma.XOR<Prisma.PortfolioCreateWithoutDividendsInput, Prisma.PortfolioUncheckedCreateWithoutDividendsInput>
-}
-
-export type PortfolioUpsertWithoutDividendsInput = {
-  update: Prisma.XOR<Prisma.PortfolioUpdateWithoutDividendsInput, Prisma.PortfolioUncheckedUpdateWithoutDividendsInput>
-  create: Prisma.XOR<Prisma.PortfolioCreateWithoutDividendsInput, Prisma.PortfolioUncheckedCreateWithoutDividendsInput>
-  where?: Prisma.PortfolioWhereInput
-}
-
-export type PortfolioUpdateToOneWithWhereWithoutDividendsInput = {
-  where?: Prisma.PortfolioWhereInput
-  data: Prisma.XOR<Prisma.PortfolioUpdateWithoutDividendsInput, Prisma.PortfolioUncheckedUpdateWithoutDividendsInput>
-}
-
-export type PortfolioUpdateWithoutDividendsInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
-  totalBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  krwBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  usdBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalAvailableOrderAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalInvestmentAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  domesticStockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  foreignStockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  user?: Prisma.UserUpdateOneRequiredWithoutPortfoliosNestedInput
-  items?: Prisma.PortfolioItemUpdateManyWithoutPortfolioNestedInput
-  tradeOrders?: Prisma.TradeOrderUpdateManyWithoutPortfolioNestedInput
-  transactions?: Prisma.PortfolioTransactionUpdateManyWithoutPortfolioNestedInput
-}
-
-export type PortfolioUncheckedUpdateWithoutDividendsInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  totalBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  krwBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  usdBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalAvailableOrderAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalInvestmentAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  domesticStockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  foreignStockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  items?: Prisma.PortfolioItemUncheckedUpdateManyWithoutPortfolioNestedInput
-  tradeOrders?: Prisma.TradeOrderUncheckedUpdateManyWithoutPortfolioNestedInput
-  transactions?: Prisma.PortfolioTransactionUncheckedUpdateManyWithoutPortfolioNestedInput
-}
-
-export type PortfolioCreateWithoutTradeOrdersInput = {
-  id: bigint | number
-  accountNumber: string
-  totalBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  krwBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  usdBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalAvailableOrderAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalInvestmentAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  domesticStockAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  foreignStockAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  user: Prisma.UserCreateNestedOneWithoutPortfoliosInput
-  items?: Prisma.PortfolioItemCreateNestedManyWithoutPortfolioInput
-  transactions?: Prisma.PortfolioTransactionCreateNestedManyWithoutPortfolioInput
-  dividends?: Prisma.PortfolioDividendCreateNestedManyWithoutPortfolioInput
-}
-
-export type PortfolioUncheckedCreateWithoutTradeOrdersInput = {
-  id: bigint | number
-  accountNumber: string
-  userId: bigint | number
-  totalBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  krwBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  usdBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalAvailableOrderAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalInvestmentAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  domesticStockAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  foreignStockAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  createdAt?: Date | string
-  updatedAt?: Date | string
-  items?: Prisma.PortfolioItemUncheckedCreateNestedManyWithoutPortfolioInput
-  transactions?: Prisma.PortfolioTransactionUncheckedCreateNestedManyWithoutPortfolioInput
-  dividends?: Prisma.PortfolioDividendUncheckedCreateNestedManyWithoutPortfolioInput
-}
-
-export type PortfolioCreateOrConnectWithoutTradeOrdersInput = {
-  where: Prisma.PortfolioWhereUniqueInput
-  create: Prisma.XOR<Prisma.PortfolioCreateWithoutTradeOrdersInput, Prisma.PortfolioUncheckedCreateWithoutTradeOrdersInput>
-}
-
-export type PortfolioUpsertWithoutTradeOrdersInput = {
-  update: Prisma.XOR<Prisma.PortfolioUpdateWithoutTradeOrdersInput, Prisma.PortfolioUncheckedUpdateWithoutTradeOrdersInput>
-  create: Prisma.XOR<Prisma.PortfolioCreateWithoutTradeOrdersInput, Prisma.PortfolioUncheckedCreateWithoutTradeOrdersInput>
-  where?: Prisma.PortfolioWhereInput
-}
-
-export type PortfolioUpdateToOneWithWhereWithoutTradeOrdersInput = {
-  where?: Prisma.PortfolioWhereInput
-  data: Prisma.XOR<Prisma.PortfolioUpdateWithoutTradeOrdersInput, Prisma.PortfolioUncheckedUpdateWithoutTradeOrdersInput>
-}
-
-export type PortfolioUpdateWithoutTradeOrdersInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
-  totalBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  krwBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  usdBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalAvailableOrderAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalInvestmentAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  domesticStockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  foreignStockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  user?: Prisma.UserUpdateOneRequiredWithoutPortfoliosNestedInput
-  items?: Prisma.PortfolioItemUpdateManyWithoutPortfolioNestedInput
-  transactions?: Prisma.PortfolioTransactionUpdateManyWithoutPortfolioNestedInput
-  dividends?: Prisma.PortfolioDividendUpdateManyWithoutPortfolioNestedInput
-}
-
-export type PortfolioUncheckedUpdateWithoutTradeOrdersInput = {
-  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
-  userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
-  totalBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  krwBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  usdBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalAvailableOrderAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalInvestmentAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  domesticStockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  foreignStockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
-  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  items?: Prisma.PortfolioItemUncheckedUpdateManyWithoutPortfolioNestedInput
-  transactions?: Prisma.PortfolioTransactionUncheckedUpdateManyWithoutPortfolioNestedInput
-  dividends?: Prisma.PortfolioDividendUncheckedUpdateManyWithoutPortfolioNestedInput
-}
-
-export type PortfolioCreateManyUserInput = {
-  id: bigint | number
-  accountNumber: string
-  totalBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  krwBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  usdBalance: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalAvailableOrderAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  totalInvestmentAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  domesticStockAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  foreignStockAmount: runtime.Decimal | runtime.DecimalJsLike | number | string
-  createdAt?: Date | string
-  updatedAt?: Date | string
 }
 
 export type PortfolioUpdateWithoutUserInput = {
@@ -1176,7 +767,59 @@ export type PortfolioUncheckedUpdateWithoutUserInput = {
   dividends?: Prisma.PortfolioDividendUncheckedUpdateManyWithoutPortfolioNestedInput
 }
 
-export type PortfolioUncheckedUpdateManyWithoutUserInput = {
+export type PortfolioCreateWithoutTransactionsInput = {
+  id?: bigint | number
+  accountNumber: string
+  totalBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  krwBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  usdBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAvailableOrderAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInvestmentAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  domesticStockAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  foreignStockAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutPortfolioInput
+  items?: Prisma.PortfolioItemCreateNestedManyWithoutPortfolioInput
+  tradeOrders?: Prisma.TradeOrderCreateNestedManyWithoutPortfolioInput
+  dividends?: Prisma.PortfolioDividendCreateNestedManyWithoutPortfolioInput
+}
+
+export type PortfolioUncheckedCreateWithoutTransactionsInput = {
+  id?: bigint | number
+  accountNumber: string
+  userId: bigint | number
+  totalBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  krwBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  usdBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAvailableOrderAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInvestmentAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  domesticStockAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  foreignStockAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  items?: Prisma.PortfolioItemUncheckedCreateNestedManyWithoutPortfolioInput
+  tradeOrders?: Prisma.TradeOrderUncheckedCreateNestedManyWithoutPortfolioInput
+  dividends?: Prisma.PortfolioDividendUncheckedCreateNestedManyWithoutPortfolioInput
+}
+
+export type PortfolioCreateOrConnectWithoutTransactionsInput = {
+  where: Prisma.PortfolioWhereUniqueInput
+  create: Prisma.XOR<Prisma.PortfolioCreateWithoutTransactionsInput, Prisma.PortfolioUncheckedCreateWithoutTransactionsInput>
+}
+
+export type PortfolioUpsertWithoutTransactionsInput = {
+  update: Prisma.XOR<Prisma.PortfolioUpdateWithoutTransactionsInput, Prisma.PortfolioUncheckedUpdateWithoutTransactionsInput>
+  create: Prisma.XOR<Prisma.PortfolioCreateWithoutTransactionsInput, Prisma.PortfolioUncheckedCreateWithoutTransactionsInput>
+  where?: Prisma.PortfolioWhereInput
+}
+
+export type PortfolioUpdateToOneWithWhereWithoutTransactionsInput = {
+  where?: Prisma.PortfolioWhereInput
+  data: Prisma.XOR<Prisma.PortfolioUpdateWithoutTransactionsInput, Prisma.PortfolioUncheckedUpdateWithoutTransactionsInput>
+}
+
+export type PortfolioUpdateWithoutTransactionsInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
   totalBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -1188,6 +831,292 @@ export type PortfolioUncheckedUpdateManyWithoutUserInput = {
   foreignStockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutPortfolioNestedInput
+  items?: Prisma.PortfolioItemUpdateManyWithoutPortfolioNestedInput
+  tradeOrders?: Prisma.TradeOrderUpdateManyWithoutPortfolioNestedInput
+  dividends?: Prisma.PortfolioDividendUpdateManyWithoutPortfolioNestedInput
+}
+
+export type PortfolioUncheckedUpdateWithoutTransactionsInput = {
+  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  totalBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  krwBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  usdBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAvailableOrderAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInvestmentAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  domesticStockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  foreignStockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  items?: Prisma.PortfolioItemUncheckedUpdateManyWithoutPortfolioNestedInput
+  tradeOrders?: Prisma.TradeOrderUncheckedUpdateManyWithoutPortfolioNestedInput
+  dividends?: Prisma.PortfolioDividendUncheckedUpdateManyWithoutPortfolioNestedInput
+}
+
+export type PortfolioCreateWithoutItemsInput = {
+  id?: bigint | number
+  accountNumber: string
+  totalBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  krwBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  usdBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAvailableOrderAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInvestmentAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  domesticStockAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  foreignStockAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutPortfolioInput
+  tradeOrders?: Prisma.TradeOrderCreateNestedManyWithoutPortfolioInput
+  transactions?: Prisma.PortfolioTransactionCreateNestedManyWithoutPortfolioInput
+  dividends?: Prisma.PortfolioDividendCreateNestedManyWithoutPortfolioInput
+}
+
+export type PortfolioUncheckedCreateWithoutItemsInput = {
+  id?: bigint | number
+  accountNumber: string
+  userId: bigint | number
+  totalBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  krwBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  usdBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAvailableOrderAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInvestmentAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  domesticStockAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  foreignStockAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  tradeOrders?: Prisma.TradeOrderUncheckedCreateNestedManyWithoutPortfolioInput
+  transactions?: Prisma.PortfolioTransactionUncheckedCreateNestedManyWithoutPortfolioInput
+  dividends?: Prisma.PortfolioDividendUncheckedCreateNestedManyWithoutPortfolioInput
+}
+
+export type PortfolioCreateOrConnectWithoutItemsInput = {
+  where: Prisma.PortfolioWhereUniqueInput
+  create: Prisma.XOR<Prisma.PortfolioCreateWithoutItemsInput, Prisma.PortfolioUncheckedCreateWithoutItemsInput>
+}
+
+export type PortfolioUpsertWithoutItemsInput = {
+  update: Prisma.XOR<Prisma.PortfolioUpdateWithoutItemsInput, Prisma.PortfolioUncheckedUpdateWithoutItemsInput>
+  create: Prisma.XOR<Prisma.PortfolioCreateWithoutItemsInput, Prisma.PortfolioUncheckedCreateWithoutItemsInput>
+  where?: Prisma.PortfolioWhereInput
+}
+
+export type PortfolioUpdateToOneWithWhereWithoutItemsInput = {
+  where?: Prisma.PortfolioWhereInput
+  data: Prisma.XOR<Prisma.PortfolioUpdateWithoutItemsInput, Prisma.PortfolioUncheckedUpdateWithoutItemsInput>
+}
+
+export type PortfolioUpdateWithoutItemsInput = {
+  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  totalBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  krwBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  usdBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAvailableOrderAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInvestmentAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  domesticStockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  foreignStockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutPortfolioNestedInput
+  tradeOrders?: Prisma.TradeOrderUpdateManyWithoutPortfolioNestedInput
+  transactions?: Prisma.PortfolioTransactionUpdateManyWithoutPortfolioNestedInput
+  dividends?: Prisma.PortfolioDividendUpdateManyWithoutPortfolioNestedInput
+}
+
+export type PortfolioUncheckedUpdateWithoutItemsInput = {
+  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  totalBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  krwBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  usdBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAvailableOrderAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInvestmentAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  domesticStockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  foreignStockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  tradeOrders?: Prisma.TradeOrderUncheckedUpdateManyWithoutPortfolioNestedInput
+  transactions?: Prisma.PortfolioTransactionUncheckedUpdateManyWithoutPortfolioNestedInput
+  dividends?: Prisma.PortfolioDividendUncheckedUpdateManyWithoutPortfolioNestedInput
+}
+
+export type PortfolioCreateWithoutDividendsInput = {
+  id?: bigint | number
+  accountNumber: string
+  totalBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  krwBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  usdBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAvailableOrderAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInvestmentAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  domesticStockAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  foreignStockAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutPortfolioInput
+  items?: Prisma.PortfolioItemCreateNestedManyWithoutPortfolioInput
+  tradeOrders?: Prisma.TradeOrderCreateNestedManyWithoutPortfolioInput
+  transactions?: Prisma.PortfolioTransactionCreateNestedManyWithoutPortfolioInput
+}
+
+export type PortfolioUncheckedCreateWithoutDividendsInput = {
+  id?: bigint | number
+  accountNumber: string
+  userId: bigint | number
+  totalBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  krwBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  usdBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAvailableOrderAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInvestmentAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  domesticStockAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  foreignStockAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  items?: Prisma.PortfolioItemUncheckedCreateNestedManyWithoutPortfolioInput
+  tradeOrders?: Prisma.TradeOrderUncheckedCreateNestedManyWithoutPortfolioInput
+  transactions?: Prisma.PortfolioTransactionUncheckedCreateNestedManyWithoutPortfolioInput
+}
+
+export type PortfolioCreateOrConnectWithoutDividendsInput = {
+  where: Prisma.PortfolioWhereUniqueInput
+  create: Prisma.XOR<Prisma.PortfolioCreateWithoutDividendsInput, Prisma.PortfolioUncheckedCreateWithoutDividendsInput>
+}
+
+export type PortfolioUpsertWithoutDividendsInput = {
+  update: Prisma.XOR<Prisma.PortfolioUpdateWithoutDividendsInput, Prisma.PortfolioUncheckedUpdateWithoutDividendsInput>
+  create: Prisma.XOR<Prisma.PortfolioCreateWithoutDividendsInput, Prisma.PortfolioUncheckedCreateWithoutDividendsInput>
+  where?: Prisma.PortfolioWhereInput
+}
+
+export type PortfolioUpdateToOneWithWhereWithoutDividendsInput = {
+  where?: Prisma.PortfolioWhereInput
+  data: Prisma.XOR<Prisma.PortfolioUpdateWithoutDividendsInput, Prisma.PortfolioUncheckedUpdateWithoutDividendsInput>
+}
+
+export type PortfolioUpdateWithoutDividendsInput = {
+  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  totalBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  krwBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  usdBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAvailableOrderAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInvestmentAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  domesticStockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  foreignStockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutPortfolioNestedInput
+  items?: Prisma.PortfolioItemUpdateManyWithoutPortfolioNestedInput
+  tradeOrders?: Prisma.TradeOrderUpdateManyWithoutPortfolioNestedInput
+  transactions?: Prisma.PortfolioTransactionUpdateManyWithoutPortfolioNestedInput
+}
+
+export type PortfolioUncheckedUpdateWithoutDividendsInput = {
+  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  totalBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  krwBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  usdBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAvailableOrderAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInvestmentAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  domesticStockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  foreignStockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  items?: Prisma.PortfolioItemUncheckedUpdateManyWithoutPortfolioNestedInput
+  tradeOrders?: Prisma.TradeOrderUncheckedUpdateManyWithoutPortfolioNestedInput
+  transactions?: Prisma.PortfolioTransactionUncheckedUpdateManyWithoutPortfolioNestedInput
+}
+
+export type PortfolioCreateWithoutTradeOrdersInput = {
+  id?: bigint | number
+  accountNumber: string
+  totalBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  krwBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  usdBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAvailableOrderAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInvestmentAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  domesticStockAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  foreignStockAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutPortfolioInput
+  items?: Prisma.PortfolioItemCreateNestedManyWithoutPortfolioInput
+  transactions?: Prisma.PortfolioTransactionCreateNestedManyWithoutPortfolioInput
+  dividends?: Prisma.PortfolioDividendCreateNestedManyWithoutPortfolioInput
+}
+
+export type PortfolioUncheckedCreateWithoutTradeOrdersInput = {
+  id?: bigint | number
+  accountNumber: string
+  userId: bigint | number
+  totalBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  krwBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  usdBalance?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAvailableOrderAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInvestmentAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  domesticStockAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  foreignStockAmount?: runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  items?: Prisma.PortfolioItemUncheckedCreateNestedManyWithoutPortfolioInput
+  transactions?: Prisma.PortfolioTransactionUncheckedCreateNestedManyWithoutPortfolioInput
+  dividends?: Prisma.PortfolioDividendUncheckedCreateNestedManyWithoutPortfolioInput
+}
+
+export type PortfolioCreateOrConnectWithoutTradeOrdersInput = {
+  where: Prisma.PortfolioWhereUniqueInput
+  create: Prisma.XOR<Prisma.PortfolioCreateWithoutTradeOrdersInput, Prisma.PortfolioUncheckedCreateWithoutTradeOrdersInput>
+}
+
+export type PortfolioUpsertWithoutTradeOrdersInput = {
+  update: Prisma.XOR<Prisma.PortfolioUpdateWithoutTradeOrdersInput, Prisma.PortfolioUncheckedUpdateWithoutTradeOrdersInput>
+  create: Prisma.XOR<Prisma.PortfolioCreateWithoutTradeOrdersInput, Prisma.PortfolioUncheckedCreateWithoutTradeOrdersInput>
+  where?: Prisma.PortfolioWhereInput
+}
+
+export type PortfolioUpdateToOneWithWhereWithoutTradeOrdersInput = {
+  where?: Prisma.PortfolioWhereInput
+  data: Prisma.XOR<Prisma.PortfolioUpdateWithoutTradeOrdersInput, Prisma.PortfolioUncheckedUpdateWithoutTradeOrdersInput>
+}
+
+export type PortfolioUpdateWithoutTradeOrdersInput = {
+  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  totalBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  krwBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  usdBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAvailableOrderAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInvestmentAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  domesticStockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  foreignStockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutPortfolioNestedInput
+  items?: Prisma.PortfolioItemUpdateManyWithoutPortfolioNestedInput
+  transactions?: Prisma.PortfolioTransactionUpdateManyWithoutPortfolioNestedInput
+  dividends?: Prisma.PortfolioDividendUpdateManyWithoutPortfolioNestedInput
+}
+
+export type PortfolioUncheckedUpdateWithoutTradeOrdersInput = {
+  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  accountNumber?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  totalBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  krwBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  usdBalance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalAvailableOrderAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  totalInvestmentAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  domesticStockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  foreignStockAmount?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  items?: Prisma.PortfolioItemUncheckedUpdateManyWithoutPortfolioNestedInput
+  transactions?: Prisma.PortfolioTransactionUncheckedUpdateManyWithoutPortfolioNestedInput
+  dividends?: Prisma.PortfolioDividendUncheckedUpdateManyWithoutPortfolioNestedInput
 }
 
 

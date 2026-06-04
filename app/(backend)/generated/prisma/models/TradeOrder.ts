@@ -613,9 +613,9 @@ export type TradeOrderOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type TradeOrderScalarRelationFilter = {
-  is?: Prisma.TradeOrderWhereInput
-  isNot?: Prisma.TradeOrderWhereInput
+export type TradeOrderNullableScalarRelationFilter = {
+  is?: Prisma.TradeOrderWhereInput | null
+  isNot?: Prisma.TradeOrderWhereInput | null
 }
 
 export type TradeOrderCountOrderByAggregateInput = {
@@ -751,10 +751,12 @@ export type TradeOrderCreateNestedOneWithoutTransactionsInput = {
   connect?: Prisma.TradeOrderWhereUniqueInput
 }
 
-export type TradeOrderUpdateOneRequiredWithoutTransactionsNestedInput = {
+export type TradeOrderUpdateOneWithoutTransactionsNestedInput = {
   create?: Prisma.XOR<Prisma.TradeOrderCreateWithoutTransactionsInput, Prisma.TradeOrderUncheckedCreateWithoutTransactionsInput>
   connectOrCreate?: Prisma.TradeOrderCreateOrConnectWithoutTransactionsInput
   upsert?: Prisma.TradeOrderUpsertWithoutTransactionsInput
+  disconnect?: Prisma.TradeOrderWhereInput | boolean
+  delete?: Prisma.TradeOrderWhereInput | boolean
   connect?: Prisma.TradeOrderWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.TradeOrderUpdateToOneWithWhereWithoutTransactionsInput, Prisma.TradeOrderUpdateWithoutTransactionsInput>, Prisma.TradeOrderUncheckedUpdateWithoutTransactionsInput>
 }
@@ -807,14 +809,6 @@ export type EnumTradeOrderTypeFieldUpdateOperationsInput = {
 
 export type EnumTradeOrderStatusFieldUpdateOperationsInput = {
   set?: $Enums.TradeOrderStatus
-}
-
-export type NullableDecimalFieldUpdateOperationsInput = {
-  set?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
-  increment?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  decrement?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  multiply?: runtime.Decimal | runtime.DecimalJsLike | number | string
-  divide?: runtime.Decimal | runtime.DecimalJsLike | number | string
 }
 
 export type TradeOrderCreateWithoutPortfolioInput = {

@@ -150,15 +150,15 @@ model User {
   email              String?                 @unique @db.VarChar(255)
   investmentType     InvestmentType?         @map("investment_type")
   profileImageUrl    String?                 @map("profile_image_url") @db.VarChar(2048)
-  currentLevel       Int?                    @map("current_level")
-  currentStep        Int?                    @map("current_step")
-  totalSteps         Int?                    @map("total_steps")
+  currentLevel       Int?                    @default(1) @map("current_level")
+  currentStep        Int?                    @default(1) @map("current_step")
+  totalSteps         Int?                    @default(0) @map("total_steps")
   createdAt          DateTime                @default(now()) @map("created_at")
   updatedAt          DateTime                @updatedAt @map("updated_at")
   refreshTokens      RefreshToken[]
   articleCompletions UserArticleCompletion[]
   agent              Agent?
-  portfolios         Portfolio[]
+  portfolio         Portfolio?
 
   @@index([email])
   @@map("User")
@@ -205,9 +205,9 @@ model Quiz {
   article          Article              @relation(fields: [articleId], references: [id])
   quizType         Quiz_type            @map("quiz_type")
   question         String               @db.VarChar(255)
-  description      String
-  answer           String
-  explanation      String
+  description      String               @db.Text
+  answer           String               @db.Text
+  explanation      String               @db.Text
   optionText       String[]             @map("option_text") @db.VarChar(255)
   createdAt        DateTime             @default(now()) @map("created_at")
   updatedAt        DateTime             @updatedAt @map("updated_at")
@@ -221,7 +221,7 @@ model UserQuizSubmission {
   userId         BigInt    @map("user_id")
   quizId         Int       @map("quiz_id")
   quiz           Quiz      @relation(fields: [quizId], references: [id])
-  selectedAnswer String    @map("selected_answer")
+  selectedAnswer String    @map("selected_answer") @db.Text
   isSkip         Boolean   @map("is_skip")
   isCorrect      Boolean   @map("is_correct")
   answeredAt     DateTime? @map("answered_at")
@@ -321,16 +321,16 @@ model AgentStockSector {
 }
 
 model Portfolio {
-  id                        BigInt                 @id
-  accountNumber             String                 @map("account_number") @db.VarChar(255)
-  userId                    BigInt                 @map("user_id")
-  totalBalance              Decimal                @map("total_balance")
-  krwBalance                Decimal                @map("krw_balance")
-  usdBalance                Decimal                @map("usd_balance")
-  totalAvailableOrderAmount Decimal                @map("total_available_order_amount")
-  totalInvestmentAmount     Decimal                @map("total_investment_amount")
-  domesticStockAmount       Decimal                @map("domestic_stock_amount")
-  foreignStockAmount        Decimal                @map("foreign_stock_amount")
+  id                        BigInt                 @id @default(autoincrement())
+  accountNumber             String                 @unique @map("account_number") @db.VarChar(255)
+  userId                    BigInt                 @unique @map("user_id")
+  totalBalance              Decimal                @default(0) @map("total_balance") @db.Decimal(20, 2)
+  krwBalance                Decimal                @default(0) @map("krw_balance") @db.Decimal(20, 2)
+  usdBalance                Decimal                @default(0) @map("usd_balance") @db.Decimal(20, 2)
+  totalAvailableOrderAmount Decimal                @default(0) @map("total_available_order_amount") @db.Decimal(20, 2)
+  totalInvestmentAmount     Decimal                @default(0) @map("total_investment_amount") @db.Decimal(20, 2)
+  domesticStockAmount       Decimal                @default(0) @map("domestic_stock_amount") @db.Decimal(20, 2)
+  foreignStockAmount        Decimal                @default(0) @map("foreign_stock_amount") @db.Decimal(20, 2)
   createdAt                 DateTime               @default(now()) @map("created_at")
   updatedAt                 DateTime               @updatedAt @map("updated_at")
   user                      User                   @relation(fields: [userId], references: [id])
@@ -343,24 +343,33 @@ model Portfolio {
 }
 
 model PortfolioTransaction {
-  id              String              @id @db.VarChar(255)
+  id              String              @id @default(cuid()) @db.VarChar(255)
   portfolioId     BigInt              @map("portfolio_id")
-  stockId         Int                 @map("stock_id")
-  tradeOrderId    BigInt              @map("trade_order_id")
+  stockId         Int?                @map("stock_id")
+  tradeOrderId    BigInt?             @map("trade_order_id")
   executedAt      DateTime            @map("executed_at") @db.Date
   companyName     String              @map("company_name") @db.VarChar(255)
   transactionType TransactionType     @map("transaction_type")
-  totalAmount     Decimal             @map("total_amount")
+  totalAmount     Decimal             @map("total_amount") @db.Decimal(20, 2)
   totalQuantity   Int                 @map("total_quantity")
+  purchaseAmount  Decimal?            @map("purchase_amount") @db.Decimal(20, 2)
+  realizedProfit  Decimal?            @map("realized_profit") @db.Decimal(20, 2)
   withdrawalAt    DateTime            @map("withdrawal_at") @db.Date
-  fee             Decimal
+  fee             Decimal             @default(0) @db.Decimal(20, 2)
+  exchangeType    String?             @map("exchange_type") @db.VarChar(16)
+  paidAmount      Decimal?            @map("paid_amount") @db.Decimal(20, 2)
+  receivedAmount  Decimal?            @map("received_amount") @db.Decimal(20, 2)
+  exchangeRate    Decimal?            @map("exchange_rate") @db.Decimal(20, 4)
   createdAt       DateTime            @default(now()) @map("created_at")
   updatedAt       DateTime            @updatedAt @map("updated_at")
   portfolio       Portfolio           @relation(fields: [portfolioId], references: [id])
-  stock           Stock               @relation(fields: [stockId], references: [id])
-  tradeOrder      TradeOrder          @relation(fields: [tradeOrderId], references: [orderId])
+  stock           Stock?              @relation(fields: [stockId], references: [id])
+  tradeOrder      TradeOrder?         @relation(fields: [tradeOrderId], references: [orderId])
   dividends       PortfolioDividend[]
 
+  @@index([portfolioId])
+  @@index([stockId])
+  @@index([tradeOrderId])
   @@map("Portfolio_transaction")
 }
 
@@ -369,17 +378,17 @@ model PortfolioItem {
   stockId          Int       @map("stock_id")
   assetType        String    @map("asset_type") @db.VarChar(255)
   companyName      String    @map("company_name") @db.VarChar(255)
-  companyLogoUrl   String    @map("company_logo_url") @db.VarChar(255)
-  quantity         Int
-  averagePrice     Decimal   @map("average_price")
-  currentPrice     Decimal   @map("current_price")
-  totalInvested    Decimal   @map("total_invested")
-  currentAmount    Decimal   @map("current_amount")
-  evaluationAmount Decimal   @map("evaluation_amount")
-  profit           Decimal
-  profitRate       Decimal   @map("profit_rate")
-  fee              Decimal
-  saleTax          Decimal   @map("sale_tax")
+  companyLogoUrl   String    @map("company_logo_url") @db.VarChar(2048)
+  quantity         Int       @default(0)
+  averagePrice     Decimal   @default(0) @map("average_price") @db.Decimal(20, 2)
+  currentPrice     Decimal   @default(0) @map("current_price") @db.Decimal(20, 2)
+  totalInvested    Decimal   @default(0) @map("total_invested") @db.Decimal(20, 2)
+  currentAmount    Decimal   @default(0) @map("current_amount") @db.Decimal(20, 2)
+  evaluationAmount Decimal   @default(0) @map("evaluation_amount") @db.Decimal(20, 2)
+  profit           Decimal   @default(0) @db.Decimal(20, 2)
+  profitRate       Decimal   @default(0) @map("profit_rate") @db.Decimal(10, 4)
+  fee              Decimal   @default(0) @db.Decimal(20, 2)
+  saleTax          Decimal   @default(0) @map("sale_tax") @db.Decimal(20, 2)
   createdAt        DateTime  @default(now()) @map("created_at")
   updatedAt        DateTime  @updatedAt @map("updated_at")
   portfolio        Portfolio @relation(fields: [portfolioId], references: [id])

@@ -2494,8 +2494,14 @@ export const PortfolioTransactionScalarFieldEnum = {
   transactionType: 'transactionType',
   totalAmount: 'totalAmount',
   totalQuantity: 'totalQuantity',
+  purchaseAmount: 'purchaseAmount',
+  realizedProfit: 'realizedProfit',
   withdrawalAt: 'withdrawalAt',
   fee: 'fee',
+  exchangeType: 'exchangeType',
+  paidAmount: 'paidAmount',
+  receivedAmount: 'receivedAmount',
+  exchangeRate: 'exchangeRate',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

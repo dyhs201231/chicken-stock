@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { Toaster } from "sonner";
 import QueryProvider from "../components/providers/query-provider";
 import Header from "../components/header";
 
@@ -78,6 +79,7 @@ export default function RootLayout({
 
           <Header />
           {children}
+          <Toaster />
         </QueryProvider>
       </body>
     </html>

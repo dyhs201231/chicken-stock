@@ -545,14 +545,6 @@ export type StockEarningUncheckedUpdateManyWithoutStockNestedInput = {
   deleteMany?: Prisma.StockEarningScalarWhereInput | Prisma.StockEarningScalarWhereInput[]
 }
 
-export type NullableBigIntFieldUpdateOperationsInput = {
-  set?: bigint | number | null
-  increment?: bigint | number
-  decrement?: bigint | number
-  multiply?: bigint | number
-  divide?: bigint | number
-}
-
 export type StockEarningCreateWithoutStockInput = {
   id?: string
   announcementDate?: Date | string | null

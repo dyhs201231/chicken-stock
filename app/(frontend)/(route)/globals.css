@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "react-datepicker/dist/react-datepicker.css";
 
 :root {
   --background: #ffffff;
@@ -24,3 +25,123 @@ body {
   color: var(--foreground);
   font-family: var(--font-atoz), Arial, Helvetica, sans-serif;
 }
+
+@utility row {
+  display: flex;
+  flex-direction: row;
+}
+
+@utility col {
+  display: flex;
+  flex-direction: column;
+}
+
+@utility center {
+  align-items: center;
+  justify-content: center;
+}
+
+@utility scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility scrollbar-hide-y {
+  -ms-overflow-style: auto;
+  scrollbar-width: auto;
+
+  &::-webkit-scrollbar:vertical {
+    width: 0;
+  }
+
+  &::-webkit-scrollbar:horizontal {
+    height: 8px;
+  }
+}
+
+.income-month-calendar.react-datepicker {
+  width: fit-content;
+  border: 0;
+  background: #ffffff;
+  color: #18181b;
+  font-family: var(--font-atoz), Arial, Helvetica, sans-serif;
+}
+
+.income-month-calendar .react-datepicker__month-container {
+  float: none;
+  width: fit-content;
+}
+
+.income-month-calendar .react-datepicker__header {
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+
+.income-month-calendar .react-datepicker-year-header {
+  display: none;
+}
+
+.income-month-calendar .react-datepicker__month {
+  margin: 0;
+}
+
+.income-month-calendar .react-datepicker__month-wrapper {
+  display: grid;
+  grid-template-columns: repeat(3, 60px);
+  gap: 8px;
+}
+
+.income-month-calendar
+  .react-datepicker__month-wrapper
+  + .react-datepicker__month-wrapper {
+  margin-top: 8px;
+}
+
+.income-month-calendar .react-datepicker__month-text {
+  display: inline-flex;
+  width: 60px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  border-radius: 6px;
+  color: #18181b;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
+}
+
+.income-month-calendar
+  .react-datepicker__month-text:not([aria-disabled="true"]):hover {
+  background: #f4f4f5;
+}
+
+.income-month-calendar .react-datepicker__month-text--today {
+  font-weight: 700;
+}
+
+.income-month-calendar .react-datepicker__month-text--keyboard-selected {
+  background: #f4f4f5;
+  color: #18181b;
+}
+
+.income-month-calendar .react-datepicker__month-text--selected,
+.income-month-calendar
+  .react-datepicker__month-text--selected:not([aria-disabled="true"]):hover {
+  background: #18181b;
+  color: #ffffff;
+}
+
+/* 
+TODO: 테마 색상 논의 필요
+@theme {
+  --color-custom-gray: #d9d9d9;
+} 
+*/

@@ -1,4 +1,5 @@
 import { requests } from "../request";
+import type { InvestmentType } from "../../types/portfolio";
 
 export type MyInfoUser = {
   createdAt: string;
@@ -6,7 +7,7 @@ export type MyInfoUser = {
   currentStep: number | null;
   email: string | null;
   id: string;
-  investmentType: string | null;
+  investmentType: InvestmentType | null;
   name: string;
   profileImageUrl: string | null;
   totalSteps: number | null;
@@ -24,8 +25,21 @@ export type MyInfoResponse =
       user: MyInfoUser;
     };
 
+export type UpdateMyInfoRequest = {
+  investmentType: InvestmentType;
+};
+
 export async function getMyInfo() {
   const { data } = await requests.get<MyInfoResponse>("/api/auth/my-info");
+
+  return data;
+}
+
+export async function updateMyInfo(payload: UpdateMyInfoRequest) {
+  const { data } = await requests.patch<MyInfoResponse>(
+    "/api/auth/my-info",
+    payload,
+  );
 
   return data;
 }

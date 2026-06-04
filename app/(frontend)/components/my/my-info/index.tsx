@@ -2,7 +2,6 @@
 
 import { useGetMyInfo } from "@/app/(frontend)/apis/auth/queries";
 import { Avatar } from "@/app/(frontend)/components/ui";
-import { redirect } from "next/navigation";
 
 export default function MyInfo() {
   const { data, isPending } = useGetMyInfo();
@@ -12,7 +11,7 @@ export default function MyInfo() {
   }
 
   if (!data?.isLoggedIn) {
-    redirect("/login");
+    return null;
   }
 
   return (

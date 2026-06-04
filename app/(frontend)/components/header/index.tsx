@@ -19,7 +19,7 @@ export default function Header() {
     <header className="sticky top-0 z-40 w-full bg-white font-sans font-normal text-black">
       <div className="mx-auto flex h-18 w-full max-w-360 items-center justify-between px-5">
         <div className="flex gap-18">
-          <Link href="/" className="flex items-center gap-1">
+          <Link href="/" className="flex shrink-0 items-center gap-1">
             <Logo />
             <span className="text-xl text-[#DF2B2E]">치킨스톡</span>
           </Link>
