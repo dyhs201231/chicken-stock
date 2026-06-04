@@ -2,8 +2,12 @@ import type {
   StockCurrencyCode,
   StockDetailData,
 } from "../../types/stock/stock-detail";
+import {
+  convertCurrencyValue,
+  USD_KRW_EXCHANGE_RATE,
+} from "../../../(shared)/utils/currency";
 
-export const USD_KRW_EXCHANGE_RATE = 1478.55;
+export { convertCurrencyValue, USD_KRW_EXCHANGE_RATE };
 
 const financialStatementMoneyKeys = new Set([
   "revenue",
@@ -112,20 +116,6 @@ export function formatTradingValue(
   }
 
   return formatPrice(value, currencyCode);
-}
-
-export function convertCurrencyValue(
-  value: number,
-  fromCurrencyCode: StockCurrencyCode,
-  toCurrencyCode: StockCurrencyCode,
-) {
-  if (fromCurrencyCode === toCurrencyCode) {
-    return value;
-  }
-
-  return toCurrencyCode === "KRW"
-    ? Math.round(value * USD_KRW_EXCHANGE_RATE)
-    : value / USD_KRW_EXCHANGE_RATE;
 }
 
 function convertNullableCurrencyValue(
