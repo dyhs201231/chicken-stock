@@ -18,7 +18,6 @@ export type StockCandleResponse = {
   volume: number;
 };
 
-// TODO: 추후 ADK 사용에 따른 날짜 수집 또는 holiday 테이블로 분리할 예정
 export function parseCandleInterval(value: string | null): CandleInterval {
   if (value === "WEEK" || value === "MONTH") {
     return value;

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   convertCurrencyValue,
   type CurrencyCode,
-} from "../../../(shared)/utils/currency";
+} from "../../../(frontend)/utils/currency";
 import { prisma } from "../../lib/prisma";
 
 const DEFAULT_STOCKS_PAGE = 1;
