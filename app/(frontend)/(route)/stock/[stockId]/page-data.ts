@@ -1,5 +1,8 @@
 import { prisma } from "../../../../(backend)/lib/prisma";
-import { serializeOrderBookSnapshot } from "../../../../(backend)/lib/stock-order-book";
+import {
+  getOrderBookActivity,
+  serializeOrderBookSnapshot,
+} from "../../../../(backend)/lib/stock-order-book";
 import type {
   StockDetailData,
   StockFinancialStatementData,
@@ -35,9 +38,7 @@ function bigintToNullableNumber(value: bigint | null) {
   return value === null ? null : Number(value);
 }
 
-function toStatementData(
-  value: unknown,
-): StockFinancialStatementData["data"] {
+function toStatementData(value: unknown): StockFinancialStatementData["data"] {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     return {};
   }
@@ -156,9 +157,7 @@ function calculateForwardPer(stock: ValuationSourceStock) {
 
 function getLatestCandleBaseDate(candles: { timestamp: bigint }[]) {
   const latestTimestamp = candles[0]?.timestamp;
-  const date = latestTimestamp
-    ? new Date(Number(latestTimestamp))
-    : new Date();
+  const date = latestTimestamp ? new Date(Number(latestTimestamp)) : new Date();
 
   return date.toISOString();
 }
@@ -227,10 +226,8 @@ export async function getStockDetailData(
   }
 
   const [orderBookSnapshot] = stock.orderBookSnapshots;
-  const [
-    themePeerCount,
-    themeFinancialMetricAverage,
-  ] = await Promise.all([
+  const [themePeerCount, themeFinancialMetricAverage, orderBookActivity] =
+    await Promise.all([
       prisma.stock.count({
         where: {
           theme: stock.theme,
@@ -253,6 +250,9 @@ export async function getStockDetailData(
           pbr: true,
         },
       }),
+      orderBookSnapshot
+        ? getOrderBookActivity(stock.id)
+        : Promise.resolve(undefined),
     ]);
   const valuationPeerStocks = await prisma.stock.findMany({
     where: {
@@ -317,7 +317,7 @@ export async function getStockDetailData(
       }))
       .reverse(),
     orderBookSnapshot: orderBookSnapshot
-      ? serializeOrderBookSnapshot(orderBookSnapshot)
+      ? serializeOrderBookSnapshot(orderBookSnapshot, orderBookActivity, stock)
       : null,
     financialMetric: stock.financialMetric
       ? {

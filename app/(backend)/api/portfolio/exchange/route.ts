@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import {
   ACCESS_TOKEN_COOKIE_NAME,
@@ -87,6 +88,10 @@ async function getExchangePayload(request: NextRequest) {
 
 function serializeDecimalNumber(value: { toString: () => string }) {
   return Number(value.toString());
+}
+
+function createPortfolioTransactionId() {
+  return randomUUID();
 }
 
 function getExchangedValue(type: ExchangeType, value: Prisma.Decimal) {
@@ -185,6 +190,7 @@ export async function POST(request: NextRequest) {
           exchangeType: payload.type,
           executedAt,
           fee: new Prisma.Decimal(0),
+          id: createPortfolioTransactionId(),
           paidAmount: payload.value,
           portfolioId: currentPortfolio.id,
           receivedAmount: exchangedValue,

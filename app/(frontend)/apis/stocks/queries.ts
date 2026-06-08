@@ -1,5 +1,10 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { fetchStockCandles, fetchStockOrderBook, fetchStocks } from "./api";
+import {
+  fetchStockCandles,
+  fetchStockOrderBook,
+  fetchStockOrders,
+  fetchStocks,
+} from "./api";
 import type { StockCandleInterval } from "./api";
 import type { StockOrderBookSnapshotData } from "../../types/stock/stock-detail";
 
@@ -10,7 +15,12 @@ export const stockQueryKeys = {
   candles: (stockId: number, interval: StockCandleInterval) =>
     ["stock-candles", stockId, interval] as const,
   orderBook: (stockId: number) => ["stock-order-book", stockId] as const,
+  orders: (stockId: number) => ["stock-orders", stockId] as const,
 };
+
+const STOCK_CANDLES_REFETCH_INTERVAL_MS = 10_000;
+const STOCK_ORDER_BOOK_REFETCH_INTERVAL_MS = 5_000;
+const STOCK_ORDERS_REFETCH_INTERVAL_MS = 10_000;
 
 export function useStocksInfiniteQuery(market: string, ranking: string) {
   return useInfiniteQuery({
@@ -28,6 +38,8 @@ export function useStockCandlesQuery(
   return useQuery({
     queryKey: stockQueryKeys.candles(stockId, interval),
     queryFn: () => fetchStockCandles(stockId, interval),
+    enabled: Number.isInteger(stockId) && stockId > 0,
+    refetchInterval: STOCK_CANDLES_REFETCH_INTERVAL_MS,
   });
 }
 
@@ -40,6 +52,16 @@ export function useStockOrderBookQuery(
     queryFn: () => fetchStockOrderBook(stockId),
     enabled: Number.isInteger(stockId) && stockId > 0,
     initialData,
+    refetchInterval: STOCK_ORDER_BOOK_REFETCH_INTERVAL_MS,
     staleTime: 5_000,
+  });
+}
+
+export function useStockOrdersQuery(stockId: number) {
+  return useQuery({
+    queryKey: stockQueryKeys.orders(stockId),
+    queryFn: () => fetchStockOrders(stockId),
+    enabled: Number.isInteger(stockId) && stockId > 0,
+    refetchInterval: STOCK_ORDERS_REFETCH_INTERVAL_MS,
   });
 }

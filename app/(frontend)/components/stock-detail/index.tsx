@@ -7,6 +7,12 @@ import InfoPanel from "./analytics/info-panel";
 import StockLogo from "./stock-logo";
 import OrderBookPanel from "./order/order-book-panel";
 import OrderPanel from "./order/order-panel";
+import { useStockRealtime } from "../../hooks/use-stock-realtime";
+import type {
+  MainOrderTab,
+  NormalOrderTab,
+  SelectedOrderBookLimitPrice,
+} from "./order/order-panel";
 import { SegmentedControl, Tab } from "../ui";
 import type {
   StockCurrencyCode,
@@ -14,6 +20,7 @@ import type {
   StockOnlyProps,
 } from "../../types/stock/stock-detail";
 import {
+  convertCurrencyValue,
   convertStockCurrency,
   formatChange,
   formatPercent,
@@ -32,8 +39,15 @@ const sideTabs: { label: string; value: StockDetailTab }[] = [
 
 export default function StockDetail({ stock, activeTab }: StockDetailProps) {
   const router = useRouter();
+  useStockRealtime(stock.id);
   const [selectedCurrencyCode, setSelectedCurrencyCode] =
     useState<StockCurrencyCode>(stock.currencyCode);
+  const [orderPanelMainTab, setOrderPanelMainTab] =
+    useState<MainOrderTab>("normal");
+  const [orderPanelNormalTab, setOrderPanelNormalTab] =
+    useState<NormalOrderTab>("buy");
+  const [selectedLimitPrice, setSelectedLimitPrice] =
+    useState<SelectedOrderBookLimitPrice | null>(null);
 
   const displayStock = useMemo(
     () => convertStockCurrency(stock, selectedCurrencyCode),
@@ -68,6 +82,29 @@ export default function StockDetail({ stock, activeTab }: StockDetailProps) {
     if (nextTab === "portfolio-info") {
       router.push(`/stock/${stock.id}/analytics`);
     }
+  };
+
+  const selectedDisplayPrice = selectedLimitPrice
+    ? convertCurrencyValue(
+        selectedLimitPrice.price,
+        stock.currencyCode,
+        displayStock.currencyCode,
+      )
+    : null;
+
+  const handleOrderBookPriceSelect = (price: number) => {
+    setSelectedLimitPrice((previous) => ({
+      price: convertCurrencyValue(
+        price,
+        displayStock.currencyCode,
+        stock.currencyCode,
+      ),
+      sequence: (previous?.sequence ?? 0) + 1,
+    }));
+    setOrderPanelMainTab("normal");
+    setOrderPanelNormalTab((previous) =>
+      previous === "sell" ? "sell" : "buy",
+    );
   };
 
   return (
@@ -161,10 +198,19 @@ export default function StockDetail({ stock, activeTab }: StockDetailProps) {
           <ChartPanel stock={displayStock} />
           <OrderBookPanel
             initialOrderBookSnapshot={stock.orderBookSnapshot}
+            onPriceSelect={handleOrderBookPriceSelect}
+            selectedPrice={selectedDisplayPrice}
             sourceCurrencyCode={stock.currencyCode}
             stock={displayStock}
           />
-          <OrderPanel stock={displayStock} />
+          <OrderPanel
+            mainTab={orderPanelMainTab}
+            normalTab={orderPanelNormalTab}
+            selectedLimitPrice={selectedLimitPrice}
+            stock={stock}
+            onMainTabChange={setOrderPanelMainTab}
+            onNormalTabChange={setOrderPanelNormalTab}
+          />
         </div>
       )}
 
@@ -173,10 +219,19 @@ export default function StockDetail({ stock, activeTab }: StockDetailProps) {
           <InfoPanel stock={displayStock} />
           <OrderBookPanel
             initialOrderBookSnapshot={stock.orderBookSnapshot}
+            onPriceSelect={handleOrderBookPriceSelect}
+            selectedPrice={selectedDisplayPrice}
             sourceCurrencyCode={stock.currencyCode}
             stock={displayStock}
           />
-          <OrderPanel stock={displayStock} />
+          <OrderPanel
+            mainTab={orderPanelMainTab}
+            normalTab={orderPanelNormalTab}
+            selectedLimitPrice={selectedLimitPrice}
+            stock={stock}
+            onMainTabChange={setOrderPanelMainTab}
+            onNormalTabChange={setOrderPanelNormalTab}
+          />
         </div>
       )}
     </main>
