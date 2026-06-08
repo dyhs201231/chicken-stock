@@ -42,7 +42,7 @@ export default function OrderBookPanel({
     getClientHydrationSnapshot,
     getServerHydrationSnapshot,
   );
-  const { data, isError, isFetching } = useStockOrderBookQuery(
+  const { data, isError, isLoading } = useStockOrderBookQuery(
     stock.id,
     initialOrderBookSnapshot,
   );
@@ -59,11 +59,11 @@ export default function OrderBookPanel({
   );
 
   if (!snapshot) {
-    if (isHydrated && isFetching) {
+    if (isHydrated && data === undefined && isLoading) {
       return <OrderBookStatePanel message="호가 데이터를 불러오는 중입니다." />;
     }
 
-    if (isHydrated && isError) {
+    if (isHydrated && data === undefined && isError) {
       return (
         <OrderBookStatePanel message="호가 데이터를 불러오지 못했습니다." />
       );

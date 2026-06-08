@@ -6,6 +6,7 @@ import {
   TradeOrderStatus,
   TradeOrderType,
 } from "@/app/(backend)/generated/prisma/enums";
+import { Prisma } from "@/app/(backend)/generated/prisma/client";
 import { prisma } from "./prisma";
 
 type DecimalLike = {
@@ -80,6 +81,7 @@ const EMPTY_ORDER_BOOK_ACTIVITY: OrderBookActivity = {
   totalPendingBidSize: 0,
   volume: 0,
 };
+const ZERO_DECIMAL = new Prisma.Decimal(0);
 
 function toNumber(value: DecimalLike) {
   return value.toNumber();
@@ -95,6 +97,37 @@ function getOrderCountKey(side: "ASK" | "BID", price: DecimalLike) {
 
 function serializeDate(value: Date) {
   return value.toISOString();
+}
+
+export function hasOrderBookActivity(activity: OrderBookActivity) {
+  return (
+    activity.levelsByKey.size > 0 ||
+    activity.recentOrders.length > 0 ||
+    activity.totalPendingAskSize > 0 ||
+    activity.totalPendingBidSize > 0 ||
+    activity.volume > 0
+  );
+}
+
+export function serializeOrderBookActivitySnapshot(
+  activity: OrderBookActivity,
+  market?: OrderBookMarketSource,
+): StockOrderBookSnapshotData {
+  return serializeOrderBookSnapshot(
+    {
+      timestamp: BigInt(Date.now()),
+      totalAskSize: ZERO_DECIMAL,
+      totalBidSize: ZERO_DECIMAL,
+      volume: ZERO_DECIMAL,
+      buyVolume: ZERO_DECIMAL,
+      sellVolume: ZERO_DECIMAL,
+      executionStrength: ZERO_DECIMAL,
+      lastTradeVolume: ZERO_DECIMAL,
+      levels: [],
+    },
+    activity,
+    market,
+  );
 }
 
 function serializeRecentExecution(
@@ -374,14 +407,14 @@ export async function getLatestOrderBookSnapshot(stockId: number) {
   }
 
   const [orderBookSnapshot] = stock.orderBookSnapshots;
-  const activity = orderBookSnapshot
-    ? await getOrderBookActivity(stockId)
-    : EMPTY_ORDER_BOOK_ACTIVITY;
+  const activity = await getOrderBookActivity(stockId);
 
   return {
     stockExists: true,
     orderBookSnapshot: orderBookSnapshot
       ? serializeOrderBookSnapshot(orderBookSnapshot, activity, stock)
+      : hasOrderBookActivity(activity)
+        ? serializeOrderBookActivitySnapshot(activity, stock)
       : null,
   };
 }

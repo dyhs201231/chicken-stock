@@ -1,6 +1,8 @@
 import { prisma } from "../../../../(backend)/lib/prisma";
 import {
   getOrderBookActivity,
+  hasOrderBookActivity,
+  serializeOrderBookActivitySnapshot,
   serializeOrderBookSnapshot,
 } from "../../../../(backend)/lib/stock-order-book";
 import type {
@@ -250,9 +252,7 @@ export async function getStockDetailData(
           pbr: true,
         },
       }),
-      orderBookSnapshot
-        ? getOrderBookActivity(stock.id)
-        : Promise.resolve(undefined),
+      getOrderBookActivity(stock.id),
     ]);
   const valuationPeerStocks = await prisma.stock.findMany({
     where: {
@@ -318,6 +318,8 @@ export async function getStockDetailData(
       .reverse(),
     orderBookSnapshot: orderBookSnapshot
       ? serializeOrderBookSnapshot(orderBookSnapshot, orderBookActivity, stock)
+      : hasOrderBookActivity(orderBookActivity)
+        ? serializeOrderBookActivitySnapshot(orderBookActivity, stock)
       : null,
     financialMetric: stock.financialMetric
       ? {

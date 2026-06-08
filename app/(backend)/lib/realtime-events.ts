@@ -6,12 +6,19 @@ import {
   getStockRealtimeChannelName,
   getUserOrderRealtimeChannelName,
 } from "@/app/(backend)/lib/realtime-channels";
+import {
+  getStockMarketSync,
+  getStockMutationSync,
+  type StockSyncReason,
+} from "@/app/(backend)/lib/stock-order-sync";
 import { Prisma } from "@/app/(backend)/generated/prisma/client";
 import type { TradeOrderType } from "@/app/(backend)/generated/prisma/enums";
 
 const STOCK_UPDATED_THROTTLE_MS = 1_500;
 
 type BroadcastPayload = Record<string, unknown>;
+type StockMarketSyncPayload = Awaited<ReturnType<typeof getStockMarketSync>>;
+type StockMutationSyncPayload = Awaited<ReturnType<typeof getStockMutationSync>>;
 
 export type UserOrderFilledPayload = {
   counterOrderId: string | null;
@@ -23,18 +30,22 @@ export type UserOrderFilledPayload = {
   side: TradeOrderType;
   stockId: number;
   stockName: string;
+  sync?: StockMutationSyncPayload | null;
   ticker: string;
   totalAmount: number;
 };
 
-export type StockUpdatedPayload = {
+export type StockUpdatedPayload = StockMarketSyncPayload & {
   changedAt?: string;
   lastExecutionPrice?: number;
   lastExecutionQuantity?: number;
-  reason: "ORDER_CHANGED" | "TRADE_EXECUTED";
   stockId: number;
   ticker?: string;
 };
+type ScheduledStockUpdatedPayload = Omit<
+  StockUpdatedPayload,
+  "candles" | "orderBookSnapshot"
+>;
 
 type UserOrderFilledEvent = {
   payload: UserOrderFilledPayload;
@@ -43,7 +54,7 @@ type UserOrderFilledEvent = {
 
 let serverSupabaseClient: SupabaseClient | null = null;
 const stockUpdatedTimers = new Map<number, NodeJS.Timeout>();
-const stockUpdatedPayloads = new Map<number, StockUpdatedPayload>();
+const stockUpdatedPayloads = new Map<number, ScheduledStockUpdatedPayload>();
 const lastStockUpdatedAt = new Map<number, number>();
 
 function getSupabaseServerClient() {
@@ -110,6 +121,48 @@ async function publishBroadcast(
   }
 }
 
+async function getSafeStockMarketSync(
+  stockId: number,
+  reason: StockSyncReason,
+): Promise<StockMarketSyncPayload> {
+  try {
+    return await getStockMarketSync(stockId, reason);
+  } catch (error) {
+    console.error("Building stock realtime sync payload failed", {
+      error,
+      reason,
+      stockId,
+    });
+
+    return {
+      candles: null,
+      orderBookSnapshot: null,
+      reason,
+    };
+  }
+}
+
+async function getSafeStockMutationSync(
+  userId: bigint,
+  stockId: number,
+): Promise<StockMutationSyncPayload | null> {
+  try {
+    return await getStockMutationSync({
+      reason: "TRADE_EXECUTED",
+      stockId,
+      userId,
+    });
+  } catch (error) {
+    console.error("Building user order realtime sync payload failed", {
+      error,
+      stockId,
+      userId: userId.toString(),
+    });
+
+    return null;
+  }
+}
+
 function serializeDecimalNumber(value: Prisma.Decimal) {
   return Number(value.toString());
 }
@@ -131,7 +184,7 @@ export async function publishUserOrderFilled(
 
 function mergeStockUpdatedPayload(
   stockId: number,
-  payload: Omit<StockUpdatedPayload, "stockId">,
+  payload: Omit<ScheduledStockUpdatedPayload, "stockId">,
 ) {
   const previous = stockUpdatedPayloads.get(stockId);
 
@@ -157,17 +210,23 @@ async function publishScheduledStockUpdated(stockId: number) {
     return;
   }
 
+  const sync = await getSafeStockMarketSync(stockId, payload.reason);
+
   lastStockUpdatedAt.set(stockId, Date.now());
   await publishBroadcast(
     getStockRealtimeChannelName(stockId),
     "stock_updated",
-    payload,
+    {
+      ...payload,
+      ...sync,
+      stockId,
+    },
   );
 }
 
 export function scheduleStockUpdated(
   stockId: number,
-  payload: Omit<StockUpdatedPayload, "stockId">,
+  payload: Omit<ScheduledStockUpdatedPayload, "stockId">,
 ) {
   mergeStockUpdatedPayload(stockId, payload);
 
@@ -311,9 +370,17 @@ export async function publishOrderFilledEventsForOrder(
     const events = await getOrderFilledRealtimeEvents(orderId, options);
 
     await Promise.all(
-      events.map((event) =>
-        publishUserOrderFilled(event.userId, event.payload),
-      ),
+      events.map(async (event) => {
+        const sync = await getSafeStockMutationSync(
+          event.userId,
+          event.payload.stockId,
+        );
+
+        return publishUserOrderFilled(event.userId, {
+          ...event.payload,
+          sync,
+        });
+      }),
     );
   } catch (error) {
     console.error("Publishing order filled realtime events failed", {

@@ -4,13 +4,21 @@ import {
   ACCESS_TOKEN_COOKIE_NAME,
   verifyAuthToken,
 } from "@/app/(backend)/lib/auth";
-import { getTotalAvailableOrderAmountKrw } from "@/app/(backend)/lib/portfolio-balance";
 import {
   publishOrderFilledEventsForOrder,
   scheduleStockUpdated,
 } from "@/app/(backend)/lib/realtime-events";
 import {
+  getStockMutationSync,
+  getStockOrderContext,
+  StockOrderContextError,
+  type StockSyncReason,
+} from "@/app/(backend)/lib/stock-order-sync";
+import {
   getEstimatedMarketOrderAmount,
+  lockPortfolioRows,
+  lockStockForOrderProcessing,
+  StockOrderConcurrencyError,
   matchStockOrder,
   StockOrderMatchingError,
 } from "@/app/(backend)/lib/stock-order-matching";
@@ -26,8 +34,11 @@ export const runtime = "nodejs";
 
 const orderTypes = new Set<string>(Object.values(TradeOrderType));
 const orderPriceTypes = new Set(["LIMIT", "MARKET"]);
+const ORDER_TRANSACTION_MAX_ATTEMPTS = 3;
+const ORDER_TRANSACTION_RETRY_DELAY_MS = 30;
 
 type OrderPriceType = "LIMIT" | "MARKET";
+type TransactionClient = Prisma.TransactionClient;
 type StockOrderParams = {
   params: Promise<{
     stockId: string;
@@ -56,6 +67,67 @@ function createStockOrderErrorResponse(message: string, status: number) {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
+}
+
+function getErrorCode(error: unknown) {
+  if (!isRecord(error)) {
+    return null;
+  }
+
+  if (typeof error.code === "string") {
+    return error.code;
+  }
+
+  if (isRecord(error.meta) && typeof error.meta.code === "string") {
+    return error.meta.code;
+  }
+
+  return null;
+}
+
+function isRetryableOrderTransactionError(error: unknown) {
+  if (error instanceof StockOrderConcurrencyError) {
+    return true;
+  }
+
+  const code = getErrorCode(error);
+
+  return code === "P2034" || code === "40001" || code === "40P01";
+}
+
+function wait(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function runSerializableOrderTransaction<T>(
+  operation: (tx: TransactionClient) => Promise<T>,
+) {
+  for (let attempt = 1; attempt <= ORDER_TRANSACTION_MAX_ATTEMPTS; attempt += 1) {
+    try {
+      return await prisma.$transaction(operation, {
+        isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+      });
+    } catch (error) {
+      if (
+        !isRetryableOrderTransactionError(error) ||
+        attempt >= ORDER_TRANSACTION_MAX_ATTEMPTS
+      ) {
+        if (isRetryableOrderTransactionError(error)) {
+          throw new StockOrderConcurrencyError(
+            "동시 주문이 몰려 처리하지 못했습니다. 다시 시도해주세요.",
+          );
+        }
+
+        throw error;
+      }
+
+      await wait(ORDER_TRANSACTION_RETRY_DELAY_MS * attempt);
+    }
+  }
+
+  throw new StockOrderConcurrencyError(
+    "동시 주문이 몰려 처리하지 못했습니다. 다시 시도해주세요.",
+  );
 }
 
 function getAuthenticatedUserId(request: NextRequest) {
@@ -184,16 +256,43 @@ function getNonNegativeDecimal(value: Prisma.Decimal) {
   return value.lt(0) ? new Prisma.Decimal(0) : value.toDecimalPlaces(2);
 }
 
-function getProfitRate(profit: Prisma.Decimal, invested: Prisma.Decimal) {
-  if (invested.lte(0)) {
-    return new Prisma.Decimal(0);
-  }
-
-  return profit.div(invested).mul(100).toDecimalPlaces(4);
-}
-
 function createOrderId() {
   return BigInt(Date.now()) * BigInt(100000) + BigInt(randomInt(100000));
+}
+
+async function getLockedPortfolioForUser(
+  tx: TransactionClient,
+  userId: bigint,
+  stockId: number,
+) {
+  const portfolioRef = await tx.portfolio.findUnique({
+    select: {
+      id: true,
+    },
+    where: {
+      userId,
+    },
+  });
+
+  if (!portfolioRef) {
+    return null;
+  }
+
+  await lockPortfolioRows(tx, [portfolioRef.id]);
+
+  return tx.portfolio.findUnique({
+    include: {
+      items: {
+        take: 1,
+        where: {
+          stockId,
+        },
+      },
+    },
+    where: {
+      id: portfolioRef.id,
+    },
+  });
 }
 
 function serializeTradeOrder(order: {
@@ -230,6 +329,29 @@ function serializeTradeOrder(order: {
   };
 }
 
+async function getSafeStockMutationSync({
+  reason,
+  stockId,
+  userId,
+}: {
+  reason: StockSyncReason;
+  stockId: number;
+  userId: bigint;
+}) {
+  try {
+    return await getStockMutationSync({ reason, stockId, userId });
+  } catch (error) {
+    console.error("Stock order sync snapshot failed", {
+      error,
+      reason,
+      stockId,
+      userId: userId.toString(),
+    });
+
+    return null;
+  }
+}
+
 export async function GET(request: NextRequest, { params }: StockOrderParams) {
   const userId = getAuthenticatedUserId(request);
 
@@ -244,118 +366,25 @@ export async function GET(request: NextRequest, { params }: StockOrderParams) {
     return createStockOrderErrorResponse("유효한 종목 ID가 필요합니다.", 400);
   }
 
-  const stock = await prisma.stock.findUnique({
-    select: {
-      countryCode: true,
-      currencyCode: true,
-      currentPrice: true,
-      id: true,
-      name: true,
-      ticker: true,
-    },
-    where: {
-      id: parsedStockId,
-    },
-  });
+  try {
+    const orderContext = await getStockOrderContext(userId, parsedStockId);
 
-  if (!stock) {
-    return createStockOrderErrorResponse("종목을 찾을 수 없습니다.", 404);
+    return NextResponse.json({
+      ok: true,
+      data: orderContext,
+    });
+  } catch (error) {
+    if (error instanceof StockOrderContextError) {
+      return createStockOrderErrorResponse(error.message, error.status);
+    }
+
+    console.error("Stock order context fetch failed", error);
+
+    return createStockOrderErrorResponse(
+      "주문 정보를 불러오지 못했습니다.",
+      500,
+    );
   }
-
-  const portfolio = await prisma.portfolio.findUnique({
-    include: {
-      items: {
-        take: 1,
-        where: {
-          stockId: parsedStockId,
-        },
-      },
-    },
-    where: {
-      userId,
-    },
-  });
-
-  if (!portfolio) {
-    return createStockOrderErrorResponse("계좌가 없습니다.", 404);
-  }
-
-  const [pendingOrders, pendingBuyOrders] = await Promise.all([
-    prisma.tradeOrder.findMany({
-      orderBy: {
-        orderedAt: "desc",
-      },
-      where: {
-        portfolioId: portfolio.id,
-        status: TradeOrderStatus.PENDING,
-        stockId: parsedStockId,
-      },
-    }),
-    prisma.tradeOrder.findMany({
-      where: {
-        currencyCode: stock.currencyCode,
-        portfolioId: portfolio.id,
-        status: TradeOrderStatus.PENDING,
-        type: TradeOrderType.BUY,
-      },
-    }),
-  ]);
-  const holding = portfolio.items[0] ?? null;
-  const pendingSellQuantity = pendingOrders
-    .filter((order) => order.type === TradeOrderType.SELL)
-    .reduce((sum, order) => sum + order.remainingQuantity, 0);
-  const buyingPower = getNonNegativeDecimal(
-    getCashBalance(portfolio, stock.currencyCode).sub(
-      sumPendingBuyAmount(pendingBuyOrders),
-    ),
-  );
-  const holdingQuantity = holding?.quantity ?? 0;
-  const sellableQuantity = Math.max(holdingQuantity - pendingSellQuantity, 0);
-  const currentAmount = stock.currentPrice
-    .mul(holdingQuantity)
-    .toDecimalPlaces(2);
-  const averagePrice = holding?.averagePrice ?? new Prisma.Decimal(0);
-  const totalInvested =
-    holding?.totalInvested ??
-    averagePrice.mul(holdingQuantity).toDecimalPlaces(2);
-  const currentProfit = currentAmount.sub(totalInvested).toDecimalPlaces(2);
-
-  return NextResponse.json({
-    ok: true,
-    data: {
-      buyingPower: serializeDecimalNumber(buyingPower),
-      holding: {
-        averagePrice: serializeDecimalNumber(averagePrice),
-        currentAmount: serializeDecimalNumber(currentAmount),
-        currentProfit: serializeDecimalNumber(currentProfit),
-        currentProfitRate: serializeDecimalNumber(
-          getProfitRate(currentProfit, totalInvested),
-        ),
-        quantity: holdingQuantity,
-        sellableQuantity,
-        totalInvested: serializeDecimalNumber(totalInvested),
-      },
-      pendingOrders: pendingOrders.map((order) => ({
-        ...serializeTradeOrder(order),
-        stockId: parsedStockId,
-        stockName: stock.name,
-      })),
-      pendingOrderCount: pendingOrders.length,
-      stock: {
-        currencyCode: stock.currencyCode,
-        currentPrice: serializeDecimalNumber(stock.currentPrice),
-        id: stock.id,
-        name: stock.name,
-        ticker: stock.ticker,
-      },
-      totalAvailableOrderAmount: serializeDecimalNumber(
-        getTotalAvailableOrderAmountKrw(
-          portfolio.krwBalance,
-          portfolio.usdBalance,
-        ),
-      ),
-    },
-  });
 }
 
 export async function POST(request: NextRequest, { params }: StockOrderParams) {
@@ -381,7 +410,9 @@ export async function POST(request: NextRequest, { params }: StockOrderParams) {
   try {
     const orderId = createOrderId();
     const orderedAt = new Date();
-    const order = await prisma.$transaction(async (tx) => {
+    const order = await runSerializableOrderTransaction(async (tx) => {
+      await lockStockForOrderProcessing(tx, parsedStockId);
+
       const stock = await tx.stock.findUnique({
         select: {
           countryCode: true,
@@ -401,19 +432,11 @@ export async function POST(request: NextRequest, { params }: StockOrderParams) {
         throw new StockOrderError("종목을 찾을 수 없습니다.", 404);
       }
 
-      const portfolio = await tx.portfolio.findUnique({
-        include: {
-          items: {
-            take: 1,
-            where: {
-              stockId: parsedStockId,
-            },
-          },
-        },
-        where: {
-          userId,
-        },
-      });
+      const portfolio = await getLockedPortfolioForUser(
+        tx,
+        userId,
+        parsedStockId,
+      );
 
       if (!portfolio) {
         throw new StockOrderError("계좌가 없습니다.", 404);
@@ -509,10 +532,19 @@ export async function POST(request: NextRequest, { params }: StockOrderParams) {
       );
     });
 
-    await publishOrderFilledEventsForOrder(orderId, { since: orderedAt });
+    const reason: StockSyncReason =
+      order.filledQuantity > 0 ? "TRADE_EXECUTED" : "ORDER_CHANGED";
+    const [sync] = await Promise.all([
+      getSafeStockMutationSync({
+        reason,
+        stockId: parsedStockId,
+        userId,
+      }),
+      publishOrderFilledEventsForOrder(orderId, { since: orderedAt }),
+    ]);
+
     scheduleStockUpdated(parsedStockId, {
-      reason:
-        order.filledQuantity > 0 ? "TRADE_EXECUTED" : "ORDER_CHANGED",
+      reason,
       ticker: order.ticker,
     });
 
@@ -520,6 +552,7 @@ export async function POST(request: NextRequest, { params }: StockOrderParams) {
       ok: true,
       data: {
         order: serializeTradeOrder(order),
+        sync,
       },
     });
   } catch (error) {
@@ -553,44 +586,65 @@ export async function DELETE(
     return createStockOrderErrorResponse("유효한 종목 ID가 필요합니다.", 400);
   }
 
-  const portfolio = await prisma.portfolio.findUnique({
-    select: {
-      id: true,
-    },
-    where: {
-      userId,
-    },
-  });
-
-  if (!portfolio) {
-    return createStockOrderErrorResponse("계좌가 없습니다.", 404);
-  }
-
   const canceledAt = new Date();
-  const result = await prisma.tradeOrder.updateMany({
-    data: {
-      canceledAt,
-      remainingQuantity: 0,
-      status: TradeOrderStatus.CANCELED,
-    },
-    where: {
-      portfolioId: portfolio.id,
-      status: TradeOrderStatus.PENDING,
-      stockId: parsedStockId,
-    },
-  });
 
-  if (result.count > 0) {
-    scheduleStockUpdated(parsedStockId, {
-      changedAt: canceledAt.toISOString(),
-      reason: "ORDER_CHANGED",
+  try {
+    const result = await runSerializableOrderTransaction(async (tx) => {
+      await lockStockForOrderProcessing(tx, parsedStockId);
+
+      const portfolio = await getLockedPortfolioForUser(
+        tx,
+        userId,
+        parsedStockId,
+      );
+
+      if (!portfolio) {
+        throw new StockOrderError("계좌가 없습니다.", 404);
+      }
+
+      return tx.tradeOrder.updateMany({
+        data: {
+          canceledAt,
+          remainingQuantity: 0,
+          status: TradeOrderStatus.CANCELED,
+        },
+        where: {
+          portfolioId: portfolio.id,
+          status: TradeOrderStatus.PENDING,
+          stockId: parsedStockId,
+        },
+      });
     });
-  }
 
-  return NextResponse.json({
-    ok: true,
-    data: {
-      canceledCount: result.count,
-    },
-  });
+    if (result.count > 0) {
+      scheduleStockUpdated(parsedStockId, {
+        changedAt: canceledAt.toISOString(),
+        reason: "ORDER_CHANGED",
+      });
+    }
+    const sync = await getSafeStockMutationSync({
+      reason: "ORDER_CHANGED",
+      stockId: parsedStockId,
+      userId,
+    });
+
+    return NextResponse.json({
+      ok: true,
+      data: {
+        canceledCount: result.count,
+        sync,
+      },
+    });
+  } catch (error) {
+    if (
+      error instanceof StockOrderError ||
+      error instanceof StockOrderMatchingError
+    ) {
+      return createStockOrderErrorResponse(error.message, error.status);
+    }
+
+    console.error("Stock order cancellation failed", error);
+
+    return createStockOrderErrorResponse("주문 취소에 실패했습니다.", 500);
+  }
 }

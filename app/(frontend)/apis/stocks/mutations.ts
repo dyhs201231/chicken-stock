@@ -1,11 +1,14 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
+import type { QueryClient } from "@tanstack/react-query";
 import { portfolioQueryKeys } from "../portfolio/queries";
 import {
   cancelAllStockOrders,
   cancelStockOrder,
   createStockOrder,
   type CreateStockOrderRequest,
+  type StockCandleInterval,
+  type StockMutationSync,
+  type StockMutationSyncReason,
   type UpdateStockOrderRequest,
   updateStockOrder,
 } from "./api";
@@ -29,9 +32,22 @@ type CancelStockOrderVariables = {
 
 function useInvalidateStockOrderQueries() {
   const queryClient = useQueryClient();
-  const router = useRouter();
 
-  return (stockId: number) => {
+  return (
+    stockId: number,
+    reason: StockMutationSyncReason = "TRADE_EXECUTED",
+  ) => {
+    void queryClient.invalidateQueries({
+      queryKey: stockQueryKeys.orders(stockId),
+    });
+    void queryClient.invalidateQueries({
+      queryKey: stockQueryKeys.orderBook(stockId),
+    });
+
+    if (reason === "ORDER_CHANGED") {
+      return;
+    }
+
     void queryClient.invalidateQueries({
       queryKey: stockQueryKeys.lists(),
     });
@@ -39,61 +55,124 @@ function useInvalidateStockOrderQueries() {
       queryKey: ["stock-candles", stockId],
     });
     void queryClient.invalidateQueries({
-      queryKey: stockQueryKeys.orders(stockId),
-    });
-    void queryClient.invalidateQueries({
-      queryKey: stockQueryKeys.orderBook(stockId),
-    });
-    void queryClient.invalidateQueries({
       queryKey: portfolioQueryKeys.myPortfolio,
     });
-    router.refresh();
+  };
+}
+
+function applyStockMutationSync(
+  queryClient: QueryClient,
+  stockId: number,
+  sync: StockMutationSync,
+) {
+  queryClient.setQueryData(stockQueryKeys.orders(stockId), sync.orderContext);
+  queryClient.setQueryData(
+    stockQueryKeys.orderBook(stockId),
+    sync.orderBookSnapshot,
+  );
+
+  Object.entries(sync.candles ?? {}).forEach(([interval, candles]) => {
+    queryClient.setQueryData(
+      stockQueryKeys.candles(stockId, interval as StockCandleInterval),
+      candles,
+    );
+  });
+
+  if (sync.reason !== "TRADE_EXECUTED") {
+    return;
+  }
+
+  void queryClient.invalidateQueries({
+    queryKey: stockQueryKeys.lists(),
+  });
+  void queryClient.invalidateQueries({
+    queryKey: portfolioQueryKeys.myPortfolio,
+  });
+}
+
+function getOrderMutationReason(data: {
+  order?: {
+    filledQuantity: number;
+  };
+}) {
+  return data.order && data.order.filledQuantity > 0
+    ? "TRADE_EXECUTED"
+    : "ORDER_CHANGED";
+}
+
+function useApplyStockOrderMutationResult() {
+  const queryClient = useQueryClient();
+  const invalidateStockOrderQueries = useInvalidateStockOrderQueries();
+
+  return (
+    stockId: number,
+    sync: StockMutationSync | null,
+    fallbackReason: StockMutationSyncReason,
+  ) => {
+    if (sync) {
+      applyStockMutationSync(queryClient, stockId, sync);
+      return;
+    }
+
+    invalidateStockOrderQueries(stockId, fallbackReason);
   };
 }
 
 export function useCreateStockOrder() {
-  const invalidateStockOrderQueries = useInvalidateStockOrderQueries();
+  const applyStockOrderMutationResult = useApplyStockOrderMutationResult();
 
   return useMutation({
     mutationFn: ({ payload, stockId }: CreateStockOrderVariables) =>
       createStockOrder(stockId, payload),
-    onSuccess: (_data, variables) => {
-      invalidateStockOrderQueries(variables.stockId);
+    onSuccess: (data, variables) => {
+      applyStockOrderMutationResult(
+        variables.stockId,
+        data.sync,
+        getOrderMutationReason(data),
+      );
     },
   });
 }
 
 export function useUpdateStockOrder() {
-  const invalidateStockOrderQueries = useInvalidateStockOrderQueries();
+  const applyStockOrderMutationResult = useApplyStockOrderMutationResult();
 
   return useMutation({
     mutationFn: ({ orderId, payload, stockId }: UpdateStockOrderVariables) =>
       updateStockOrder(stockId, orderId, payload),
-    onSuccess: (_data, variables) => {
-      invalidateStockOrderQueries(variables.stockId);
+    onSuccess: (data, variables) => {
+      applyStockOrderMutationResult(
+        variables.stockId,
+        data.sync,
+        getOrderMutationReason(data),
+      );
     },
   });
 }
 
 export function useCancelStockOrder() {
-  const invalidateStockOrderQueries = useInvalidateStockOrderQueries();
+  const applyStockOrderMutationResult = useApplyStockOrderMutationResult();
 
   return useMutation({
     mutationFn: ({ orderId, stockId }: CancelStockOrderVariables) =>
       cancelStockOrder(stockId, orderId),
-    onSuccess: (_data, variables) => {
-      invalidateStockOrderQueries(variables.stockId);
+    onSuccess: (data, variables) => {
+      applyStockOrderMutationResult(
+        variables.stockId,
+        data.sync,
+        "ORDER_CHANGED",
+      );
     },
   });
 }
 
 export function useCancelAllStockOrders(stockId: number) {
-  const invalidateStockOrderQueries = useInvalidateStockOrderQueries();
+  const applyStockOrderMutationResult = useApplyStockOrderMutationResult();
 
   return useMutation({
     mutationFn: () => cancelAllStockOrders(stockId),
-    onSuccess: () => {
-      invalidateStockOrderQueries(stockId);
+    onSuccess: (data) => {
+      applyStockOrderMutationResult(stockId, data.sync, "ORDER_CHANGED");
     },
   });
 }

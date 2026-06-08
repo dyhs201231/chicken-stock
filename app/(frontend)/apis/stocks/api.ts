@@ -91,6 +91,18 @@ export type StockOrderContext = {
   totalAvailableOrderAmount: number;
 };
 
+export type StockMutationSyncReason = "ORDER_CHANGED" | "TRADE_EXECUTED";
+
+export type StockMarketSync = {
+  candles: Partial<Record<StockCandleInterval, ChartCandleData[]>> | null;
+  orderBookSnapshot: StockOrderBookSnapshotData | null;
+  reason: StockMutationSyncReason;
+};
+
+export type StockMutationSync = StockMarketSync & {
+  orderContext: StockOrderContext;
+};
+
 export type CreateStockOrderRequest = {
   orderPriceType: StockOrderPriceType;
   pricePerShare?: number;
@@ -118,6 +130,7 @@ type StockOrderMutationResponse =
       ok: true;
       data: {
         order: Omit<StockPendingOrder, "stockId" | "stockName">;
+        sync: StockMutationSync | null;
       };
     }
   | {
@@ -130,6 +143,7 @@ type StockOrderCancelResponse =
       ok: true;
       data: {
         canceledCount: number;
+        sync: StockMutationSync | null;
       };
     }
   | {

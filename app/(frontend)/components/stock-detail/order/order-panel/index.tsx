@@ -40,7 +40,7 @@ export default function OrderPanel({
   const {
     data: orderContext,
     error,
-    isError,
+    isFetched,
     isPending,
   } = useStockOrdersQuery(stock.id);
   const { data: orderBookSnapshot } = useStockOrderBookQuery(
@@ -49,11 +49,11 @@ export default function OrderPanel({
   );
 
   const renderPanelContent = () => {
-    if (isPending) {
+    if (!orderContext && isPending && !isFetched) {
       return <OrderPanelState message="주문 정보를 불러오는 중입니다." />;
     }
 
-    if (isError || !orderContext) {
+    if (!orderContext) {
       return (
         <OrderPanelState
           message={getApiErrorMessage(

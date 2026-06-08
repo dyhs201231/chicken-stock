@@ -86,6 +86,46 @@ export class StockOrderMatchingError extends Error {
   }
 }
 
+export class StockOrderConcurrencyError extends StockOrderMatchingError {
+  constructor(message = "동시 주문 처리 중 충돌이 발생했습니다.") {
+    super(message, 409);
+    this.name = "StockOrderConcurrencyError";
+  }
+}
+
+export async function lockStockForOrderProcessing(
+  tx: TransactionClient,
+  stockId: number,
+) {
+  await tx.$queryRaw`
+    SELECT "id"
+    FROM "Stock"
+    WHERE "id" = ${stockId}
+    FOR UPDATE
+  `;
+}
+
+export async function lockPortfolioRows(
+  tx: TransactionClient,
+  portfolioIds: Array<bigint | number>,
+) {
+  const ids = Array.from(new Set(portfolioIds.map((id) => id.toString())))
+    .map((id) => BigInt(id))
+    .sort((left, right) => (left < right ? -1 : left > right ? 1 : 0));
+
+  if (ids.length === 0) {
+    return;
+  }
+
+  await tx.$queryRaw`
+    SELECT "id"
+    FROM "Portfolio"
+    WHERE "id" IN (${Prisma.join(ids)})
+    ORDER BY "id" ASC
+    FOR UPDATE
+  `;
+}
+
 function createPortfolioTransactionId() {
   return randomUUID();
 }
@@ -202,8 +242,9 @@ export async function getEstimatedMarketOrderAmount(
   }
 
   if (remainingQuantity > 0) {
-    orderAmount = orderAmount.add(
-      getFillAmount(executionPrice, remainingQuantity),
+    throw new StockOrderMatchingError(
+      "시장가로 체결할 수 있는 상대 호가가 부족합니다.",
+      400,
     );
   }
 
@@ -398,25 +439,47 @@ async function updateOrderAfterFill(
   executionPrice: Prisma.Decimal,
   executedAt: Date,
 ) {
-  const nextFilledQuantity = order.filledQuantity + fillQuantity;
   const nextRemainingQuantity = order.remainingQuantity - fillQuantity;
   const nextStatus =
     nextRemainingQuantity <= 0
       ? TradeOrderStatus.COMPLETED
       : TradeOrderStatus.PENDING;
-
-  return tx.tradeOrder.update({
+  const updateResult = await tx.tradeOrder.updateMany({
     data: {
       executedAt,
       executedPrice: getNextExecutedPrice(order, fillQuantity, executionPrice),
-      filledQuantity: nextFilledQuantity,
-      remainingQuantity: Math.max(nextRemainingQuantity, 0),
+      filledQuantity: {
+        increment: fillQuantity,
+      },
+      remainingQuantity: {
+        decrement: fillQuantity,
+      },
       status: nextStatus,
     },
     where: {
       orderId: order.orderId,
+      remainingQuantity: {
+        gte: fillQuantity,
+      },
+      status: TradeOrderStatus.PENDING,
     },
   });
+
+  if (updateResult.count === 0) {
+    throw new StockOrderConcurrencyError();
+  }
+
+  const updatedOrder = await tx.tradeOrder.findUnique({
+    where: {
+      orderId: order.orderId,
+    },
+  });
+
+  if (!updatedOrder) {
+    throw new StockOrderConcurrencyError();
+  }
+
+  return updatedOrder;
 }
 
 async function applyBuyFill(
@@ -648,21 +711,8 @@ function getOppositeOrderType(type: TradeOrderType) {
   return type === TradeOrderType.BUY ? TradeOrderType.SELL : TradeOrderType.BUY;
 }
 
-function getCandidatePriceFilter(
-  incomingOrder: MatchingOrder,
-  orderPriceType: StockOrderPriceType,
-) {
-  if (orderPriceType === "MARKET") {
-    return undefined;
-  }
-
-  return incomingOrder.type === TradeOrderType.BUY
-    ? {
-        lte: incomingOrder.pricePerShare,
-      }
-    : {
-        gte: incomingOrder.pricePerShare,
-      };
+function getTradeOrderTypeDbValue(type: TradeOrderType) {
+  return type === TradeOrderType.BUY ? "매수" : "매도";
 }
 
 async function getMatchCandidates(
@@ -670,40 +720,46 @@ async function getMatchCandidates(
   incomingOrder: MatchingOrder,
   orderPriceType: StockOrderPriceType,
 ) {
-  const priceFilter = getCandidatePriceFilter(incomingOrder, orderPriceType);
+  const priceFilter =
+    orderPriceType === "MARKET"
+      ? Prisma.empty
+      : incomingOrder.type === TradeOrderType.BUY
+        ? Prisma.sql`AND "price_per_share" <= ${incomingOrder.pricePerShare}`
+        : Prisma.sql`AND "price_per_share" >= ${incomingOrder.pricePerShare}`;
+  const oppositeOrderType = getOppositeOrderType(incomingOrder.type);
+  const oppositeOrderTypeDbValue = getTradeOrderTypeDbValue(oppositeOrderType);
+  const orderBy =
+    incomingOrder.type === TradeOrderType.BUY
+      ? Prisma.sql`"price_per_share" ASC, "ordered_at" ASC, "order_id" ASC`
+      : Prisma.sql`"price_per_share" DESC, "ordered_at" ASC, "order_id" ASC`;
 
-  return tx.tradeOrder.findMany({
-    orderBy:
-      incomingOrder.type === TradeOrderType.BUY
-        ? [
-            {
-              pricePerShare: "asc",
-            },
-            {
-              orderedAt: "asc",
-            },
-          ]
-        : [
-            {
-              pricePerShare: "desc",
-            },
-            {
-              orderedAt: "asc",
-            },
-          ],
-    where: {
-      portfolioId: {
-        not: incomingOrder.portfolioId,
-      },
-      pricePerShare: priceFilter,
-      remainingQuantity: {
-        gt: 0,
-      },
-      status: TradeOrderStatus.PENDING,
-      stockId: incomingOrder.stockId,
-      type: getOppositeOrderType(incomingOrder.type),
-    },
-  });
+  return tx.$queryRaw<MatchingOrder[]>`
+    SELECT
+      "order_id" AS "orderId",
+      "portfolio_id" AS "portfolioId",
+      "stock_id" AS "stockId",
+      "ticker",
+      "type",
+      "quantity",
+      "price_per_share" AS "pricePerShare",
+      "status",
+      "ordered_at" AS "orderedAt",
+      "filled_quantity" AS "filledQuantity",
+      "remaining_quantity" AS "remainingQuantity",
+      "executed_price" AS "executedPrice",
+      "executed_at" AS "executedAt",
+      "canceled_at" AS "canceledAt",
+      "currency_code" AS "currencyCode"
+    FROM "Trade_order"
+    WHERE "portfolio_id" <> ${incomingOrder.portfolioId}
+      AND "remaining_quantity" > 0
+      AND "status" = ${TradeOrderStatus.PENDING}::"Trade_order_status"
+      AND "stock_id" = ${incomingOrder.stockId}
+      AND "type" = ${oppositeOrderTypeDbValue}::"Trade_order_type"
+      ${priceFilter}
+    ORDER BY ${orderBy}
+    FOR UPDATE SKIP LOCKED
+  `;
 }
 
 async function executeInternalFill(
@@ -727,6 +783,8 @@ async function executeInternalFill(
   const sellOrder =
     incomingOrder.type === TradeOrderType.SELL ? incomingOrder : candidateOrder;
   const executionPrice = candidateOrder.pricePerShare.toDecimalPlaces(2);
+
+  await lockPortfolioRows(tx, [buyOrder.portfolioId, sellOrder.portfolioId]);
 
   await applyBuyFill(tx, {
     executedAt,
@@ -773,33 +831,6 @@ async function executeInternalFill(
   return incomingOrder.type === TradeOrderType.BUY
     ? updatedBuyOrder
     : updatedSellOrder;
-}
-
-async function convertMarketRemainderToCurrentPriceLimit(
-  tx: TransactionClient,
-  incomingOrder: MatchingOrder,
-  stock: MatchingStock,
-) {
-  const latestStockPrice = await tx.stock.findUnique({
-    select: {
-      currentPrice: true,
-    },
-    where: {
-      id: stock.id,
-    },
-  });
-  const pricePerShare = (
-    latestStockPrice?.currentPrice ?? stock.currentPrice
-  ).toDecimalPlaces(2);
-
-  return tx.tradeOrder.update({
-    data: {
-      pricePerShare,
-    },
-    where: {
-      orderId: incomingOrder.orderId,
-    },
-  });
 }
 
 export async function matchStockOrder(
@@ -855,10 +886,9 @@ export async function matchStockOrder(
     incomingOrder &&
     incomingOrder.remainingQuantity > 0
   ) {
-    incomingOrder = await convertMarketRemainderToCurrentPriceLimit(
-      tx,
-      incomingOrder,
-      stock,
+    throw new StockOrderMatchingError(
+      "시장가로 체결할 수 있는 상대 호가가 부족합니다.",
+      400,
     );
   }
 
