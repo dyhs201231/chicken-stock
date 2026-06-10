@@ -2,6 +2,11 @@ import { PrismaClient } from "../generated/prisma/client";
 
 const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
+if (process.platform === "linux" && !process.env.PRISMA_QUERY_ENGINE_LIBRARY) {
+  process.env.PRISMA_QUERY_ENGINE_LIBRARY =
+    `${process.cwd()}/node_modules/prisma/libquery_engine-rhel-openssl-3.0.x.so.node`;
+}
+
 function getDatasourceUrl() {
   const datasourceUrl = process.env.DATABASE_URL;
 

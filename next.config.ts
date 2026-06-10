@@ -11,7 +11,10 @@ const agentTraceExcludes = [
 
 const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
-    "/api/**/*": ["./app/(backend)/generated/prisma/**/*"],
+    "/api/**/*": [
+      "./app/(backend)/generated/prisma/**/*",
+      "./node_modules/prisma/libquery_engine-rhel-openssl-3.0.x.so.node",
+    ],
   },
   outputFileTracingExcludes: {
     "/api/internal/agents/run-trade": agentTraceExcludes,
