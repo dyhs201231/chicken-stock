@@ -69,6 +69,7 @@ export const ModelName = {
   StockFinancialStatement: 'StockFinancialStatement',
   StockEarning: 'StockEarning',
   TradeOrder: 'TradeOrder',
+  AgentDecisionLog: 'AgentDecisionLog',
   TradeExecution: 'TradeExecution',
   StockCandle: 'StockCandle',
   OrderBookSnapshot: 'OrderBookSnapshot',
@@ -440,6 +441,27 @@ export const TradeOrderScalarFieldEnum = {
 } as const
 
 export type TradeOrderScalarFieldEnum = (typeof TradeOrderScalarFieldEnum)[keyof typeof TradeOrderScalarFieldEnum]
+
+
+export const AgentDecisionLogScalarFieldEnum = {
+  id: 'id',
+  agentUserId: 'agentUserId',
+  stockId: 'stockId',
+  agentType: 'agentType',
+  decisionSource: 'decisionSource',
+  side: 'side',
+  quantity: 'quantity',
+  reason: 'reason',
+  score: 'score',
+  rawResponse: 'rawResponse',
+  status: 'status',
+  rejectReason: 'rejectReason',
+  executedOrderId: 'executedOrderId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AgentDecisionLogScalarFieldEnum = (typeof AgentDecisionLogScalarFieldEnum)[keyof typeof AgentDecisionLogScalarFieldEnum]
 
 
 export const TradeExecutionScalarFieldEnum = {

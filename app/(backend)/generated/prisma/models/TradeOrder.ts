@@ -353,6 +353,7 @@ export type TradeOrderWhereInput = {
   transactions?: Prisma.PortfolioTransactionListRelationFilter
   buyExecutions?: Prisma.TradeExecutionListRelationFilter
   sellExecutions?: Prisma.TradeExecutionListRelationFilter
+  agentDecisionLogs?: Prisma.AgentDecisionLogListRelationFilter
 }
 
 export type TradeOrderOrderByWithRelationInput = {
@@ -379,6 +380,7 @@ export type TradeOrderOrderByWithRelationInput = {
   transactions?: Prisma.PortfolioTransactionOrderByRelationAggregateInput
   buyExecutions?: Prisma.TradeExecutionOrderByRelationAggregateInput
   sellExecutions?: Prisma.TradeExecutionOrderByRelationAggregateInput
+  agentDecisionLogs?: Prisma.AgentDecisionLogOrderByRelationAggregateInput
 }
 
 export type TradeOrderWhereUniqueInput = Prisma.AtLeast<{
@@ -408,6 +410,7 @@ export type TradeOrderWhereUniqueInput = Prisma.AtLeast<{
   transactions?: Prisma.PortfolioTransactionListRelationFilter
   buyExecutions?: Prisma.TradeExecutionListRelationFilter
   sellExecutions?: Prisma.TradeExecutionListRelationFilter
+  agentDecisionLogs?: Prisma.AgentDecisionLogListRelationFilter
 }, "orderId">
 
 export type TradeOrderOrderByWithAggregationInput = {
@@ -482,6 +485,7 @@ export type TradeOrderCreateInput = {
   transactions?: Prisma.PortfolioTransactionCreateNestedManyWithoutTradeOrderInput
   buyExecutions?: Prisma.TradeExecutionCreateNestedManyWithoutBuyOrderInput
   sellExecutions?: Prisma.TradeExecutionCreateNestedManyWithoutSellOrderInput
+  agentDecisionLogs?: Prisma.AgentDecisionLogCreateNestedManyWithoutExecutedOrderInput
 }
 
 export type TradeOrderUncheckedCreateInput = {
@@ -506,6 +510,7 @@ export type TradeOrderUncheckedCreateInput = {
   transactions?: Prisma.PortfolioTransactionUncheckedCreateNestedManyWithoutTradeOrderInput
   buyExecutions?: Prisma.TradeExecutionUncheckedCreateNestedManyWithoutBuyOrderInput
   sellExecutions?: Prisma.TradeExecutionUncheckedCreateNestedManyWithoutSellOrderInput
+  agentDecisionLogs?: Prisma.AgentDecisionLogUncheckedCreateNestedManyWithoutExecutedOrderInput
 }
 
 export type TradeOrderUpdateInput = {
@@ -530,6 +535,7 @@ export type TradeOrderUpdateInput = {
   transactions?: Prisma.PortfolioTransactionUpdateManyWithoutTradeOrderNestedInput
   buyExecutions?: Prisma.TradeExecutionUpdateManyWithoutBuyOrderNestedInput
   sellExecutions?: Prisma.TradeExecutionUpdateManyWithoutSellOrderNestedInput
+  agentDecisionLogs?: Prisma.AgentDecisionLogUpdateManyWithoutExecutedOrderNestedInput
 }
 
 export type TradeOrderUncheckedUpdateInput = {
@@ -554,6 +560,7 @@ export type TradeOrderUncheckedUpdateInput = {
   transactions?: Prisma.PortfolioTransactionUncheckedUpdateManyWithoutTradeOrderNestedInput
   buyExecutions?: Prisma.TradeExecutionUncheckedUpdateManyWithoutBuyOrderNestedInput
   sellExecutions?: Prisma.TradeExecutionUncheckedUpdateManyWithoutSellOrderNestedInput
+  agentDecisionLogs?: Prisma.AgentDecisionLogUncheckedUpdateManyWithoutExecutedOrderNestedInput
 }
 
 export type TradeOrderCreateManyInput = {
@@ -825,6 +832,22 @@ export type EnumTradeOrderStatusFieldUpdateOperationsInput = {
   set?: $Enums.TradeOrderStatus
 }
 
+export type TradeOrderCreateNestedOneWithoutAgentDecisionLogsInput = {
+  create?: Prisma.XOR<Prisma.TradeOrderCreateWithoutAgentDecisionLogsInput, Prisma.TradeOrderUncheckedCreateWithoutAgentDecisionLogsInput>
+  connectOrCreate?: Prisma.TradeOrderCreateOrConnectWithoutAgentDecisionLogsInput
+  connect?: Prisma.TradeOrderWhereUniqueInput
+}
+
+export type TradeOrderUpdateOneWithoutAgentDecisionLogsNestedInput = {
+  create?: Prisma.XOR<Prisma.TradeOrderCreateWithoutAgentDecisionLogsInput, Prisma.TradeOrderUncheckedCreateWithoutAgentDecisionLogsInput>
+  connectOrCreate?: Prisma.TradeOrderCreateOrConnectWithoutAgentDecisionLogsInput
+  upsert?: Prisma.TradeOrderUpsertWithoutAgentDecisionLogsInput
+  disconnect?: Prisma.TradeOrderWhereInput | boolean
+  delete?: Prisma.TradeOrderWhereInput | boolean
+  connect?: Prisma.TradeOrderWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TradeOrderUpdateToOneWithWhereWithoutAgentDecisionLogsInput, Prisma.TradeOrderUpdateWithoutAgentDecisionLogsInput>, Prisma.TradeOrderUncheckedUpdateWithoutAgentDecisionLogsInput>
+}
+
 export type TradeOrderCreateNestedOneWithoutBuyExecutionsInput = {
   create?: Prisma.XOR<Prisma.TradeOrderCreateWithoutBuyExecutionsInput, Prisma.TradeOrderUncheckedCreateWithoutBuyExecutionsInput>
   connectOrCreate?: Prisma.TradeOrderCreateOrConnectWithoutBuyExecutionsInput
@@ -878,6 +901,7 @@ export type TradeOrderCreateWithoutPortfolioInput = {
   transactions?: Prisma.PortfolioTransactionCreateNestedManyWithoutTradeOrderInput
   buyExecutions?: Prisma.TradeExecutionCreateNestedManyWithoutBuyOrderInput
   sellExecutions?: Prisma.TradeExecutionCreateNestedManyWithoutSellOrderInput
+  agentDecisionLogs?: Prisma.AgentDecisionLogCreateNestedManyWithoutExecutedOrderInput
 }
 
 export type TradeOrderUncheckedCreateWithoutPortfolioInput = {
@@ -901,6 +925,7 @@ export type TradeOrderUncheckedCreateWithoutPortfolioInput = {
   transactions?: Prisma.PortfolioTransactionUncheckedCreateNestedManyWithoutTradeOrderInput
   buyExecutions?: Prisma.TradeExecutionUncheckedCreateNestedManyWithoutBuyOrderInput
   sellExecutions?: Prisma.TradeExecutionUncheckedCreateNestedManyWithoutSellOrderInput
+  agentDecisionLogs?: Prisma.AgentDecisionLogUncheckedCreateNestedManyWithoutExecutedOrderInput
 }
 
 export type TradeOrderCreateOrConnectWithoutPortfolioInput = {
@@ -974,6 +999,7 @@ export type TradeOrderCreateWithoutTransactionsInput = {
   stock: Prisma.StockCreateNestedOneWithoutTradeOrdersInput
   buyExecutions?: Prisma.TradeExecutionCreateNestedManyWithoutBuyOrderInput
   sellExecutions?: Prisma.TradeExecutionCreateNestedManyWithoutSellOrderInput
+  agentDecisionLogs?: Prisma.AgentDecisionLogCreateNestedManyWithoutExecutedOrderInput
 }
 
 export type TradeOrderUncheckedCreateWithoutTransactionsInput = {
@@ -997,6 +1023,7 @@ export type TradeOrderUncheckedCreateWithoutTransactionsInput = {
   updatedAt?: Date | string
   buyExecutions?: Prisma.TradeExecutionUncheckedCreateNestedManyWithoutBuyOrderInput
   sellExecutions?: Prisma.TradeExecutionUncheckedCreateNestedManyWithoutSellOrderInput
+  agentDecisionLogs?: Prisma.AgentDecisionLogUncheckedCreateNestedManyWithoutExecutedOrderInput
 }
 
 export type TradeOrderCreateOrConnectWithoutTransactionsInput = {
@@ -1036,6 +1063,7 @@ export type TradeOrderUpdateWithoutTransactionsInput = {
   stock?: Prisma.StockUpdateOneRequiredWithoutTradeOrdersNestedInput
   buyExecutions?: Prisma.TradeExecutionUpdateManyWithoutBuyOrderNestedInput
   sellExecutions?: Prisma.TradeExecutionUpdateManyWithoutSellOrderNestedInput
+  agentDecisionLogs?: Prisma.AgentDecisionLogUpdateManyWithoutExecutedOrderNestedInput
 }
 
 export type TradeOrderUncheckedUpdateWithoutTransactionsInput = {
@@ -1059,6 +1087,7 @@ export type TradeOrderUncheckedUpdateWithoutTransactionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   buyExecutions?: Prisma.TradeExecutionUncheckedUpdateManyWithoutBuyOrderNestedInput
   sellExecutions?: Prisma.TradeExecutionUncheckedUpdateManyWithoutSellOrderNestedInput
+  agentDecisionLogs?: Prisma.AgentDecisionLogUncheckedUpdateManyWithoutExecutedOrderNestedInput
 }
 
 export type TradeOrderCreateWithoutStockInput = {
@@ -1082,6 +1111,7 @@ export type TradeOrderCreateWithoutStockInput = {
   transactions?: Prisma.PortfolioTransactionCreateNestedManyWithoutTradeOrderInput
   buyExecutions?: Prisma.TradeExecutionCreateNestedManyWithoutBuyOrderInput
   sellExecutions?: Prisma.TradeExecutionCreateNestedManyWithoutSellOrderInput
+  agentDecisionLogs?: Prisma.AgentDecisionLogCreateNestedManyWithoutExecutedOrderInput
 }
 
 export type TradeOrderUncheckedCreateWithoutStockInput = {
@@ -1105,6 +1135,7 @@ export type TradeOrderUncheckedCreateWithoutStockInput = {
   transactions?: Prisma.PortfolioTransactionUncheckedCreateNestedManyWithoutTradeOrderInput
   buyExecutions?: Prisma.TradeExecutionUncheckedCreateNestedManyWithoutBuyOrderInput
   sellExecutions?: Prisma.TradeExecutionUncheckedCreateNestedManyWithoutSellOrderInput
+  agentDecisionLogs?: Prisma.AgentDecisionLogUncheckedCreateNestedManyWithoutExecutedOrderInput
 }
 
 export type TradeOrderCreateOrConnectWithoutStockInput = {
@@ -1133,6 +1164,118 @@ export type TradeOrderUpdateManyWithWhereWithoutStockInput = {
   data: Prisma.XOR<Prisma.TradeOrderUpdateManyMutationInput, Prisma.TradeOrderUncheckedUpdateManyWithoutStockInput>
 }
 
+export type TradeOrderCreateWithoutAgentDecisionLogsInput = {
+  orderId: bigint | number
+  ticker: string
+  type: $Enums.TradeOrderType
+  quantity: number
+  pricePerShare: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status: $Enums.TradeOrderStatus
+  orderedAt: Date | string
+  filledQuantity: number
+  remainingQuantity: number
+  executedPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  executedAt?: Date | string | null
+  canceledAt?: Date | string | null
+  rejectReason?: string | null
+  currencyCode: $Enums.CurrencyCode
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  portfolio: Prisma.PortfolioCreateNestedOneWithoutTradeOrdersInput
+  stock: Prisma.StockCreateNestedOneWithoutTradeOrdersInput
+  transactions?: Prisma.PortfolioTransactionCreateNestedManyWithoutTradeOrderInput
+  buyExecutions?: Prisma.TradeExecutionCreateNestedManyWithoutBuyOrderInput
+  sellExecutions?: Prisma.TradeExecutionCreateNestedManyWithoutSellOrderInput
+}
+
+export type TradeOrderUncheckedCreateWithoutAgentDecisionLogsInput = {
+  orderId: bigint | number
+  portfolioId: bigint | number
+  stockId: number
+  ticker: string
+  type: $Enums.TradeOrderType
+  quantity: number
+  pricePerShare: runtime.Decimal | runtime.DecimalJsLike | number | string
+  status: $Enums.TradeOrderStatus
+  orderedAt: Date | string
+  filledQuantity: number
+  remainingQuantity: number
+  executedPrice?: runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  executedAt?: Date | string | null
+  canceledAt?: Date | string | null
+  rejectReason?: string | null
+  currencyCode: $Enums.CurrencyCode
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  transactions?: Prisma.PortfolioTransactionUncheckedCreateNestedManyWithoutTradeOrderInput
+  buyExecutions?: Prisma.TradeExecutionUncheckedCreateNestedManyWithoutBuyOrderInput
+  sellExecutions?: Prisma.TradeExecutionUncheckedCreateNestedManyWithoutSellOrderInput
+}
+
+export type TradeOrderCreateOrConnectWithoutAgentDecisionLogsInput = {
+  where: Prisma.TradeOrderWhereUniqueInput
+  create: Prisma.XOR<Prisma.TradeOrderCreateWithoutAgentDecisionLogsInput, Prisma.TradeOrderUncheckedCreateWithoutAgentDecisionLogsInput>
+}
+
+export type TradeOrderUpsertWithoutAgentDecisionLogsInput = {
+  update: Prisma.XOR<Prisma.TradeOrderUpdateWithoutAgentDecisionLogsInput, Prisma.TradeOrderUncheckedUpdateWithoutAgentDecisionLogsInput>
+  create: Prisma.XOR<Prisma.TradeOrderCreateWithoutAgentDecisionLogsInput, Prisma.TradeOrderUncheckedCreateWithoutAgentDecisionLogsInput>
+  where?: Prisma.TradeOrderWhereInput
+}
+
+export type TradeOrderUpdateToOneWithWhereWithoutAgentDecisionLogsInput = {
+  where?: Prisma.TradeOrderWhereInput
+  data: Prisma.XOR<Prisma.TradeOrderUpdateWithoutAgentDecisionLogsInput, Prisma.TradeOrderUncheckedUpdateWithoutAgentDecisionLogsInput>
+}
+
+export type TradeOrderUpdateWithoutAgentDecisionLogsInput = {
+  orderId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  ticker?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumTradeOrderTypeFieldUpdateOperationsInput | $Enums.TradeOrderType
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  pricePerShare?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumTradeOrderStatusFieldUpdateOperationsInput | $Enums.TradeOrderStatus
+  orderedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  filledQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  remainingQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  executedPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  executedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  canceledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  rejectReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currencyCode?: Prisma.EnumCurrencyCodeFieldUpdateOperationsInput | $Enums.CurrencyCode
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  portfolio?: Prisma.PortfolioUpdateOneRequiredWithoutTradeOrdersNestedInput
+  stock?: Prisma.StockUpdateOneRequiredWithoutTradeOrdersNestedInput
+  transactions?: Prisma.PortfolioTransactionUpdateManyWithoutTradeOrderNestedInput
+  buyExecutions?: Prisma.TradeExecutionUpdateManyWithoutBuyOrderNestedInput
+  sellExecutions?: Prisma.TradeExecutionUpdateManyWithoutSellOrderNestedInput
+}
+
+export type TradeOrderUncheckedUpdateWithoutAgentDecisionLogsInput = {
+  orderId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  portfolioId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  stockId?: Prisma.IntFieldUpdateOperationsInput | number
+  ticker?: Prisma.StringFieldUpdateOperationsInput | string
+  type?: Prisma.EnumTradeOrderTypeFieldUpdateOperationsInput | $Enums.TradeOrderType
+  quantity?: Prisma.IntFieldUpdateOperationsInput | number
+  pricePerShare?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  status?: Prisma.EnumTradeOrderStatusFieldUpdateOperationsInput | $Enums.TradeOrderStatus
+  orderedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  filledQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  remainingQuantity?: Prisma.IntFieldUpdateOperationsInput | number
+  executedPrice?: Prisma.NullableDecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string | null
+  executedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  canceledAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  rejectReason?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  currencyCode?: Prisma.EnumCurrencyCodeFieldUpdateOperationsInput | $Enums.CurrencyCode
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  transactions?: Prisma.PortfolioTransactionUncheckedUpdateManyWithoutTradeOrderNestedInput
+  buyExecutions?: Prisma.TradeExecutionUncheckedUpdateManyWithoutBuyOrderNestedInput
+  sellExecutions?: Prisma.TradeExecutionUncheckedUpdateManyWithoutSellOrderNestedInput
+}
+
 export type TradeOrderCreateWithoutBuyExecutionsInput = {
   orderId: bigint | number
   ticker: string
@@ -1154,6 +1297,7 @@ export type TradeOrderCreateWithoutBuyExecutionsInput = {
   stock: Prisma.StockCreateNestedOneWithoutTradeOrdersInput
   transactions?: Prisma.PortfolioTransactionCreateNestedManyWithoutTradeOrderInput
   sellExecutions?: Prisma.TradeExecutionCreateNestedManyWithoutSellOrderInput
+  agentDecisionLogs?: Prisma.AgentDecisionLogCreateNestedManyWithoutExecutedOrderInput
 }
 
 export type TradeOrderUncheckedCreateWithoutBuyExecutionsInput = {
@@ -1177,6 +1321,7 @@ export type TradeOrderUncheckedCreateWithoutBuyExecutionsInput = {
   updatedAt?: Date | string
   transactions?: Prisma.PortfolioTransactionUncheckedCreateNestedManyWithoutTradeOrderInput
   sellExecutions?: Prisma.TradeExecutionUncheckedCreateNestedManyWithoutSellOrderInput
+  agentDecisionLogs?: Prisma.AgentDecisionLogUncheckedCreateNestedManyWithoutExecutedOrderInput
 }
 
 export type TradeOrderCreateOrConnectWithoutBuyExecutionsInput = {
@@ -1205,6 +1350,7 @@ export type TradeOrderCreateWithoutSellExecutionsInput = {
   stock: Prisma.StockCreateNestedOneWithoutTradeOrdersInput
   transactions?: Prisma.PortfolioTransactionCreateNestedManyWithoutTradeOrderInput
   buyExecutions?: Prisma.TradeExecutionCreateNestedManyWithoutBuyOrderInput
+  agentDecisionLogs?: Prisma.AgentDecisionLogCreateNestedManyWithoutExecutedOrderInput
 }
 
 export type TradeOrderUncheckedCreateWithoutSellExecutionsInput = {
@@ -1228,6 +1374,7 @@ export type TradeOrderUncheckedCreateWithoutSellExecutionsInput = {
   updatedAt?: Date | string
   transactions?: Prisma.PortfolioTransactionUncheckedCreateNestedManyWithoutTradeOrderInput
   buyExecutions?: Prisma.TradeExecutionUncheckedCreateNestedManyWithoutBuyOrderInput
+  agentDecisionLogs?: Prisma.AgentDecisionLogUncheckedCreateNestedManyWithoutExecutedOrderInput
 }
 
 export type TradeOrderCreateOrConnectWithoutSellExecutionsInput = {
@@ -1267,6 +1414,7 @@ export type TradeOrderUpdateWithoutBuyExecutionsInput = {
   stock?: Prisma.StockUpdateOneRequiredWithoutTradeOrdersNestedInput
   transactions?: Prisma.PortfolioTransactionUpdateManyWithoutTradeOrderNestedInput
   sellExecutions?: Prisma.TradeExecutionUpdateManyWithoutSellOrderNestedInput
+  agentDecisionLogs?: Prisma.AgentDecisionLogUpdateManyWithoutExecutedOrderNestedInput
 }
 
 export type TradeOrderUncheckedUpdateWithoutBuyExecutionsInput = {
@@ -1290,6 +1438,7 @@ export type TradeOrderUncheckedUpdateWithoutBuyExecutionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   transactions?: Prisma.PortfolioTransactionUncheckedUpdateManyWithoutTradeOrderNestedInput
   sellExecutions?: Prisma.TradeExecutionUncheckedUpdateManyWithoutSellOrderNestedInput
+  agentDecisionLogs?: Prisma.AgentDecisionLogUncheckedUpdateManyWithoutExecutedOrderNestedInput
 }
 
 export type TradeOrderUpsertWithoutSellExecutionsInput = {
@@ -1324,6 +1473,7 @@ export type TradeOrderUpdateWithoutSellExecutionsInput = {
   stock?: Prisma.StockUpdateOneRequiredWithoutTradeOrdersNestedInput
   transactions?: Prisma.PortfolioTransactionUpdateManyWithoutTradeOrderNestedInput
   buyExecutions?: Prisma.TradeExecutionUpdateManyWithoutBuyOrderNestedInput
+  agentDecisionLogs?: Prisma.AgentDecisionLogUpdateManyWithoutExecutedOrderNestedInput
 }
 
 export type TradeOrderUncheckedUpdateWithoutSellExecutionsInput = {
@@ -1347,6 +1497,7 @@ export type TradeOrderUncheckedUpdateWithoutSellExecutionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   transactions?: Prisma.PortfolioTransactionUncheckedUpdateManyWithoutTradeOrderNestedInput
   buyExecutions?: Prisma.TradeExecutionUncheckedUpdateManyWithoutBuyOrderNestedInput
+  agentDecisionLogs?: Prisma.AgentDecisionLogUncheckedUpdateManyWithoutExecutedOrderNestedInput
 }
 
 export type TradeOrderCreateManyPortfolioInput = {
@@ -1390,6 +1541,7 @@ export type TradeOrderUpdateWithoutPortfolioInput = {
   transactions?: Prisma.PortfolioTransactionUpdateManyWithoutTradeOrderNestedInput
   buyExecutions?: Prisma.TradeExecutionUpdateManyWithoutBuyOrderNestedInput
   sellExecutions?: Prisma.TradeExecutionUpdateManyWithoutSellOrderNestedInput
+  agentDecisionLogs?: Prisma.AgentDecisionLogUpdateManyWithoutExecutedOrderNestedInput
 }
 
 export type TradeOrderUncheckedUpdateWithoutPortfolioInput = {
@@ -1413,6 +1565,7 @@ export type TradeOrderUncheckedUpdateWithoutPortfolioInput = {
   transactions?: Prisma.PortfolioTransactionUncheckedUpdateManyWithoutTradeOrderNestedInput
   buyExecutions?: Prisma.TradeExecutionUncheckedUpdateManyWithoutBuyOrderNestedInput
   sellExecutions?: Prisma.TradeExecutionUncheckedUpdateManyWithoutSellOrderNestedInput
+  agentDecisionLogs?: Prisma.AgentDecisionLogUncheckedUpdateManyWithoutExecutedOrderNestedInput
 }
 
 export type TradeOrderUncheckedUpdateManyWithoutPortfolioInput = {
@@ -1476,6 +1629,7 @@ export type TradeOrderUpdateWithoutStockInput = {
   transactions?: Prisma.PortfolioTransactionUpdateManyWithoutTradeOrderNestedInput
   buyExecutions?: Prisma.TradeExecutionUpdateManyWithoutBuyOrderNestedInput
   sellExecutions?: Prisma.TradeExecutionUpdateManyWithoutSellOrderNestedInput
+  agentDecisionLogs?: Prisma.AgentDecisionLogUpdateManyWithoutExecutedOrderNestedInput
 }
 
 export type TradeOrderUncheckedUpdateWithoutStockInput = {
@@ -1499,6 +1653,7 @@ export type TradeOrderUncheckedUpdateWithoutStockInput = {
   transactions?: Prisma.PortfolioTransactionUncheckedUpdateManyWithoutTradeOrderNestedInput
   buyExecutions?: Prisma.TradeExecutionUncheckedUpdateManyWithoutBuyOrderNestedInput
   sellExecutions?: Prisma.TradeExecutionUncheckedUpdateManyWithoutSellOrderNestedInput
+  agentDecisionLogs?: Prisma.AgentDecisionLogUncheckedUpdateManyWithoutExecutedOrderNestedInput
 }
 
 export type TradeOrderUncheckedUpdateManyWithoutStockInput = {
@@ -1530,12 +1685,14 @@ export type TradeOrderCountOutputType = {
   transactions: number
   buyExecutions: number
   sellExecutions: number
+  agentDecisionLogs: number
 }
 
 export type TradeOrderCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   transactions?: boolean | TradeOrderCountOutputTypeCountTransactionsArgs
   buyExecutions?: boolean | TradeOrderCountOutputTypeCountBuyExecutionsArgs
   sellExecutions?: boolean | TradeOrderCountOutputTypeCountSellExecutionsArgs
+  agentDecisionLogs?: boolean | TradeOrderCountOutputTypeCountAgentDecisionLogsArgs
 }
 
 /**
@@ -1569,6 +1726,13 @@ export type TradeOrderCountOutputTypeCountSellExecutionsArgs<ExtArgs extends run
   where?: Prisma.TradeExecutionWhereInput
 }
 
+/**
+ * TradeOrderCountOutputType without action
+ */
+export type TradeOrderCountOutputTypeCountAgentDecisionLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AgentDecisionLogWhereInput
+}
+
 
 export type TradeOrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   orderId?: boolean
@@ -1594,6 +1758,7 @@ export type TradeOrderSelect<ExtArgs extends runtime.Types.Extensions.InternalAr
   transactions?: boolean | Prisma.TradeOrder$transactionsArgs<ExtArgs>
   buyExecutions?: boolean | Prisma.TradeOrder$buyExecutionsArgs<ExtArgs>
   sellExecutions?: boolean | Prisma.TradeOrder$sellExecutionsArgs<ExtArgs>
+  agentDecisionLogs?: boolean | Prisma.TradeOrder$agentDecisionLogsArgs<ExtArgs>
   _count?: boolean | Prisma.TradeOrderCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["tradeOrder"]>
 
@@ -1671,6 +1836,7 @@ export type TradeOrderInclude<ExtArgs extends runtime.Types.Extensions.InternalA
   transactions?: boolean | Prisma.TradeOrder$transactionsArgs<ExtArgs>
   buyExecutions?: boolean | Prisma.TradeOrder$buyExecutionsArgs<ExtArgs>
   sellExecutions?: boolean | Prisma.TradeOrder$sellExecutionsArgs<ExtArgs>
+  agentDecisionLogs?: boolean | Prisma.TradeOrder$agentDecisionLogsArgs<ExtArgs>
   _count?: boolean | Prisma.TradeOrderCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type TradeOrderIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1690,6 +1856,7 @@ export type $TradeOrderPayload<ExtArgs extends runtime.Types.Extensions.Internal
     transactions: Prisma.$PortfolioTransactionPayload<ExtArgs>[]
     buyExecutions: Prisma.$TradeExecutionPayload<ExtArgs>[]
     sellExecutions: Prisma.$TradeExecutionPayload<ExtArgs>[]
+    agentDecisionLogs: Prisma.$AgentDecisionLogPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     orderId: bigint
@@ -2109,6 +2276,7 @@ export interface Prisma__TradeOrderClient<T, Null = never, ExtArgs extends runti
   transactions<T extends Prisma.TradeOrder$transactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TradeOrder$transactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PortfolioTransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   buyExecutions<T extends Prisma.TradeOrder$buyExecutionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TradeOrder$buyExecutionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TradeExecutionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   sellExecutions<T extends Prisma.TradeOrder$sellExecutionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TradeOrder$sellExecutionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TradeExecutionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  agentDecisionLogs<T extends Prisma.TradeOrder$agentDecisionLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TradeOrder$agentDecisionLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AgentDecisionLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2621,6 +2789,30 @@ export type TradeOrder$sellExecutionsArgs<ExtArgs extends runtime.Types.Extensio
   take?: number
   skip?: number
   distinct?: Prisma.TradeExecutionScalarFieldEnum | Prisma.TradeExecutionScalarFieldEnum[]
+}
+
+/**
+ * TradeOrder.agentDecisionLogs
+ */
+export type TradeOrder$agentDecisionLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AgentDecisionLog
+   */
+  select?: Prisma.AgentDecisionLogSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AgentDecisionLog
+   */
+  omit?: Prisma.AgentDecisionLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AgentDecisionLogInclude<ExtArgs> | null
+  where?: Prisma.AgentDecisionLogWhereInput
+  orderBy?: Prisma.AgentDecisionLogOrderByWithRelationInput | Prisma.AgentDecisionLogOrderByWithRelationInput[]
+  cursor?: Prisma.AgentDecisionLogWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AgentDecisionLogScalarFieldEnum | Prisma.AgentDecisionLogScalarFieldEnum[]
 }
 
 /**

@@ -86,11 +86,37 @@ enum TransactionType {
 enum AgentType {
   AGGRESSIVE // 공격형
   CONSERVATIVE // 보수형
+  GROWTH // 성장형
   MOMENTUM // 모멘텀형
   VALUE // 가치형
   FX_FOCUSED // 환율 집중형
 
   @@map("Agent_type")
+}
+
+enum DecisionSource {
+  ADK // Google ADK 판단
+  RULE_BASED // 규칙 기반 판단
+
+  @@map("Decision_source")
+}
+
+enum TradeSide {
+  BUY // 매수
+  SELL // 매도
+  HOLD // 보류
+
+  @@map("Trade_side")
+}
+
+enum DecisionStatus {
+  PENDING // 대기
+  EXECUTED // 실행 완료
+  REJECTED // 거절
+  FAILED // 실패
+  SKIPPED // 주문 없이 건너뜀
+
+  @@map("Decision_status")
 }
 
 enum TradeFrequency {
@@ -307,6 +333,7 @@ model Agent {
   updatedAt        DateTime           @updatedAt @map("updated_at")
   user             User               @relation(fields: [userId], references: [id])
   sectors          AgentStockSector[]
+  decisionLogs     AgentDecisionLog[]
 
   @@map("Agent")
 }
@@ -476,6 +503,7 @@ model Stock {
   financialMetric          StockFinancialMetric?
   financialStatements      StockFinancialStatement[]
   earnings                 StockEarning[]
+  agentDecisionLogs        AgentDecisionLog[]
 
   @@map("Stock")
 }
@@ -552,8 +580,35 @@ model TradeOrder {
   transactions      PortfolioTransaction[]
   buyExecutions     TradeExecution[]       @relation("BuyTradeExecutions")
   sellExecutions    TradeExecution[]       @relation("SellTradeExecutions")
+  agentDecisionLogs AgentDecisionLog[]
 
   @@map("Trade_order")
+}
+
+model AgentDecisionLog {
+  id              BigInt         @id @default(autoincrement())
+  agentUserId     BigInt         @map("agent_user_id")
+  stockId         Int            @map("stock_id")
+  agentType       AgentType      @map("agent_type")
+  decisionSource  DecisionSource @map("decision_source")
+  side            TradeSide
+  quantity        Int
+  reason          String         @db.Text
+  score           Decimal        @db.Decimal(10, 4)
+  rawResponse     Json           @map("raw_response")
+  status          DecisionStatus
+  rejectReason    String?        @map("reject_reason") @db.Text
+  executedOrderId BigInt?        @map("executed_order_id")
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+  agent           Agent          @relation(fields: [agentUserId], references: [userId])
+  stock           Stock          @relation(fields: [stockId], references: [id])
+  executedOrder   TradeOrder?    @relation(fields: [executedOrderId], references: [orderId])
+
+  @@index([agentUserId])
+  @@index([stockId])
+  @@index([executedOrderId])
+  @@map("Agent_decision_log")
 }
 
 model TradeExecution {

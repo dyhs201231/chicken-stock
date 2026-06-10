@@ -410,6 +410,7 @@ export const ModelName = {
   StockFinancialStatement: 'StockFinancialStatement',
   StockEarning: 'StockEarning',
   TradeOrder: 'TradeOrder',
+  AgentDecisionLog: 'AgentDecisionLog',
   TradeExecution: 'TradeExecution',
   StockCandle: 'StockCandle',
   OrderBookSnapshot: 'OrderBookSnapshot',
@@ -431,7 +432,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "refreshToken" | "article" | "quiz" | "userQuizSubmission" | "educationSummary" | "userEducationLevelProgress" | "userArticleCompletion" | "agent" | "agentStockSector" | "portfolio" | "portfolioTransaction" | "portfolioItem" | "dividendEvent" | "portfolioDividend" | "stock" | "stockFinancialMetric" | "stockFinancialStatement" | "stockEarning" | "tradeOrder" | "tradeExecution" | "stockCandle" | "orderBookSnapshot" | "orderBookLevel" | "marketIndex" | "marketIndexCandle"
+    modelProps: "user" | "refreshToken" | "article" | "quiz" | "userQuizSubmission" | "educationSummary" | "userEducationLevelProgress" | "userArticleCompletion" | "agent" | "agentStockSector" | "portfolio" | "portfolioTransaction" | "portfolioItem" | "dividendEvent" | "portfolioDividend" | "stock" | "stockFinancialMetric" | "stockFinancialStatement" | "stockEarning" | "tradeOrder" | "agentDecisionLog" | "tradeExecution" | "stockCandle" | "orderBookSnapshot" | "orderBookLevel" | "marketIndex" | "marketIndexCandle"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1915,6 +1916,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    AgentDecisionLog: {
+      payload: Prisma.$AgentDecisionLogPayload<ExtArgs>
+      fields: Prisma.AgentDecisionLogFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AgentDecisionLogFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentDecisionLogPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AgentDecisionLogFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentDecisionLogPayload>
+        }
+        findFirst: {
+          args: Prisma.AgentDecisionLogFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentDecisionLogPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AgentDecisionLogFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentDecisionLogPayload>
+        }
+        findMany: {
+          args: Prisma.AgentDecisionLogFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentDecisionLogPayload>[]
+        }
+        create: {
+          args: Prisma.AgentDecisionLogCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentDecisionLogPayload>
+        }
+        createMany: {
+          args: Prisma.AgentDecisionLogCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AgentDecisionLogCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentDecisionLogPayload>[]
+        }
+        delete: {
+          args: Prisma.AgentDecisionLogDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentDecisionLogPayload>
+        }
+        update: {
+          args: Prisma.AgentDecisionLogUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentDecisionLogPayload>
+        }
+        deleteMany: {
+          args: Prisma.AgentDecisionLogDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AgentDecisionLogUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AgentDecisionLogUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentDecisionLogPayload>[]
+        }
+        upsert: {
+          args: Prisma.AgentDecisionLogUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentDecisionLogPayload>
+        }
+        aggregate: {
+          args: Prisma.AgentDecisionLogAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAgentDecisionLog>
+        }
+        groupBy: {
+          args: Prisma.AgentDecisionLogGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AgentDecisionLogGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AgentDecisionLogCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AgentDecisionLogCountAggregateOutputType> | number
+        }
+      }
+    }
     TradeExecution: {
       payload: Prisma.$TradeExecutionPayload<ExtArgs>
       fields: Prisma.TradeExecutionFieldRefs
@@ -2747,6 +2822,27 @@ export const TradeOrderScalarFieldEnum = {
 export type TradeOrderScalarFieldEnum = (typeof TradeOrderScalarFieldEnum)[keyof typeof TradeOrderScalarFieldEnum]
 
 
+export const AgentDecisionLogScalarFieldEnum = {
+  id: 'id',
+  agentUserId: 'agentUserId',
+  stockId: 'stockId',
+  agentType: 'agentType',
+  decisionSource: 'decisionSource',
+  side: 'side',
+  quantity: 'quantity',
+  reason: 'reason',
+  score: 'score',
+  rawResponse: 'rawResponse',
+  status: 'status',
+  rejectReason: 'rejectReason',
+  executedOrderId: 'executedOrderId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AgentDecisionLogScalarFieldEnum = (typeof AgentDecisionLogScalarFieldEnum)[keyof typeof AgentDecisionLogScalarFieldEnum]
+
+
 export const TradeExecutionScalarFieldEnum = {
   id: 'id',
   stockId: 'stockId',
@@ -3231,6 +3327,48 @@ export type ListEnumTradeOrderStatusFieldRefInput<$PrismaModel> = FieldRefInputT
 
 
 /**
+ * Reference to a field of type 'DecisionSource'
+ */
+export type EnumDecisionSourceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DecisionSource'>
+    
+
+
+/**
+ * Reference to a field of type 'DecisionSource[]'
+ */
+export type ListEnumDecisionSourceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DecisionSource[]'>
+    
+
+
+/**
+ * Reference to a field of type 'TradeSide'
+ */
+export type EnumTradeSideFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TradeSide'>
+    
+
+
+/**
+ * Reference to a field of type 'TradeSide[]'
+ */
+export type ListEnumTradeSideFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TradeSide[]'>
+    
+
+
+/**
+ * Reference to a field of type 'DecisionStatus'
+ */
+export type EnumDecisionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DecisionStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'DecisionStatus[]'
+ */
+export type ListEnumDecisionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DecisionStatus[]'>
+    
+
+
+/**
  * Reference to a field of type 'OrderBookSide'
  */
 export type EnumOrderBookSideFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'OrderBookSide'>
@@ -3350,6 +3488,7 @@ export type GlobalOmitConfig = {
   stockFinancialStatement?: Prisma.StockFinancialStatementOmit
   stockEarning?: Prisma.StockEarningOmit
   tradeOrder?: Prisma.TradeOrderOmit
+  agentDecisionLog?: Prisma.AgentDecisionLogOmit
   tradeExecution?: Prisma.TradeExecutionOmit
   stockCandle?: Prisma.StockCandleOmit
   orderBookSnapshot?: Prisma.OrderBookSnapshotOmit
