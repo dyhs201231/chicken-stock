@@ -20,7 +20,7 @@ function getIntegerEnv(name: string, fallback: number) {
 }
 
 function isSchedulerEnabled() {
-  return process.env.AGENT_TRADE_SCHEDULER_ENABLED !== "false";
+  return process.env.AGENT_TRADE_SCHEDULER_ENABLED === "true";
 }
 
 async function runScheduledAgentTrade() {
