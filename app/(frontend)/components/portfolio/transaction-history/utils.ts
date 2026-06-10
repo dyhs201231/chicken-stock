@@ -7,9 +7,11 @@ import type { TransactionHistoryFilter } from "@/app/(frontend)/types/portfolio"
 
 const transactionLabels: Record<PortfolioTransactionType, string> = {
   BUY: "구매",
+  DEPOSIT: "입금",
   DIVIDEND: "배당",
   EXCHANGE: "환전",
   SELL: "판매",
+  WITHDRAWAL: "출금",
 };
 
 export function getFilteredTransactions(
@@ -38,6 +40,13 @@ export function getFilteredTransactions(
 export function getTransactionDetailRows(transaction: PortfolioTransaction) {
   if (transaction.transactionType === "EXCHANGE") {
     return getExchangeDetailRows(transaction);
+  }
+
+  if (
+    transaction.transactionType === "DEPOSIT" ||
+    transaction.transactionType === "WITHDRAWAL"
+  ) {
+    return getCashDetailRows(transaction);
   }
 
   const label = getTransactionLabel(transaction.transactionType);
@@ -79,7 +88,7 @@ export function getTransactionToneClassName(type: PortfolioTransactionType) {
     return "text-[#555555]";
   }
 
-  if (type === "BUY") {
+  if (type === "BUY" || type === "WITHDRAWAL") {
     return "text-[#ff0000]";
   }
 
@@ -96,6 +105,10 @@ export function getLogoText(
 ) {
   if (companyName.includes("환전")) {
     return "환전";
+  }
+
+  if (companyName.includes("충전") || companyName.includes("입금")) {
+    return "원화";
   }
 
   if (companyName.includes("삼성")) {
@@ -119,7 +132,11 @@ export function formatTransactionAmount(transaction: PortfolioTransaction) {
     )}`;
   }
 
-  const sign = transaction.transactionType === "BUY" ? "-" : "";
+  const sign =
+    transaction.transactionType === "BUY" ||
+    transaction.transactionType === "WITHDRAWAL"
+      ? "-"
+      : "";
 
   return `${sign}${formatWon(transaction.totalAmount)}`;
 }
@@ -141,7 +158,7 @@ function getSettlementDateLabel(type: PortfolioTransactionType) {
     return "처리일";
   }
 
-  if (type === "SELL") {
+  if (type === "SELL" || type === "DEPOSIT") {
     return "입금일";
   }
 
@@ -150,6 +167,29 @@ function getSettlementDateLabel(type: PortfolioTransactionType) {
   }
 
   return "출금일";
+}
+
+function getCashDetailRows(transaction: PortfolioTransaction) {
+  const label = getTransactionLabel(transaction.transactionType);
+
+  return [
+    {
+      label: "거래유형",
+      value: label,
+    },
+    {
+      label: `${label}일`,
+      value: formatDateKorean(transaction.executedAt),
+    },
+    {
+      label: `총 ${label}금액`,
+      value: formatWon(transaction.totalAmount),
+    },
+    {
+      label: "수수료",
+      value: formatWon(transaction.fee),
+    },
+  ];
 }
 
 function formatDateKorean(value: string) {

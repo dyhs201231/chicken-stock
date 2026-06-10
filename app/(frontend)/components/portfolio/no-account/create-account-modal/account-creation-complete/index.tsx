@@ -13,7 +13,7 @@ export default function AccountCreationComplete({
     <>
       <div className="col center flex-1 text-[36px] font-semibold">
         <p>축하합니다!</p>
-        <p>삼성전자 1주를 받았습니다!</p>
+        <p>원화 100,000원이 충전되었습니다!</p>
       </div>
 
       <div className="row justify-end">

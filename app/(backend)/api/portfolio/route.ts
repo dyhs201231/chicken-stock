@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import {
   ACCESS_TOKEN_COOKIE_NAME,
@@ -5,13 +6,16 @@ import {
 } from "@/app/(backend)/lib/auth";
 import { prisma } from "@/app/(backend)/lib/prisma";
 import { getTotalAvailableOrderAmountKrw } from "@/app/(backend)/lib/portfolio-balance";
+import { Prisma } from "@/app/(backend)/generated/prisma/client";
 import {
   InvestmentType,
+  TransactionType,
   type InvestmentType as InvestmentTypeValue,
 } from "@/app/(backend)/generated/prisma/enums";
 
 export const runtime = "nodejs";
 
+const INITIAL_PORTFOLIO_KRW_BALANCE = 100_000;
 const investmentTypeValues = new Set<string>(Object.values(InvestmentType));
 const AssetType = {
   DOMESTIC_STOCK: "DOMESTIC_STOCK",
@@ -69,6 +73,10 @@ async function getCreatePortfolioPayload(request: NextRequest) {
 
 function createAccountNumber(userId: bigint) {
   return `CSTK-${userId.toString().padStart(10, "0")}`;
+}
+
+function createPortfolioTransactionId() {
+  return randomUUID();
 }
 
 function serializeDecimal(value: { toString: () => string }) {
@@ -299,6 +307,9 @@ export async function POST(request: NextRequest) {
   }
 
   const portfolio = await prisma.$transaction(async (tx) => {
+    const initialKrwBalance = new Prisma.Decimal(INITIAL_PORTFOLIO_KRW_BALANCE);
+    const createdAt = new Date();
+
     await tx.user.update({
       data: {
         investmentType: payload.investmentType,
@@ -311,6 +322,22 @@ export async function POST(request: NextRequest) {
     return tx.portfolio.upsert({
       create: {
         accountNumber: createAccountNumber(userId),
+        krwBalance: initialKrwBalance,
+        totalAvailableOrderAmount: initialKrwBalance,
+        totalBalance: initialKrwBalance,
+        transactions: {
+          create: {
+            companyName: "원화 충전",
+            executedAt: createdAt,
+            fee: new Prisma.Decimal(0),
+            id: createPortfolioTransactionId(),
+            receivedAmount: initialKrwBalance,
+            totalAmount: initialKrwBalance,
+            totalQuantity: 0,
+            transactionType: TransactionType.DEPOSIT,
+            withdrawalAt: createdAt,
+          },
+        },
         userId,
       },
       select: {

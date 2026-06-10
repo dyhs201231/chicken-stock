@@ -23,7 +23,7 @@ const config: runtime.GetPrismaClientConfig = {
       "value": "prisma-client"
     },
     "output": {
-      "value": "/Users/doyeon/Downloads/chicken-stock/app/(backend)/generated/prisma",
+      "value": "/Users/hyunsu/Desktop/chicken-stock/app/(backend)/generated/prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -37,7 +37,7 @@ const config: runtime.GetPrismaClientConfig = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/Users/doyeon/Downloads/chicken-stock/app/(backend)/prisma/schema.prisma",
+    "sourceFilePath": "/Users/hyunsu/Desktop/chicken-stock/app/(backend)/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativePath": "../../prisma",
