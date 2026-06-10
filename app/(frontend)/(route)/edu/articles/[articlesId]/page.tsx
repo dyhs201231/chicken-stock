@@ -3,7 +3,11 @@ import Image from "next/image";
 import { IconChevronLeft } from "@tabler/icons-react";
 import { getEducationArticle } from "@/app/(frontend)/apis/edu/queries";
 import { getArticleQuizProgress } from "@/app/(frontend)/apis/edu/quizzes/queries";
-import { getRequestOrigin } from "../../../../lib/server/request";
+import { getCurrentUser } from "../../../../lib/auth-check";
+import {
+  getRequestCookieHeader,
+  getRequestOrigin,
+} from "../../../../lib/server/request";
 import { parseArticleContent } from "../../../../utils/edu/article-content";
 import { isPositiveIntegerString } from "../../../../utils/number";
 import ArticleProgressTracker from "../../../../components/edu/article-progress-tracker";
@@ -15,8 +19,6 @@ type ArticlePageProps = {
   }>;
   searchParams: Promise<{
     level?: string;
-    userId?: string;
-    user_id?: string;
   }>;
 };
 
@@ -84,16 +86,9 @@ export default async function ArticlePage({
   searchParams,
 }: ArticlePageProps) {
   const { articlesId } = await params;
-  const { level, userId, user_id } = await searchParams;
-  const currentUserId = userId ?? user_id;
-  let currentUserIdParam: string | null = null;
-
-  if (
-    typeof currentUserId === "string" &&
-    isPositiveIntegerString(currentUserId)
-  ) {
-    currentUserIdParam = currentUserId;
-  }
+  const { level } = await searchParams;
+  const currentUser = await getCurrentUser();
+  const currentUserIdParam = currentUser ? String(currentUser.id) : null;
 
   if (!isPositiveIntegerString(articlesId) || !isPositiveIntegerString(level)) {
     return (
@@ -129,25 +124,23 @@ export default async function ArticlePage({
     null;
 
   if (currentUserIdParam) {
+    const cookieHeader = await getRequestCookieHeader();
+
     quizProgress = await getArticleQuizProgress(
       articlesId,
       currentUserIdParam,
       requestOrigin,
+      cookieHeader,
     );
   }
 
   const isQuizCompleted = quizProgress?.isCorrect === true;
-  const quizLinkQuery: { level: string; userId?: string } = {
+  const quizLinkQuery = {
     level: articleLevel,
   };
-  const articleListLinkQuery: { openLevel: string; userId?: string } = {
+  const articleListLinkQuery = {
     openLevel: String(article.educationSummary.stage),
   };
-
-  if (currentUserIdParam) {
-    quizLinkQuery.userId = currentUserIdParam;
-    articleListLinkQuery.userId = currentUserIdParam;
-  }
 
   return (
     <main className="relative min-h-[calc(100dvh-74px)] bg-white px-5 pt-36 pb-20 text-zinc-950">

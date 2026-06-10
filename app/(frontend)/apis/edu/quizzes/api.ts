@@ -67,6 +67,7 @@ export async function fetchArticleQuizProgress(
   articleId: string,
   userId: string,
   origin: string,
+  cookieHeader?: string | null,
 ) {
   const url = new URL("/api/quizzes", origin);
   url.searchParams.set("articleId", articleId);
@@ -74,6 +75,13 @@ export async function fetchArticleQuizProgress(
 
   const { data } = await requests.get<ArticleQuizProgressResponse>(
     url.toString(),
+    cookieHeader
+      ? {
+          headers: {
+            Cookie: cookieHeader,
+          },
+        }
+      : undefined,
   );
 
   if (!data.ok) {

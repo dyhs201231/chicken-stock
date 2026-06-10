@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { IconChevronLeft } from "@tabler/icons-react";
 import { getEducationArticle } from "@/app/(frontend)/apis/edu/queries";
+import { getCurrentUser } from "../../../../lib/auth-check";
 import { getRequestOrigin } from "../../../../lib/server/request";
 import { isPositiveIntegerString } from "../../../../utils/number";
 import QuizContainer from "@/app/(frontend)/components/edu/quizzes/quiz-container";
@@ -11,8 +12,6 @@ type QuizPageProps = {
   }>;
   searchParams: Promise<{
     level?: string;
-    userId?: string;
-    user_id?: string;
   }>;
 };
 
@@ -64,8 +63,9 @@ export default async function QuizPage({
   searchParams,
 }: QuizPageProps) {
   const { quizId } = await params;
-  const { level, userId, user_id } = await searchParams;
-  const currentUserId = userId ?? user_id;
+  const { level } = await searchParams;
+  const currentUser = await getCurrentUser();
+  const currentUserId = currentUser ? String(currentUser.id) : undefined;
   const { articleHref, articleId, label } = await getQuizArticleContext(
     quizId,
     level,
