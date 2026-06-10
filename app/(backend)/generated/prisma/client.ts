@@ -145,8 +145,13 @@ export type StockEarning = Prisma.StockEarningModel
  */
 export type TradeOrder = Prisma.TradeOrderModel
 /**
+ * Model AgentDecisionLog
+ * 
+ */
+export type AgentDecisionLog = Prisma.AgentDecisionLogModel
+/**
  * Model TradeExecution
- *
+ * 
  */
 export type TradeExecution = Prisma.TradeExecutionModel
 /**

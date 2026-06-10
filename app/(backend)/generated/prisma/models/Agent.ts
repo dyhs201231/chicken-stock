@@ -262,6 +262,7 @@ export type AgentWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Agent"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   sectors?: Prisma.AgentStockSectorListRelationFilter
+  decisionLogs?: Prisma.AgentDecisionLogListRelationFilter
 }
 
 export type AgentOrderByWithRelationInput = {
@@ -276,6 +277,7 @@ export type AgentOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   sectors?: Prisma.AgentStockSectorOrderByRelationAggregateInput
+  decisionLogs?: Prisma.AgentDecisionLogOrderByRelationAggregateInput
 }
 
 export type AgentWhereUniqueInput = Prisma.AtLeast<{
@@ -293,6 +295,7 @@ export type AgentWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"Agent"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   sectors?: Prisma.AgentStockSectorListRelationFilter
+  decisionLogs?: Prisma.AgentDecisionLogListRelationFilter
 }, "userId">
 
 export type AgentOrderByWithAggregationInput = {
@@ -338,6 +341,7 @@ export type AgentCreateInput = {
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutAgentInput
   sectors?: Prisma.AgentStockSectorCreateNestedManyWithoutAgentInput
+  decisionLogs?: Prisma.AgentDecisionLogCreateNestedManyWithoutAgentInput
 }
 
 export type AgentUncheckedCreateInput = {
@@ -351,6 +355,7 @@ export type AgentUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   sectors?: Prisma.AgentStockSectorUncheckedCreateNestedManyWithoutAgentInput
+  decisionLogs?: Prisma.AgentDecisionLogUncheckedCreateNestedManyWithoutAgentInput
 }
 
 export type AgentUpdateInput = {
@@ -364,6 +369,7 @@ export type AgentUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutAgentNestedInput
   sectors?: Prisma.AgentStockSectorUpdateManyWithoutAgentNestedInput
+  decisionLogs?: Prisma.AgentDecisionLogUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentUncheckedUpdateInput = {
@@ -377,6 +383,7 @@ export type AgentUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sectors?: Prisma.AgentStockSectorUncheckedUpdateManyWithoutAgentNestedInput
+  decisionLogs?: Prisma.AgentDecisionLogUncheckedUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentCreateManyInput = {
@@ -536,6 +543,20 @@ export type AgentUpdateOneRequiredWithoutSectorsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.AgentUpdateToOneWithWhereWithoutSectorsInput, Prisma.AgentUpdateWithoutSectorsInput>, Prisma.AgentUncheckedUpdateWithoutSectorsInput>
 }
 
+export type AgentCreateNestedOneWithoutDecisionLogsInput = {
+  create?: Prisma.XOR<Prisma.AgentCreateWithoutDecisionLogsInput, Prisma.AgentUncheckedCreateWithoutDecisionLogsInput>
+  connectOrCreate?: Prisma.AgentCreateOrConnectWithoutDecisionLogsInput
+  connect?: Prisma.AgentWhereUniqueInput
+}
+
+export type AgentUpdateOneRequiredWithoutDecisionLogsNestedInput = {
+  create?: Prisma.XOR<Prisma.AgentCreateWithoutDecisionLogsInput, Prisma.AgentUncheckedCreateWithoutDecisionLogsInput>
+  connectOrCreate?: Prisma.AgentCreateOrConnectWithoutDecisionLogsInput
+  upsert?: Prisma.AgentUpsertWithoutDecisionLogsInput
+  connect?: Prisma.AgentWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AgentUpdateToOneWithWhereWithoutDecisionLogsInput, Prisma.AgentUpdateWithoutDecisionLogsInput>, Prisma.AgentUncheckedUpdateWithoutDecisionLogsInput>
+}
+
 export type AgentCreateWithoutUserInput = {
   agentType: $Enums.AgentType
   riskTolerance: runtime.Decimal | runtime.DecimalJsLike | number | string
@@ -546,6 +567,7 @@ export type AgentCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   sectors?: Prisma.AgentStockSectorCreateNestedManyWithoutAgentInput
+  decisionLogs?: Prisma.AgentDecisionLogCreateNestedManyWithoutAgentInput
 }
 
 export type AgentUncheckedCreateWithoutUserInput = {
@@ -558,6 +580,7 @@ export type AgentUncheckedCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   sectors?: Prisma.AgentStockSectorUncheckedCreateNestedManyWithoutAgentInput
+  decisionLogs?: Prisma.AgentDecisionLogUncheckedCreateNestedManyWithoutAgentInput
 }
 
 export type AgentCreateOrConnectWithoutUserInput = {
@@ -586,6 +609,7 @@ export type AgentUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sectors?: Prisma.AgentStockSectorUpdateManyWithoutAgentNestedInput
+  decisionLogs?: Prisma.AgentDecisionLogUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentUncheckedUpdateWithoutUserInput = {
@@ -598,6 +622,7 @@ export type AgentUncheckedUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sectors?: Prisma.AgentStockSectorUncheckedUpdateManyWithoutAgentNestedInput
+  decisionLogs?: Prisma.AgentDecisionLogUncheckedUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentCreateWithoutSectorsInput = {
@@ -610,6 +635,7 @@ export type AgentCreateWithoutSectorsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutAgentInput
+  decisionLogs?: Prisma.AgentDecisionLogCreateNestedManyWithoutAgentInput
 }
 
 export type AgentUncheckedCreateWithoutSectorsInput = {
@@ -622,6 +648,7 @@ export type AgentUncheckedCreateWithoutSectorsInput = {
   isActive: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  decisionLogs?: Prisma.AgentDecisionLogUncheckedCreateNestedManyWithoutAgentInput
 }
 
 export type AgentCreateOrConnectWithoutSectorsInput = {
@@ -650,6 +677,7 @@ export type AgentUpdateWithoutSectorsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutAgentNestedInput
+  decisionLogs?: Prisma.AgentDecisionLogUpdateManyWithoutAgentNestedInput
 }
 
 export type AgentUncheckedUpdateWithoutSectorsInput = {
@@ -662,6 +690,75 @@ export type AgentUncheckedUpdateWithoutSectorsInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  decisionLogs?: Prisma.AgentDecisionLogUncheckedUpdateManyWithoutAgentNestedInput
+}
+
+export type AgentCreateWithoutDecisionLogsInput = {
+  agentType: $Enums.AgentType
+  riskTolerance: runtime.Decimal | runtime.DecimalJsLike | number | string
+  maxPositionRatio: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cashReserveRatio: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tradeFrequency: $Enums.TradeFrequency
+  isActive: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutAgentInput
+  sectors?: Prisma.AgentStockSectorCreateNestedManyWithoutAgentInput
+}
+
+export type AgentUncheckedCreateWithoutDecisionLogsInput = {
+  userId: bigint | number
+  agentType: $Enums.AgentType
+  riskTolerance: runtime.Decimal | runtime.DecimalJsLike | number | string
+  maxPositionRatio: runtime.Decimal | runtime.DecimalJsLike | number | string
+  cashReserveRatio: runtime.Decimal | runtime.DecimalJsLike | number | string
+  tradeFrequency: $Enums.TradeFrequency
+  isActive: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sectors?: Prisma.AgentStockSectorUncheckedCreateNestedManyWithoutAgentInput
+}
+
+export type AgentCreateOrConnectWithoutDecisionLogsInput = {
+  where: Prisma.AgentWhereUniqueInput
+  create: Prisma.XOR<Prisma.AgentCreateWithoutDecisionLogsInput, Prisma.AgentUncheckedCreateWithoutDecisionLogsInput>
+}
+
+export type AgentUpsertWithoutDecisionLogsInput = {
+  update: Prisma.XOR<Prisma.AgentUpdateWithoutDecisionLogsInput, Prisma.AgentUncheckedUpdateWithoutDecisionLogsInput>
+  create: Prisma.XOR<Prisma.AgentCreateWithoutDecisionLogsInput, Prisma.AgentUncheckedCreateWithoutDecisionLogsInput>
+  where?: Prisma.AgentWhereInput
+}
+
+export type AgentUpdateToOneWithWhereWithoutDecisionLogsInput = {
+  where?: Prisma.AgentWhereInput
+  data: Prisma.XOR<Prisma.AgentUpdateWithoutDecisionLogsInput, Prisma.AgentUncheckedUpdateWithoutDecisionLogsInput>
+}
+
+export type AgentUpdateWithoutDecisionLogsInput = {
+  agentType?: Prisma.EnumAgentTypeFieldUpdateOperationsInput | $Enums.AgentType
+  riskTolerance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  maxPositionRatio?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cashReserveRatio?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tradeFrequency?: Prisma.EnumTradeFrequencyFieldUpdateOperationsInput | $Enums.TradeFrequency
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutAgentNestedInput
+  sectors?: Prisma.AgentStockSectorUpdateManyWithoutAgentNestedInput
+}
+
+export type AgentUncheckedUpdateWithoutDecisionLogsInput = {
+  userId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  agentType?: Prisma.EnumAgentTypeFieldUpdateOperationsInput | $Enums.AgentType
+  riskTolerance?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  maxPositionRatio?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  cashReserveRatio?: Prisma.DecimalFieldUpdateOperationsInput | runtime.Decimal | runtime.DecimalJsLike | number | string
+  tradeFrequency?: Prisma.EnumTradeFrequencyFieldUpdateOperationsInput | $Enums.TradeFrequency
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sectors?: Prisma.AgentStockSectorUncheckedUpdateManyWithoutAgentNestedInput
 }
 
 
@@ -671,10 +768,12 @@ export type AgentUncheckedUpdateWithoutSectorsInput = {
 
 export type AgentCountOutputType = {
   sectors: number
+  decisionLogs: number
 }
 
 export type AgentCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sectors?: boolean | AgentCountOutputTypeCountSectorsArgs
+  decisionLogs?: boolean | AgentCountOutputTypeCountDecisionLogsArgs
 }
 
 /**
@@ -694,6 +793,13 @@ export type AgentCountOutputTypeCountSectorsArgs<ExtArgs extends runtime.Types.E
   where?: Prisma.AgentStockSectorWhereInput
 }
 
+/**
+ * AgentCountOutputType without action
+ */
+export type AgentCountOutputTypeCountDecisionLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AgentDecisionLogWhereInput
+}
+
 
 export type AgentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   userId?: boolean
@@ -707,6 +813,7 @@ export type AgentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   sectors?: boolean | Prisma.Agent$sectorsArgs<ExtArgs>
+  decisionLogs?: boolean | Prisma.Agent$decisionLogsArgs<ExtArgs>
   _count?: boolean | Prisma.AgentCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["agent"]>
 
@@ -752,6 +859,7 @@ export type AgentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = ru
 export type AgentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   sectors?: boolean | Prisma.Agent$sectorsArgs<ExtArgs>
+  decisionLogs?: boolean | Prisma.Agent$decisionLogsArgs<ExtArgs>
   _count?: boolean | Prisma.AgentCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type AgentIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -766,6 +874,7 @@ export type $AgentPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
     sectors: Prisma.$AgentStockSectorPayload<ExtArgs>[]
+    decisionLogs: Prisma.$AgentDecisionLogPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     userId: bigint
@@ -1173,6 +1282,7 @@ export interface Prisma__AgentClient<T, Null = never, ExtArgs extends runtime.Ty
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   sectors<T extends Prisma.Agent$sectorsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Agent$sectorsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AgentStockSectorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  decisionLogs<T extends Prisma.Agent$decisionLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Agent$decisionLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AgentDecisionLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1628,6 +1738,30 @@ export type Agent$sectorsArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   take?: number
   skip?: number
   distinct?: Prisma.AgentStockSectorScalarFieldEnum | Prisma.AgentStockSectorScalarFieldEnum[]
+}
+
+/**
+ * Agent.decisionLogs
+ */
+export type Agent$decisionLogsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AgentDecisionLog
+   */
+  select?: Prisma.AgentDecisionLogSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AgentDecisionLog
+   */
+  omit?: Prisma.AgentDecisionLogOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AgentDecisionLogInclude<ExtArgs> | null
+  where?: Prisma.AgentDecisionLogWhereInput
+  orderBy?: Prisma.AgentDecisionLogOrderByWithRelationInput | Prisma.AgentDecisionLogOrderByWithRelationInput[]
+  cursor?: Prisma.AgentDecisionLogWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AgentDecisionLogScalarFieldEnum | Prisma.AgentDecisionLogScalarFieldEnum[]
 }
 
 /**

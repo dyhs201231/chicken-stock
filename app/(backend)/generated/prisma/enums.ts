@@ -103,12 +103,41 @@ export type TransactionType = (typeof TransactionType)[keyof typeof TransactionT
 export const AgentType = {
   AGGRESSIVE: 'AGGRESSIVE',
   CONSERVATIVE: 'CONSERVATIVE',
+  GROWTH: 'GROWTH',
   MOMENTUM: 'MOMENTUM',
   VALUE: 'VALUE',
   FX_FOCUSED: 'FX_FOCUSED'
 } as const
 
 export type AgentType = (typeof AgentType)[keyof typeof AgentType]
+
+
+export const DecisionSource = {
+  ADK: 'ADK',
+  RULE_BASED: 'RULE_BASED'
+} as const
+
+export type DecisionSource = (typeof DecisionSource)[keyof typeof DecisionSource]
+
+
+export const TradeSide = {
+  BUY: 'BUY',
+  SELL: 'SELL',
+  HOLD: 'HOLD'
+} as const
+
+export type TradeSide = (typeof TradeSide)[keyof typeof TradeSide]
+
+
+export const DecisionStatus = {
+  PENDING: 'PENDING',
+  EXECUTED: 'EXECUTED',
+  REJECTED: 'REJECTED',
+  FAILED: 'FAILED',
+  SKIPPED: 'SKIPPED'
+} as const
+
+export type DecisionStatus = (typeof DecisionStatus)[keyof typeof DecisionStatus]
 
 
 export const TradeFrequency = {
