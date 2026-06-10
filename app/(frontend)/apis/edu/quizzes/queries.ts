@@ -13,9 +13,15 @@ export async function getArticleQuizProgress(
   articleId: string,
   userId: string,
   origin: string,
+  cookieHeader?: string | null,
 ) {
   try {
-    return await fetchArticleQuizProgress(articleId, userId, origin);
+    return await fetchArticleQuizProgress(
+      articleId,
+      userId,
+      origin,
+      cookieHeader,
+    );
   } catch {
     return null;
   }

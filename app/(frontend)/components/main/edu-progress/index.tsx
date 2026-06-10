@@ -89,17 +89,17 @@ export default function EduProgress() {
         </div>
 
         {bubbleText && (
-          <div className="absolute top-[13%] left-[60%] h-28 w-36 md:h-32 md:w-44">
+          <div className="absolute top-[11%] left-[58%] h-20 w-20 md:h-28 md:w-32">
             <Image
-              src="/images/main/speech_bubble.png"
+              src="/images/main/rounded-speech-bubble.png"
               alt=""
               fill
-              sizes="176px"
+              sizes="192px"
               className="object-contain"
               unoptimized
             />
 
-            <p className="absolute top-[45%] left-1/2 w-[76%] -translate-x-1/2 -translate-y-1/2 text-center text-xs leading-snug font-semibold text-zinc-950 md:text-sm">
+            <p className="absolute top-[43%] left-[50%] w-[66%] -translate-x-1/2 -translate-y-1/2 text-center text-xs leading-snug font-semibold text-zinc-950 md:text-sm">
               {bubbleText}
             </p>
           </div>

@@ -1,4 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
+import {
+  ACCESS_TOKEN_COOKIE_NAME,
+  REFRESH_TOKEN_COOKIE_NAME,
+  hashAuthToken,
+  verifyAuthToken,
+} from "../../lib/auth";
 import { prisma } from "../../lib/prisma";
 
 type ArticleCompletionRequestBody = {
@@ -68,6 +74,84 @@ function parseProgressRate(value: unknown) {
   return Math.min(100, Math.max(0, Math.floor(parsedValue)));
 }
 
+async function getAuthenticatedUserId(request: NextRequest) {
+  const accessToken = request.cookies.get(ACCESS_TOKEN_COOKIE_NAME)?.value;
+  const refreshToken = request.cookies.get(REFRESH_TOKEN_COOKIE_NAME)?.value;
+
+  if (accessToken) {
+    try {
+      const payload = verifyAuthToken(accessToken, "access");
+
+      return BigInt(payload.sub);
+    } catch {
+      // Refresh token fallback handles expired access tokens.
+    }
+  }
+
+  if (!refreshToken) {
+    return null;
+  }
+
+  try {
+    const payload = verifyAuthToken(refreshToken, "refresh");
+    const userId = BigInt(payload.sub);
+    const storedRefreshToken = await prisma.refreshToken.findUnique({
+      select: {
+        expiresAt: true,
+        revokedAt: true,
+        userId: true,
+      },
+      where: {
+        tokenHash: hashAuthToken(refreshToken),
+      },
+    });
+
+    if (
+      !storedRefreshToken ||
+      storedRefreshToken.userId !== userId ||
+      storedRefreshToken.revokedAt ||
+      storedRefreshToken.expiresAt <= new Date()
+    ) {
+      return null;
+    }
+
+    return userId;
+  } catch {
+    return null;
+  }
+}
+
+function createUnauthorizedResponse() {
+  return NextResponse.json(
+    { ok: false, error: "AUTHENTICATION_REQUIRED" },
+    { status: 401 },
+  );
+}
+
+function createForbiddenResponse() {
+  return NextResponse.json(
+    { ok: false, error: "USER_ID_MISMATCH" },
+    { status: 403 },
+  );
+}
+
+async function validateRequestedUser(
+  request: NextRequest,
+  requestedUserId: bigint,
+) {
+  const authenticatedUserId = await getAuthenticatedUserId(request);
+
+  if (!authenticatedUserId) {
+    return createUnauthorizedResponse();
+  }
+
+  if (authenticatedUserId !== requestedUserId) {
+    return createForbiddenResponse();
+  }
+
+  return null;
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = request.nextUrl;
@@ -80,6 +164,17 @@ export async function GET(request: NextRequest) {
       searchParams.get("education_summary_id") ??
         searchParams.get("educationSummaryId"),
     );
+
+    if (userId) {
+      const userValidationResponse = await validateRequestedUser(
+        request,
+        userId,
+      );
+
+      if (userValidationResponse) {
+        return userValidationResponse;
+      }
+    }
 
     if (
       searchParams.has("id") ||
@@ -216,6 +311,12 @@ export async function POST(request: NextRequest) {
         { ok: false, error: "INVALID_ARTICLE_COMPLETION_QUERY" },
         { status: 400 },
       );
+    }
+
+    const userValidationResponse = await validateRequestedUser(request, userId);
+
+    if (userValidationResponse) {
+      return userValidationResponse;
     }
 
     const existingCompletion = await prisma.userArticleCompletion.findUnique({

@@ -15,7 +15,6 @@ export type EducationListItem = {
   description?: string;
   progressRate?: number;
   isCompleted?: boolean;
-  userId?: string;
 };
 
 export type EducationCardData = {
@@ -177,9 +176,6 @@ export default function EducationCard({
                                   pathname: `/edu/articles/${item.id}`,
                                   query: {
                                     level: item.level ?? level,
-                                    ...(item.userId
-                                      ? { userId: item.userId }
-                                      : {}),
                                   },
                                 }}
                                 className="block min-w-0 flex-1 truncate text-xl transition-colors hover:text-[#72327d] focus-visible:ring-2 focus-visible:ring-[#72327d] focus-visible:ring-offset-2 focus-visible:outline-none"

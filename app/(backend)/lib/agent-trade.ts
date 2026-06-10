@@ -1,14 +1,11 @@
 import { spawn } from "node:child_process";
-import path from "node:path";
 import { Prisma } from "@/app/(backend)/generated/prisma/client";
 import {
   AgentType as PrismaAgentType,
-  DecisionSource as PrismaDecisionSource,
   DecisionStatus,
   StockMarketStatus,
   TradeFrequency,
   TradeOrderType,
-  TradeSide as PrismaTradeSide,
   UserType,
 } from "@/app/(backend)/generated/prisma/enums";
 import type {
@@ -77,6 +74,7 @@ const ADK_CANDIDATE_LIMIT = clamp(
   5,
   15,
 );
+const ADK_WORKER_PATH = "adk-worker/main.py";
 
 function getIntegerEnv(name: string, fallback: number) {
   const value = Number(process.env[name]);
@@ -859,11 +857,6 @@ async function runAdkForCandidates(candidates: Map<AgentType, RuleBasedDecision[
       })),
     })),
   };
-  const workerPath = path.join(
-    /* turbopackIgnore: true */ process.cwd(),
-    "adk-worker",
-    "main.py",
-  );
   const python = process.env.PYTHON_BIN ?? "python3";
 
   return new Promise<{
@@ -883,8 +876,10 @@ async function runAdkForCandidates(candidates: Map<AgentType, RuleBasedDecision[
       clearTimeout(timeout);
       resolve(result);
     };
-    const child = spawn(python, [workerPath, "--stdin"], {
-      cwd: process.cwd(),
+    const child = spawn(python, [
+      /* turbopackIgnore: true */ ADK_WORKER_PATH,
+      "--stdin",
+    ], {
       env: {
         ...process.env,
         ADK_WORKER_CONCURRENCY: String(ADK_WORKER_CONCURRENCY),

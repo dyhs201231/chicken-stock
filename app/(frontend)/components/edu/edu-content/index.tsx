@@ -27,11 +27,8 @@ const educationCardStyles = [
 export default function EduContent() {
   const searchParams = useSearchParams();
   const openLevel = searchParams.get("openLevel");
-  const searchParamUserId =
-    searchParams.get("userId") ?? searchParams.get("user_id");
   const { data: myInfo, isLoading: isMyInfoLoading } = useGetMyInfo();
-  const userId =
-    searchParamUserId ?? (myInfo?.isLoggedIn ? myInfo.user.id : null);
+  const userId = myInfo?.isLoggedIn ? myInfo.user.id : null;
 
   const {
     data: educationSummaries = [],
@@ -55,11 +52,10 @@ export default function EduContent() {
             title: article.title,
             progressRate: article.progressRate,
             isCompleted: article.isCompleted,
-            userId: userId ?? undefined,
           })),
         },
       })),
-    [educationSummaries, userId],
+    [educationSummaries],
   );
 
   const isLoading = isMyInfoLoading || isEducationLoading;

@@ -11,3 +11,9 @@ export async function getRequestOrigin() {
 
   return `${protocol}://${host}`;
 }
+
+export async function getRequestCookieHeader() {
+  const requestHeaders = await headers();
+
+  return requestHeaders.get("cookie");
+}
