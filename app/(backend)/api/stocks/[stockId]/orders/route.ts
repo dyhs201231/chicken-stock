@@ -1,11 +1,9 @@
-import { randomInt } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import {
   ACCESS_TOKEN_COOKIE_NAME,
   verifyAuthToken,
 } from "@/app/(backend)/lib/auth";
 import {
-  publishOrderFilledEventsForOrder,
   scheduleStockUpdated,
 } from "@/app/(backend)/lib/realtime-events";
 import {
@@ -15,12 +13,10 @@ import {
   type StockSyncReason,
 } from "@/app/(backend)/lib/stock-order-sync";
 import {
-  getEstimatedMarketOrderAmount,
   lockPortfolioRows,
   lockStockForOrderProcessing,
-  StockOrderConcurrencyError,
-  matchStockOrder,
   StockOrderMatchingError,
+  StockOrderConcurrencyError,
 } from "@/app/(backend)/lib/stock-order-matching";
 import {
   createStockOrderForUser,
@@ -30,7 +26,6 @@ import {
 import { prisma } from "@/app/(backend)/lib/prisma";
 import { Prisma } from "@/app/(backend)/generated/prisma/client";
 import {
-  CurrencyCode,
   TradeOrderStatus,
   TradeOrderType,
 } from "@/app/(backend)/generated/prisma/enums";
@@ -218,53 +213,6 @@ async function getCreateOrderPayload(request: NextRequest) {
   };
 }
 
-function serializeDate(value: Date) {
-  return value.toISOString();
-}
-
-function serializeDecimalNumber(value: { toString: () => string }) {
-  return Number(value.toString());
-}
-
-function getCashBalance(
-  portfolio: {
-    krwBalance: Prisma.Decimal;
-    usdBalance: Prisma.Decimal;
-  },
-  currencyCode: CurrencyCode,
-) {
-  return currencyCode === CurrencyCode.KRW
-    ? portfolio.krwBalance
-    : portfolio.usdBalance;
-}
-
-function getOrderAmount(order: {
-  pricePerShare: Prisma.Decimal;
-  remainingQuantity: number;
-}) {
-  return order.pricePerShare.mul(order.remainingQuantity).toDecimalPlaces(2);
-}
-
-function sumPendingBuyAmount(
-  orders: Array<{
-    pricePerShare: Prisma.Decimal;
-    remainingQuantity: number;
-  }>,
-) {
-  return orders.reduce(
-    (sum, order) => sum.add(getOrderAmount(order)),
-    new Prisma.Decimal(0),
-  );
-}
-
-function getNonNegativeDecimal(value: Prisma.Decimal) {
-  return value.lt(0) ? new Prisma.Decimal(0) : value.toDecimalPlaces(2);
-}
-
-function createOrderId() {
-  return BigInt(Date.now()) * BigInt(100000) + BigInt(randomInt(100000));
-}
-
 async function getLockedPortfolioForUser(
   tx: TransactionClient,
   userId: bigint,
@@ -298,40 +246,6 @@ async function getLockedPortfolioForUser(
       id: portfolioRef.id,
     },
   });
-}
-
-function serializeTradeOrder(order: {
-  orderId: bigint;
-  type: TradeOrderType;
-  quantity: number;
-  pricePerShare: Prisma.Decimal;
-  status: TradeOrderStatus;
-  orderedAt: Date;
-  filledQuantity: number;
-  remainingQuantity: number;
-  executedPrice: Prisma.Decimal | null;
-  executedAt: Date | null;
-  canceledAt: Date | null;
-  currencyCode: CurrencyCode;
-  ticker: string;
-}) {
-  return {
-    canceledAt: order.canceledAt ? serializeDate(order.canceledAt) : null,
-    currencyCode: order.currencyCode,
-    executedAt: order.executedAt ? serializeDate(order.executedAt) : null,
-    executedPrice: order.executedPrice
-      ? serializeDecimalNumber(order.executedPrice)
-      : null,
-    filledQuantity: order.filledQuantity,
-    orderId: order.orderId.toString(),
-    orderedAt: serializeDate(order.orderedAt),
-    pricePerShare: serializeDecimalNumber(order.pricePerShare),
-    quantity: order.quantity,
-    remainingQuantity: order.remainingQuantity,
-    status: order.status,
-    ticker: order.ticker,
-    type: order.type,
-  };
 }
 
 async function getSafeStockMutationSync({
