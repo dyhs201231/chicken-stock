@@ -2,6 +2,7 @@
 
 import { useDeleteAccount } from "@/app/(frontend)/apis/auth/mutations";
 import { Modal } from "@/app/(frontend)/components/ui";
+import { IconChevronRight } from "@tabler/icons-react";
 import { useState } from "react";
 
 export default function DeleteAccount() {
@@ -26,10 +27,12 @@ export default function DeleteAccount() {
         showCloseButton={false}
       >
         <h1
-          className="mb-9 w-full cursor-pointer border-b border-[#BABABA] pb-4 text-[40px]"
+          className="row mb-9 w-full cursor-pointer items-center justify-between border-b border-[#BABABA] pb-4 text-[40px]"
           onClick={() => setIsOpen(true)}
         >
-          회원 탈퇴
+          <p>회원 탈퇴</p>
+
+          <IconChevronRight stroke={2} size={50} />
         </h1>
 
         <Modal.Overlay>

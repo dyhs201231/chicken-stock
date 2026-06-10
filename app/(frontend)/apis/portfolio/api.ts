@@ -1,7 +1,13 @@
 import { requests } from "../request";
 import type { ExchangeType, InvestmentType } from "../../types/portfolio";
 
-export type PortfolioTransactionType = "BUY" | "SELL" | "DIVIDEND" | "EXCHANGE";
+export type PortfolioTransactionType =
+  | "BUY"
+  | "SELL"
+  | "DIVIDEND"
+  | "EXCHANGE"
+  | "DEPOSIT"
+  | "WITHDRAWAL";
 export type PortfolioAssetType = "DOMESTIC_STOCK" | "FOREIGN_STOCK";
 
 export type CreatePortfolioRequest = {
