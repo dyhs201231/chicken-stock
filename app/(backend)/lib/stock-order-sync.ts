@@ -226,11 +226,7 @@ export async function getStockOrderContext(userId: bigint, stockId: number) {
 export async function getStockCandlesSnapshot(stockId: number) {
   const stock = await prisma.stock.findUnique({
     select: {
-      candles: {
-        orderBy: {
-          timestamp: "asc",
-        },
-      },
+      ticker: true,
     },
     where: {
       id: stockId,
@@ -241,7 +237,17 @@ export async function getStockCandlesSnapshot(stockId: number) {
     return null;
   }
 
-  const dailyCandles = toDailyCandles(stock.candles);
+  const candles = await prisma.stockCandle.findMany({
+    orderBy: {
+      timestamp: "desc",
+    },
+    take: 1300,
+    where: {
+      intervalCode: "1D",
+      ticker: stock.ticker,
+    },
+  });
+  const dailyCandles = toDailyCandles(candles.reverse());
   const intervals: CandleInterval[] = ["DAY", "WEEK", "MONTH"];
 
   return Object.fromEntries(

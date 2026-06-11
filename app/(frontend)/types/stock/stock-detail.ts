@@ -140,3 +140,12 @@ export type StockDetailData = {
   financialStatements: StockFinancialStatementData[];
   earnings: StockEarningData[];
 };
+
+export type StockAnalyticsData = Pick<
+  StockDetailData,
+  | "earnings"
+  | "financialMetric"
+  | "financialStatements"
+  | "themeFinancialMetric"
+  | "valuationMetric"
+>;

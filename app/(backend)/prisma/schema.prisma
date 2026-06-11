@@ -506,6 +506,7 @@ model Stock {
   earnings                 StockEarning[]
   agentDecisionLogs        AgentDecisionLog[]
 
+  @@index([theme])
   @@map("Stock")
 }
 
@@ -583,6 +584,9 @@ model TradeOrder {
   sellExecutions    TradeExecution[]       @relation("SellTradeExecutions")
   agentDecisionLogs AgentDecisionLog[]
 
+  @@index([portfolioId, stockId, status, orderedAt])
+  @@index([stockId, status, remainingQuantity])
+  @@index([stockId, status, type, pricePerShare])
   @@map("Trade_order")
 }
 

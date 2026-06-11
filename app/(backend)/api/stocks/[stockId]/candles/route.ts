@@ -36,11 +36,7 @@ export async function GET(
         id: parsedStockId,
       },
       select: {
-        candles: {
-          orderBy: {
-            timestamp: "asc",
-          },
-        },
+        ticker: true,
       },
     });
 
@@ -51,7 +47,17 @@ export async function GET(
       );
     }
 
-    const dailyCandles = toDailyCandles(stock.candles);
+    const candles = await prisma.stockCandle.findMany({
+      orderBy: {
+        timestamp: "desc",
+      },
+      take: interval === "DAY" ? 260 : 1300,
+      where: {
+        intervalCode: "1D",
+        ticker: stock.ticker,
+      },
+    });
+    const dailyCandles = toDailyCandles(candles.reverse());
 
     return NextResponse.json({
       ok: true,

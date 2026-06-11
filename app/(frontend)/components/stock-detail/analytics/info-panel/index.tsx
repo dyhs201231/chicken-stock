@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
+import { useStockAnalyticsQuery } from "../../../../apis/stocks/queries";
 import { Tab } from "../../../ui";
 import EarningsSection from "./earnings-section";
 import FinancialSection from "./financial-section";
@@ -12,6 +13,9 @@ import type { StockOnlyProps } from "../../../../types/stock/stock-detail";
 const sections: InfoSection[] = ["financial", "earnings", "valuation"];
 
 export default function InfoPanel({ stock }: StockOnlyProps) {
+  const { data: analyticsData, error, isPending } = useStockAnalyticsQuery(
+    stock.id,
+  );
   const [activeSection, setActiveSection] = useState<InfoSection>("financial");
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const sectionRefs = useRef<Record<InfoSection, HTMLElement | null>>({
@@ -72,6 +76,59 @@ export default function InfoPanel({ stock }: StockOnlyProps) {
       current === nextSection ? current : nextSection,
     );
   }, []);
+  const displayStock = analyticsData ? { ...stock, ...analyticsData } : stock;
+  const hasAnalyticsData =
+    displayStock.financialStatements.length > 0 ||
+    displayStock.earnings.length > 0 ||
+    displayStock.financialMetric !== null;
+
+  const panelContent = (() => {
+    if (!hasAnalyticsData && isPending) {
+      return (
+        <div className="grid h-full place-items-center text-sm text-zinc-500">
+          주요 정보를 불러오는 중입니다.
+        </div>
+      );
+    }
+
+    if (!hasAnalyticsData && error) {
+      return (
+        <div className="grid h-full place-items-center text-sm text-zinc-500">
+          주요 정보를 불러오지 못했습니다.
+        </div>
+      );
+    }
+
+    return (
+      <>
+        <section
+          ref={(element) => {
+            sectionRefs.current.financial = element;
+          }}
+          className="pb-20"
+        >
+          <FinancialSection stock={displayStock} />
+        </section>
+
+        <section
+          ref={(element) => {
+            sectionRefs.current.earnings = element;
+          }}
+          className="pb-20"
+        >
+          <EarningsSection stock={displayStock} />
+        </section>
+
+        <section
+          ref={(element) => {
+            sectionRefs.current.valuation = element;
+          }}
+        >
+          <ValuationSection stock={displayStock} />
+        </section>
+      </>
+    );
+  })();
 
   return (
     <section className="grid h-130 grid-cols-[10rem_minmax(0,1fr)] rounded-3xl bg-white px-7 py-6 shadow-[0_10px_18px_rgba(0,0,0,0.22)]">
@@ -107,31 +164,7 @@ export default function InfoPanel({ stock }: StockOnlyProps) {
         tabIndex={0}
         onScroll={handleScroll}
       >
-        <section
-          ref={(element) => {
-            sectionRefs.current.financial = element;
-          }}
-          className="pb-20"
-        >
-          <FinancialSection stock={stock} />
-        </section>
-
-        <section
-          ref={(element) => {
-            sectionRefs.current.earnings = element;
-          }}
-          className="pb-20"
-        >
-          <EarningsSection stock={stock} />
-        </section>
-
-        <section
-          ref={(element) => {
-            sectionRefs.current.valuation = element;
-          }}
-        >
-          <ValuationSection stock={stock} />
-        </section>
+        {panelContent}
       </div>
     </section>
   );

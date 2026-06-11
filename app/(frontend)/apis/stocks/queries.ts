@@ -1,5 +1,6 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import {
+  fetchStockAnalytics,
   fetchStockCandles,
   fetchStockOrderBook,
   fetchStockOrders,
@@ -12,6 +13,7 @@ export const stockQueryKeys = {
   lists: () => ["stocks"] as const,
   list: (market: string, ranking: string) =>
     [...stockQueryKeys.lists(), market, ranking] as const,
+  analytics: (stockId: number) => ["stock-analytics", stockId] as const,
   candles: (stockId: number, interval: StockCandleInterval) =>
     ["stock-candles", stockId, interval] as const,
   orderBook: (stockId: number) => ["stock-order-book", stockId] as const,
@@ -40,6 +42,15 @@ export function useStockCandlesQuery(
     queryFn: () => fetchStockCandles(stockId, interval),
     enabled: Number.isInteger(stockId) && stockId > 0,
     refetchInterval: STOCK_CANDLES_REFETCH_INTERVAL_MS,
+  });
+}
+
+export function useStockAnalyticsQuery(stockId: number) {
+  return useQuery({
+    queryKey: stockQueryKeys.analytics(stockId),
+    queryFn: () => fetchStockAnalytics(stockId),
+    enabled: Number.isInteger(stockId) && stockId > 0,
+    staleTime: 60_000,
   });
 }
 

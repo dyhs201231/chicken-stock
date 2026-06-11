@@ -6,6 +6,7 @@ import {
   serializeOrderBookSnapshot,
 } from "../../../../(backend)/lib/stock-order-book";
 import type {
+  StockAnalyticsData,
   StockDetailData,
   StockFinancialStatementData,
 } from "../../../types/stock/stock-detail";
@@ -31,6 +32,25 @@ type ValuationSourceStock = {
 type DecimalLike = {
   toNumber: () => number;
 };
+
+const STOCK_DETAIL_PERF_LOG_ENABLED =
+  process.env.STOCK_DETAIL_PERF_LOG === "1";
+
+function logStockDetailTiming(
+  label: string,
+  startedAt: number,
+  metadata: Record<string, string | number>,
+) {
+  if (!STOCK_DETAIL_PERF_LOG_ENABLED) {
+    return;
+  }
+
+  console.info("[stock-detail:perf]", {
+    ...metadata,
+    label,
+    durationMs: Math.round(performance.now() - startedAt),
+  });
+}
 
 function toNumber(value: DecimalLike) {
   return value.toNumber();
@@ -164,10 +184,29 @@ function getLatestCandleBaseDate(candles: { timestamp: bigint }[]) {
   return date.toISOString();
 }
 
-export async function getStockDetailData(
-  stockId: number,
-): Promise<StockDetailData | null> {
-  const stock = await prisma.stock.findUnique({
+function getEmptyAnalyticsData(baseDate: string): StockAnalyticsData {
+  return {
+    earnings: [],
+    financialMetric: null,
+    financialStatements: [],
+    themeFinancialMetric: {
+      forwardPer: null,
+      pbr: null,
+      peerCount: 0,
+      per: null,
+    },
+    valuationMetric: {
+      baseDate,
+      forwardPer: null,
+      industryForwardPer: null,
+      industryPer: null,
+      per: null,
+    },
+  };
+}
+
+async function getStockShellSource(stockId: number) {
+  return prisma.stock.findUnique({
     where: {
       id: stockId,
     },
@@ -177,6 +216,9 @@ export async function getStockDetailData(
           timestamp: "desc",
         },
         take: 45,
+        where: {
+          intervalCode: "1D",
+        },
       },
       orderBookSnapshots: {
         orderBy: {
@@ -196,82 +238,16 @@ export async function getStockDetailData(
           },
         },
       },
-      financialMetric: true,
-      financialStatements: {
-        orderBy: [
-          {
-            fiscalYear: "desc",
-          },
-          {
-            fiscalQuarter: "desc",
-          },
-          {
-            statementType: "asc",
-          },
-        ],
-      },
-      earnings: {
-        orderBy: [
-          {
-            fiscalYear: "desc",
-          },
-          {
-            fiscalQuarter: "desc",
-          },
-        ],
-      },
     },
   });
+}
 
-  if (!stock) {
-    return null;
-  }
-
+function serializeStockDetailData(
+  stock: NonNullable<Awaited<ReturnType<typeof getStockShellSource>>>,
+  orderBookActivity: Awaited<ReturnType<typeof getOrderBookActivity>>,
+  analyticsData: StockAnalyticsData,
+): StockDetailData {
   const [orderBookSnapshot] = stock.orderBookSnapshots;
-  const [themePeerCount, themeFinancialMetricAverage, orderBookActivity] =
-    await Promise.all([
-      prisma.stock.count({
-        where: {
-          theme: stock.theme,
-          id: {
-            not: stock.id,
-          },
-        },
-      }),
-      prisma.stockFinancialMetric.aggregate({
-        where: {
-          stock: {
-            theme: stock.theme,
-            id: {
-              not: stock.id,
-            },
-          },
-        },
-        _avg: {
-          per: true,
-          pbr: true,
-        },
-      }),
-      getOrderBookActivity(stock.id),
-    ]);
-  const valuationPeerStocks = await prisma.stock.findMany({
-    where: {
-      theme: stock.theme,
-    },
-    include: {
-      financialStatements: true,
-      earnings: true,
-    },
-  });
-  const currentPer = roundMultiple(calculateCurrentPer(stock));
-  const forwardPer = roundMultiple(calculateForwardPer(stock));
-  const industryPer = roundMultiple(
-    average(valuationPeerStocks.map(calculateCurrentPer)),
-  );
-  const industryForwardPer = roundMultiple(
-    average(valuationPeerStocks.map(calculateForwardPer)),
-  );
-  const valuationBaseDate = getLatestCandleBaseDate(stock.candles);
 
   return {
     id: stock.id,
@@ -320,7 +296,153 @@ export async function getStockDetailData(
       ? serializeOrderBookSnapshot(orderBookSnapshot, orderBookActivity, stock)
       : hasOrderBookActivity(orderBookActivity)
         ? serializeOrderBookActivitySnapshot(orderBookActivity, stock)
-      : null,
+        : null,
+    ...analyticsData,
+  };
+}
+
+export async function getStockPageShellData(
+  stockId: number,
+): Promise<StockDetailData | null> {
+  const shellStartedAt = performance.now();
+  const stock = await getStockShellSource(stockId);
+  logStockDetailTiming("shell.stock", shellStartedAt, { stockId });
+
+  if (!stock) {
+    return null;
+  }
+
+  const orderBookStartedAt = performance.now();
+  const orderBookActivity = await getOrderBookActivity(stock.id);
+  logStockDetailTiming("shell.orderBookActivity", orderBookStartedAt, {
+    stockId,
+  });
+  const valuationBaseDate = getLatestCandleBaseDate(stock.candles);
+
+  return serializeStockDetailData(
+    stock,
+    orderBookActivity,
+    getEmptyAnalyticsData(valuationBaseDate),
+  );
+}
+
+export async function getStockAnalyticsData(
+  stockId: number,
+): Promise<StockAnalyticsData | null> {
+  const stockStartedAt = performance.now();
+  const stock = await prisma.stock.findUnique({
+    where: {
+      id: stockId,
+    },
+    include: {
+      candles: {
+        orderBy: {
+          timestamp: "desc",
+        },
+        select: {
+          timestamp: true,
+        },
+        take: 1,
+        where: {
+          intervalCode: "1D",
+        },
+      },
+      financialMetric: true,
+      financialStatements: {
+        orderBy: [
+          {
+            fiscalYear: "desc",
+          },
+          {
+            fiscalQuarter: "desc",
+          },
+          {
+            statementType: "asc",
+          },
+        ],
+      },
+      earnings: {
+        orderBy: [
+          {
+            fiscalYear: "desc",
+          },
+          {
+            fiscalQuarter: "desc",
+          },
+        ],
+      },
+    },
+  });
+  logStockDetailTiming("analytics.stock", stockStartedAt, { stockId });
+
+  if (!stock) {
+    return null;
+  }
+
+  const peerStartedAt = performance.now();
+  const [themePeerCount, themeFinancialMetricAverage, valuationPeerStocks] =
+    await Promise.all([
+      prisma.stock.count({
+        where: {
+          theme: stock.theme,
+          id: {
+            not: stock.id,
+          },
+        },
+      }),
+      prisma.stockFinancialMetric.aggregate({
+        where: {
+          stock: {
+            theme: stock.theme,
+            id: {
+              not: stock.id,
+            },
+          },
+        },
+        _avg: {
+          per: true,
+          pbr: true,
+        },
+      }),
+      prisma.stock.findMany({
+        where: {
+          theme: stock.theme,
+        },
+        select: {
+          currentPrice: true,
+          marketCap: true,
+          financialStatements: {
+            select: {
+              data: true,
+              fiscalQuarter: true,
+              fiscalYear: true,
+              periodType: true,
+              statementType: true,
+            },
+          },
+          earnings: {
+            select: {
+              estimatedOperatingProfit: true,
+              fiscalQuarter: true,
+              fiscalYear: true,
+              periodType: true,
+            },
+          },
+        },
+      }),
+    ]);
+  logStockDetailTiming("analytics.peerMetrics", peerStartedAt, { stockId });
+  const currentPer = roundMultiple(calculateCurrentPer(stock));
+  const forwardPer = roundMultiple(calculateForwardPer(stock));
+  const industryPer = roundMultiple(
+    average(valuationPeerStocks.map(calculateCurrentPer)),
+  );
+  const industryForwardPer = roundMultiple(
+    average(valuationPeerStocks.map(calculateForwardPer)),
+  );
+  const valuationBaseDate = getLatestCandleBaseDate(stock.candles);
+
+  return {
     financialMetric: stock.financialMetric
       ? {
           debtRatio: stock.financialMetric.debtRatio,
@@ -362,5 +484,23 @@ export async function getStockDetailData(
         earning.estimatedOperatingProfit,
       ),
     })),
+  };
+}
+
+export async function getStockDetailData(
+  stockId: number,
+): Promise<StockDetailData | null> {
+  const [shellData, analyticsData] = await Promise.all([
+    getStockPageShellData(stockId),
+    getStockAnalyticsData(stockId),
+  ]);
+
+  if (!shellData || !analyticsData) {
+    return null;
+  }
+
+  return {
+    ...shellData,
+    ...analyticsData,
   };
 }

@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getStockDetailData } from "../page-data";
+import { getStockPageShellData } from "../page-data";
 import StockDetail from "@/app/(frontend)/components/stock-detail";
 
 type StockAnalyticsPageProps = {
@@ -16,7 +16,7 @@ export default async function StockAnalyticsPage({
 
   if (!Number.isInteger(parsedStockId) || parsedStockId <= 0) notFound();
 
-  const stock = await getStockDetailData(parsedStockId);
+  const stock = await getStockPageShellData(parsedStockId);
 
   if (!stock) notFound();
 

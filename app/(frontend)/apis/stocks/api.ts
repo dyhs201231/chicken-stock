@@ -1,7 +1,10 @@
 import { requests } from "../request";
 import type { StockData } from "../../components/main/stock_list/types";
 import type { ChartCandleData } from "../../components/stock-detail/order/chart-panel/types";
-import type { StockOrderBookSnapshotData } from "../../types/stock/stock-detail";
+import type {
+  StockAnalyticsData,
+  StockOrderBookSnapshotData,
+} from "../../types/stock/stock-detail";
 
 export const STOCKS_PAGE_SIZE = 10;
 
@@ -44,6 +47,16 @@ type StockOrderBookResponse =
       data: {
         orderBookSnapshot: StockOrderBookSnapshotData | null;
       };
+    }
+  | {
+      ok: false;
+      error: string;
+    };
+
+type StockAnalyticsResponse =
+  | {
+      ok: true;
+      data: StockAnalyticsData;
     }
   | {
       ok: false;
@@ -203,6 +216,18 @@ export async function fetchStockOrderBook(stockId: number) {
   }
 
   return data.data.orderBookSnapshot;
+}
+
+export async function fetchStockAnalytics(stockId: number) {
+  const { data } = await requests.get<StockAnalyticsResponse>(
+    `/api/stocks/${stockId}/analytics`,
+  );
+
+  if (!data.ok) {
+    throw new Error(data.error);
+  }
+
+  return data.data;
 }
 
 export async function fetchStockOrders(stockId: number) {
