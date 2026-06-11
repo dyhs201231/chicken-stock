@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getStockAnalyticsData } from "@/app/(frontend)/(route)/stock/[stockId]/page-data";
+import { getCachedStockAnalyticsData } from "@/app/(frontend)/(route)/stock/[stockId]/page-data";
 
 type StockAnalyticsRouteProps = {
   params: Promise<{
@@ -22,7 +22,7 @@ export async function GET(
       );
     }
 
-    const analytics = await getStockAnalyticsData(parsedStockId);
+    const analytics = await getCachedStockAnalyticsData(parsedStockId);
 
     if (!analytics) {
       return NextResponse.json(
@@ -31,10 +31,17 @@ export async function GET(
       );
     }
 
-    return NextResponse.json({
-      ok: true,
-      data: analytics,
-    });
+    return NextResponse.json(
+      {
+        ok: true,
+        data: analytics,
+      },
+      {
+        headers: {
+          "Cache-Control": "public, s-maxage=1800, stale-while-revalidate=3600",
+        },
+      },
+    );
   } catch (error) {
     const message =
       process.env.NODE_ENV === "production"

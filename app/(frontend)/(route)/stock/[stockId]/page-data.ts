@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import { prisma } from "../../../../(backend)/lib/prisma";
 import {
   getOrderBookActivity,
@@ -325,6 +326,14 @@ export async function getStockPageShellData(
   );
 }
 
+export const getCachedStockPageShellData = unstable_cache(
+  getStockPageShellData,
+  ["stock-page-shell"],
+  {
+    revalidate: 10,
+  },
+);
+
 export async function getStockAnalyticsData(
   stockId: number,
 ): Promise<StockAnalyticsData | null> {
@@ -486,12 +495,20 @@ export async function getStockAnalyticsData(
   };
 }
 
+export const getCachedStockAnalyticsData = unstable_cache(
+  getStockAnalyticsData,
+  ["stock-analytics"],
+  {
+    revalidate: 60 * 30,
+  },
+);
+
 export async function getStockDetailData(
   stockId: number,
 ): Promise<StockDetailData | null> {
   const [shellData, analyticsData] = await Promise.all([
-    getStockPageShellData(stockId),
-    getStockAnalyticsData(stockId),
+    getCachedStockPageShellData(stockId),
+    getCachedStockAnalyticsData(stockId),
   ]);
 
   if (!shellData || !analyticsData) {

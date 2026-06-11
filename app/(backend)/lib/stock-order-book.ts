@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import type {
   StockOrderBookRecentOrderData,
   StockOrderBookSnapshotData,
@@ -432,3 +433,11 @@ export async function getLatestOrderBookSnapshot(stockId: number) {
       : null,
   };
 }
+
+export const getCachedLatestOrderBookSnapshot = unstable_cache(
+  getLatestOrderBookSnapshot,
+  ["latest-order-book-snapshot"],
+  {
+    revalidate: 2,
+  },
+);

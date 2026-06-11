@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getLatestOrderBookSnapshot } from "@/app/(backend)/lib/stock-order-book";
+import { getCachedLatestOrderBookSnapshot } from "@/app/(backend)/lib/stock-order-book";
 
 type StockOrderBookRouteProps = {
   params: Promise<{
@@ -23,7 +23,7 @@ export async function GET(
     }
 
     const { stockExists, orderBookSnapshot } =
-      await getLatestOrderBookSnapshot(parsedStockId);
+      await getCachedLatestOrderBookSnapshot(parsedStockId);
 
     if (!stockExists) {
       return NextResponse.json(
@@ -32,12 +32,19 @@ export async function GET(
       );
     }
 
-    return NextResponse.json({
-      ok: true,
-      data: {
-        orderBookSnapshot,
+    return NextResponse.json(
+      {
+        ok: true,
+        data: {
+          orderBookSnapshot,
+        },
       },
-    });
+      {
+        headers: {
+          "Cache-Control": "public, s-maxage=2, stale-while-revalidate=10",
+        },
+      },
+    );
   } catch (error) {
     const message =
       process.env.NODE_ENV === "production"
