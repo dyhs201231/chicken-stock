@@ -40,10 +40,10 @@ export default function StockDetailLoading() {
           <div className="h-[25rem] rounded-xl bg-zinc-100" />
         </section>
 
-        <section className="h-130 rounded-3xl bg-white px-5 py-5 shadow-[0_10px_18px_rgba(0,0,0,0.22)]">
+        <section className="h-130 overflow-hidden rounded-3xl bg-white px-5 py-5 shadow-[0_10px_18px_rgba(0,0,0,0.22)]">
           <div className="mb-5 h-7 w-24 rounded-md bg-zinc-200" />
           <div className="space-y-2">
-            {Array.from({ length: 12 }, (_, index) => (
+            {Array.from({ length: 10 }, (_, index) => (
               <div
                 key={index}
                 className="grid h-8 grid-cols-[4rem_minmax(0,1fr)_4rem] gap-3"
