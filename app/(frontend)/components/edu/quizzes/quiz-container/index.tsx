@@ -2,14 +2,17 @@
 
 import { useArticleQuizzesQuery } from "@/app/(frontend)/apis/edu/quizzes/queries";
 import QuizInteraction from "../quiz-interaction";
+import type { QuizContentData } from "../quiz-content";
 
 type QuizContainerProps = {
   articleId: number;
+  initialQuizzes?: QuizContentData[];
   userId?: string;
 };
 
 export default function QuizContainer({
   articleId,
+  initialQuizzes,
   userId,
 }: QuizContainerProps) {
   const {
@@ -17,7 +20,7 @@ export default function QuizContainer({
     error,
     isError,
     isLoading,
-  } = useArticleQuizzesQuery(articleId);
+  } = useArticleQuizzesQuery(articleId, { initialData: initialQuizzes });
 
   const currentQuiz = quizzes[0];
   let errorMessage = "퀴즈를 불러오지 못했어요.";

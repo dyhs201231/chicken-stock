@@ -1,43 +1,43 @@
-"use client";
+import type { MyInfoResponse } from "../../apis/auth/api";
+import type { PortfolioResponse } from "../../apis/portfolio/api";
+import PortfolioContent from "../../components/portfolio/portfolio-content";
+import {
+  getRequestCookieHeader,
+  getRequestOrigin,
+} from "../../lib/server/request";
 
-import { useGetMyInfo } from "../../apis/auth/queries";
-import { usePortfolioStore } from "../../stores/portfolio";
-import DefaultAccount from "../../components/portfolio/default-account";
-import ExpectedDividend from "../../components/portfolio/expected-dividend";
-import IncomeAnalysis from "../../components/portfolio/income-analysis";
-import NoAccount from "../../components/portfolio/no-account";
-import PortfolioTab from "../../components/portfolio/portfolio-tab";
-import TransactionHistory from "../../components/portfolio/transaction-history";
-import { twMerge } from "tailwind-merge";
+async function getInitialJson<T>(path: string): Promise<T | null> {
+  try {
+    const cookieHeader = await getRequestCookieHeader();
+    const response = await fetch(new URL(path, await getRequestOrigin()), {
+      cache: "no-store",
+      headers: cookieHeader
+        ? {
+            Cookie: cookieHeader,
+          }
+        : undefined,
+    });
 
-export default function PortfolioPage() {
-  const { data, isPending } = useGetMyInfo();
-  const { selectedTab } = usePortfolioStore();
+    if (!response.ok) {
+      return null;
+    }
 
-  if (isPending || !data?.isLoggedIn) {
+    return (await response.json()) as T;
+  } catch {
     return null;
   }
+}
+
+export default async function PortfolioPage() {
+  const [initialMyInfo, initialPortfolio] = await Promise.all([
+    getInitialJson<MyInfoResponse>("/api/auth/my-info"),
+    getInitialJson<PortfolioResponse>("/api/portfolio"),
+  ]);
 
   return (
-    <div
-      className={twMerge(
-        "col min-h-[calc(100dvh-72px)] p-15",
-        selectedTab === "거래내역" &&
-          "h-[calc(100dvh-72px)] overflow-hidden",
-      )}
-    >
-      <PortfolioTab />
-
-      {!data.user.investmentType && <NoAccount />}
-
-      {data.user.investmentType && (
-        <>
-          {selectedTab === "기본계좌" && <DefaultAccount />}
-          {selectedTab === "거래내역" && <TransactionHistory />}
-          {selectedTab === "예상 배당금" && <ExpectedDividend />}
-          {selectedTab === "수입분석" && <IncomeAnalysis />}
-        </>
-      )}
-    </div>
+    <PortfolioContent
+      initialMyInfo={initialMyInfo ?? { isLoggedIn: false, user: null }}
+      initialPortfolio={initialPortfolio}
+    />
   );
 }

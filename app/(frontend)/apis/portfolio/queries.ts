@@ -1,5 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { getPortfolio, type GetPortfolioParams } from "./api";
+import {
+  getPortfolio,
+  type GetPortfolioParams,
+  type PortfolioResponse,
+} from "./api";
 
 export const portfolioQueryKeys = {
   myPortfolio: ["portfolio", "my-portfolio"],
@@ -12,10 +16,18 @@ export const portfolioQueryKeys = {
 
 const PORTFOLIO_REFETCH_INTERVAL_MS = 10_000;
 
-export function useGetPortfolio(params?: GetPortfolioParams) {
+type UseGetPortfolioOptions = {
+  initialData?: PortfolioResponse;
+};
+
+export function useGetPortfolio(
+  params?: GetPortfolioParams,
+  options?: UseGetPortfolioOptions,
+) {
   return useQuery({
     queryFn: () => getPortfolio(params),
     queryKey: portfolioQueryKeys.myPortfolioWithParams(params),
     refetchInterval: PORTFOLIO_REFETCH_INTERVAL_MS,
+    initialData: options?.initialData,
   });
 }

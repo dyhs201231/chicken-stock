@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { IconChevronLeft } from "@tabler/icons-react";
 import { getEducationArticle } from "@/app/(frontend)/apis/edu/queries";
+import type { QuizResponse } from "@/app/(frontend)/apis/edu/quizzes/api";
 import { getCurrentUser } from "../../../../lib/auth-check";
 import { getRequestOrigin } from "../../../../lib/server/request";
 import { isPositiveIntegerString } from "../../../../utils/number";
 import QuizContainer from "@/app/(frontend)/components/edu/quizzes/quiz-container";
+import type { QuizContentData } from "@/app/(frontend)/components/edu/quizzes/quiz-content";
 
 type QuizPageProps = {
   params: Promise<{
@@ -58,6 +60,35 @@ async function getQuizArticleContext(quizId: string, level?: string) {
   };
 }
 
+async function getInitialQuizzes(articleId: number) {
+  if (articleId <= 0) {
+    return [];
+  }
+
+  try {
+    const url = new URL("/api/quizzes", await getRequestOrigin());
+    url.searchParams.set("articleId", String(articleId));
+
+    const response = await fetch(url, {
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      return [];
+    }
+
+    const result = (await response.json()) as QuizResponse;
+
+    if (!result.ok) {
+      return [];
+    }
+
+    return result.data.quizzes;
+  } catch {
+    return [];
+  }
+}
+
 export default async function QuizPage({
   params,
   searchParams,
@@ -70,6 +101,7 @@ export default async function QuizPage({
     quizId,
     level,
   );
+  const initialQuizzes: QuizContentData[] = await getInitialQuizzes(articleId);
 
   return (
     <main className="relative min-h-screen bg-white px-16 py-16 text-black">
@@ -86,7 +118,11 @@ export default async function QuizPage({
           Level {label.level} | {label.id}. {label.title}
         </p>
 
-        <QuizContainer articleId={articleId} userId={currentUserId} />
+        <QuizContainer
+          articleId={articleId}
+          initialQuizzes={initialQuizzes}
+          userId={currentUserId}
+        />
       </div>
     </main>
   );

@@ -1,11 +1,16 @@
+import type { PortfolioResponse } from "@/app/(frontend)/apis/portfolio/api";
 import AccountData from "./account-data";
 import BalanceData from "./balance-data";
 
-export default function DefaultAccount() {
+type DefaultAccountProps = {
+  initialPortfolio?: PortfolioResponse;
+};
+
+export default function DefaultAccount({ initialPortfolio }: DefaultAccountProps) {
   return (
     <div className="col gap-30">
-      <AccountData />
-      <BalanceData />
+      <AccountData initialPortfolio={initialPortfolio} />
+      <BalanceData initialPortfolio={initialPortfolio} />
     </div>
   );
 }

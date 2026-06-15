@@ -1,8 +1,15 @@
 import { useGetPortfolio } from "@/app/(frontend)/apis/portfolio/queries";
+import type { PortfolioResponse } from "@/app/(frontend)/apis/portfolio/api";
 import React from "react";
 
-export default function BalanceData() {
-  const { data } = useGetPortfolio();
+type BalanceDataProps = {
+  initialPortfolio?: PortfolioResponse;
+};
+
+export default function BalanceData({ initialPortfolio }: BalanceDataProps) {
+  const { data } = useGetPortfolio(undefined, {
+    initialData: initialPortfolio,
+  });
 
   if (!data) {
     return null;

@@ -1,11 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
+import type { QuizContentData } from "../../../components/edu/quizzes/quiz-content";
 import { fetchArticleQuizProgress, fetchQuizzesByArticleId } from "./api";
 
-export function useArticleQuizzesQuery(articleId: number) {
+type UseArticleQuizzesQueryOptions = {
+  initialData?: QuizContentData[];
+};
+
+export function useArticleQuizzesQuery(
+  articleId: number,
+  options?: UseArticleQuizzesQueryOptions,
+) {
   return useQuery({
     queryKey: ["quizzes", "article", articleId],
     queryFn: () => fetchQuizzesByArticleId(articleId),
     enabled: articleId > 0,
+    initialData: options?.initialData,
   });
 }
 

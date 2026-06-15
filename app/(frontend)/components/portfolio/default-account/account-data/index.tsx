@@ -1,10 +1,17 @@
 import { useGetPortfolio } from "@/app/(frontend)/apis/portfolio/queries";
+import type { PortfolioResponse } from "@/app/(frontend)/apis/portfolio/api";
 import Link from "next/link";
 import React from "react";
 import CurrencyExchangeModal from "./currency-exchange-modal";
 
-export default function AccountData() {
-  const { data } = useGetPortfolio();
+type AccountDataProps = {
+  initialPortfolio?: PortfolioResponse;
+};
+
+export default function AccountData({ initialPortfolio }: AccountDataProps) {
+  const { data } = useGetPortfolio(undefined, {
+    initialData: initialPortfolio,
+  });
 
   if (!data) {
     return null;
