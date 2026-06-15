@@ -1,11 +1,18 @@
 "use client";
 
 import { IconX } from "@tabler/icons-react";
-import { type KeyboardEvent, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { type KeyboardEvent, useEffect, useRef, useState } from "react";
+import {
+  fetchStockSearchResults,
+  type StockSearchResult,
+} from "../../../apis/stocks/api";
+import { useStockSearchQuery } from "../../../apis/stocks/queries";
 import { Input, Popover, SearchIcon } from "../../ui";
 
 const RECENT_SEARCHES_STORAGE_KEY = "chicken-stock:recent-searches";
 const MAX_RECENT_SEARCHES = 10;
+const SEARCH_DEBOUNCE_MS = 180;
 
 function readRecentSearches() {
   if (typeof window === "undefined") {
@@ -44,11 +51,81 @@ function saveRecentSearches(searches: string[]) {
   } catch {}
 }
 
+function useDebouncedValue(value: string, delayMs: number) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setDebouncedValue(value);
+    }, delayMs);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [delayMs, value]);
+
+  return debouncedValue;
+}
+
+function normalizeSearchValue(value: string) {
+  return value.trim().toLocaleLowerCase();
+}
+
+function findBestStockMatch(stocks: StockSearchResult[], search: string) {
+  const normalizedSearch = normalizeSearchValue(search);
+
+  return (
+    stocks.find(
+      (stock) => normalizeSearchValue(stock.ticker) === normalizedSearch,
+    ) ??
+    stocks.find(
+      (stock) => normalizeSearchValue(stock.name) === normalizedSearch,
+    ) ??
+    stocks[0] ??
+    null
+  );
+}
+
+function getMarketLabel(market: StockSearchResult["market"]) {
+  if (market === "domestic") {
+    return "국내";
+  }
+
+  return "해외";
+}
+
 export default function HeaderSearch() {
+  const router = useRouter();
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [recentSearches, setRecentSearches] = useState(readRecentSearches);
+  const [searchError, setSearchError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activeSearchResultIndex, setActiveSearchResultIndex] = useState(-1);
   const isComposingRef = useRef(false);
+  const trimmedSearchValue = searchValue.trim();
+  const debouncedSearchValue = useDebouncedValue(
+    trimmedSearchValue,
+    SEARCH_DEBOUNCE_MS,
+  );
+  const { data: searchedStocksData = [], isFetching: isFetchingSearchResults } =
+    useStockSearchQuery(debouncedSearchValue, searchOpen);
+  const canShowSearchResults =
+    trimmedSearchValue.length > 0 &&
+    debouncedSearchValue === trimmedSearchValue;
+  const searchedStocks = canShowSearchResults ? searchedStocksData : [];
+  const isSearching =
+    trimmedSearchValue.length > 0 &&
+    (!canShowSearchResults || isFetchingSearchResults);
+  const normalizedActiveSearchResultIndex =
+    activeSearchResultIndex >= 0 &&
+    activeSearchResultIndex < searchedStocks.length
+      ? activeSearchResultIndex
+      : -1;
+  const activeSearchResult = searchedStocks[normalizedActiveSearchResultIndex];
+  const activeSearchResultId = activeSearchResult
+    ? `header-search-result-${activeSearchResult.id}`
+    : undefined;
 
   const updateRecentSearches = (searches: string[]) => {
     setRecentSearches(searches);
@@ -70,13 +147,66 @@ export default function HeaderSearch() {
     ].slice(0, MAX_RECENT_SEARCHES);
 
     updateRecentSearches(nextSearches);
-    setSearchValue("");
   };
 
   const removeRecentSearch = (search: string) => {
     updateRecentSearches(
       recentSearches.filter((recentSearch) => recentSearch !== search),
     );
+  };
+
+  const navigateToStock = (stock: StockSearchResult, search: string) => {
+    addRecentSearch(search || stock.ticker);
+    setSearchValue("");
+    setSearchError("");
+    setSearchOpen(false);
+    router.push(`/stock/${stock.id}/order`);
+  };
+
+  const submitSearch = async (search: string) => {
+    const trimmedSearch = search.trim();
+
+    if (!trimmedSearch) {
+      setSearchError("검색어를 입력해주세요.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSearchError("");
+
+    try {
+      const stocks = await fetchStockSearchResults(trimmedSearch, 1);
+      const stock = findBestStockMatch(stocks, trimmedSearch);
+
+      if (!stock) {
+        setSearchError("일치하는 종목이 없습니다.");
+        return;
+      }
+
+      navigateToStock(stock, trimmedSearch);
+    } catch {
+      setSearchError("검색 중 문제가 발생했습니다.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const moveActiveSearchResult = (direction: "previous" | "next") => {
+    if (isSearching || isSubmitting || searchedStocks.length === 0) {
+      return;
+    }
+
+    setActiveSearchResultIndex((currentIndex) => {
+      if (currentIndex < 0) {
+        return direction === "next" ? 0 : searchedStocks.length - 1;
+      }
+
+      const offset = direction === "next" ? 1 : -1;
+
+      return (
+        (currentIndex + offset + searchedStocks.length) % searchedStocks.length
+      );
+    });
   };
 
   const handleSearchKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -88,12 +218,24 @@ export default function HeaderSearch() {
       return;
     }
 
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+      moveActiveSearchResult(event.key === "ArrowDown" ? "next" : "previous");
+      return;
+    }
+
     if (event.key !== "Enter") {
       return;
     }
 
     event.preventDefault();
-    addRecentSearch(event.currentTarget.value);
+
+    if (activeSearchResult) {
+      navigateToStock(activeSearchResult, event.currentTarget.value);
+      return;
+    }
+
+    void submitSearch(event.currentTarget.value);
   };
 
   const handleSearchCompositionStart = () => {
@@ -104,6 +246,12 @@ export default function HeaderSearch() {
     isComposingRef.current = false;
   };
 
+  const handleSearchValueChange = (value: string) => {
+    setSearchValue(value);
+    setSearchError("");
+    setActiveSearchResultIndex(-1);
+  };
+
   return (
     <Popover
       className="flex items-center"
@@ -112,15 +260,15 @@ export default function HeaderSearch() {
     >
       <Popover.Trigger className="relative inline-flex h-7 w-56 items-center border-b border-zinc-500 bg-transparent pr-0 pl-7 text-left text-sm text-zinc-400 transition outline-none focus:border-zinc-950">
         <SearchIcon className="absolute left-1 size-5" />
-        <span className="truncate">종목, 용어를 검색해보세요.</span>
+        <span className="truncate">종목, 티커를 검색해보세요.</span>
       </Popover.Trigger>
 
       <Popover.Content
         align="right"
-        className="h-42.5 w-[calc(100vw-2.5rem)] max-w-162.5 px-3 pt-2"
+        className="w-[calc(100vw-2.5rem)] max-w-162.5 p-3"
       >
         <Input
-          aria-label="최근 검색"
+          aria-label="종목 검색"
           inputClassName="bg-zinc-300 placeholder:text-zinc-400"
           size="sm"
           leftAddon={<SearchIcon className="size-4" />}
@@ -129,26 +277,116 @@ export default function HeaderSearch() {
           autoFocus={searchOpen}
           focusable={false}
           value={searchValue}
-          onChange={(event) => setSearchValue(event.currentTarget.value)}
+          aria-activedescendant={activeSearchResultId}
+          aria-autocomplete="list"
+          onChange={(event) =>
+            handleSearchValueChange(event.currentTarget.value)
+          }
           onCompositionEnd={handleSearchCompositionEnd}
           onCompositionStart={handleSearchCompositionStart}
           onKeyDown={handleSearchKeyDown}
         />
-        <p className="mt-4 mb-2 text-sm font-semibold">최근 검색</p>
-        <div className="flex flex-wrap gap-2">
-          {recentSearches.map((search) => (
-            <button
-              key={search}
-              type="button"
-              aria-label={`${search} 최근 검색어 삭제`}
-              className="inline-flex items-center gap-1 rounded bg-zinc-200 px-1.5 py-0.5 text-xs font-semibold text-zinc-500"
-              onClick={() => removeRecentSearch(search)}
+
+        {trimmedSearchValue ? (
+          <div className="mt-4">
+            <p className="mb-2 text-sm font-semibold">검색 결과</p>
+            <div
+              role="listbox"
+              className="flex max-h-72 flex-col overflow-y-auto"
             >
-              {search}
-              <IconX aria-hidden="true" className="size-3" stroke={2} />
-            </button>
-          ))}
-        </div>
+              {isSearching || isSubmitting ? (
+                <p className="py-4 text-sm text-zinc-400">
+                  종목을 검색하는 중입니다.
+                </p>
+              ) : null}
+
+              {!isSearching && !isSubmitting && searchedStocks.length === 0 ? (
+                <p className="py-4 text-sm text-zinc-400">
+                  일치하는 종목이 없습니다.
+                </p>
+              ) : null}
+
+              {!isSearching &&
+                !isSubmitting &&
+                searchedStocks.map((stock, index) => {
+                  const isActive = index === normalizedActiveSearchResultIndex;
+
+                  return (
+                    <button
+                      key={stock.id}
+                      id={`header-search-result-${stock.id}`}
+                      type="button"
+                      role="option"
+                      aria-selected={isActive}
+                      className={`flex cursor-pointer items-center gap-3 rounded px-2 py-2 text-left transition hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-950 ${
+                        isActive ? "bg-zinc-100" : ""
+                      }`}
+                      onMouseEnter={() => setActiveSearchResultIndex(index)}
+                      onClick={() => navigateToStock(stock, trimmedSearchValue)}
+                    >
+                      <span
+                        className="flex size-8 shrink-0 items-center justify-center rounded-full border border-zinc-200 bg-zinc-100 text-sm font-bold text-zinc-700"
+                        aria-hidden="true"
+                      >
+                        {stock.logoLabel}
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-sm font-semibold text-zinc-950">
+                          {stock.name}
+                        </span>
+                        <span className="block truncate text-xs text-zinc-500">
+                          {stock.ticker} · {getMarketLabel(stock.market)}
+                        </span>
+                      </span>
+                    </button>
+                  );
+                })}
+            </div>
+          </div>
+        ) : (
+          <div className="mt-4">
+            <p className="mb-2 text-sm font-semibold">최근 검색</p>
+            {recentSearches.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {recentSearches.map((search) => (
+                  <span
+                    key={search}
+                    className="inline-flex items-center rounded bg-zinc-200 text-xs font-semibold text-zinc-500"
+                  >
+                    <button
+                      type="button"
+                      className="cursor-pointer px-1.5 py-0.5"
+                      onClick={() => {
+                        setSearchValue(search);
+                        void submitSearch(search);
+                      }}
+                    >
+                      {search}
+                    </button>
+                    <button
+                      type="button"
+                      aria-label={`${search} 최근 검색어 삭제`}
+                      className="flex size-5 cursor-pointer items-center justify-center rounded-r transition hover:bg-zinc-300"
+                      onClick={() => removeRecentSearch(search)}
+                    >
+                      <IconX aria-hidden="true" className="size-3" stroke={2} />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            ) : (
+              <p className="py-4 text-sm text-zinc-400">
+                최근 검색어가 없습니다.
+              </p>
+            )}
+          </div>
+        )}
+
+        {searchError ? (
+          <p role="alert" className="mt-3 text-sm font-semibold text-red-500">
+            {searchError}
+          </p>
+        ) : null}
       </Popover.Content>
     </Popover>
   );

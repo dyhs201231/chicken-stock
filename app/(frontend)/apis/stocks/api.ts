@@ -1,5 +1,8 @@
 import { requests } from "../request";
-import type { StockData } from "../../components/main/stock_list/types";
+import type {
+  StockData,
+  StockMarket,
+} from "../../components/main/stock_list/types";
 import type { ChartCandleData } from "../../components/stock-detail/order/chart-panel/types";
 import type {
   StockAnalyticsData,
@@ -18,10 +21,31 @@ export type StocksPage = {
   nextPage: number | null;
 };
 
+export type StockSearchResult = {
+  id: number;
+  ticker: string;
+  name: string;
+  market: StockMarket;
+  logoLabel: string;
+  logoUrl?: string;
+};
+
 type StocksResponse =
   | {
       ok: true;
       data: StocksPage;
+    }
+  | {
+      ok: false;
+      error: string;
+    };
+
+type StockSearchResponse =
+  | {
+      ok: true;
+      data: {
+        stocks: StockSearchResult[];
+      };
     }
   | {
       ok: false;
@@ -186,6 +210,30 @@ export async function fetchStocks(
   }
 
   return data.data;
+}
+
+export async function fetchStockSearchResults(query: string, limit = 6) {
+  const trimmedQuery = query.trim();
+
+  if (!trimmedQuery) {
+    return [];
+  }
+
+  const { data } = await requests.get<StockSearchResponse>(
+    "/api/stocks/search",
+    {
+      params: {
+        q: trimmedQuery,
+        limit,
+      },
+    },
+  );
+
+  if (!data.ok) {
+    throw new Error(data.error);
+  }
+
+  return data.data.stocks;
 }
 
 export async function fetchStockCandles(
