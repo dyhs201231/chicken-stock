@@ -1,13 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useStockOrderBookQuery } from "../../apis/stocks/queries";
-import ChartPanel from "./order/chart-panel";
-import InfoPanel from "./analytics/info-panel";
 import StockLogo from "./stock-logo";
+import StockDetailPanelSkeleton from "./panel-skeleton";
 import OrderBookPanel from "./order/order-book-panel";
-import OrderPanel from "./order/order-panel";
 import { useStockRealtime } from "../../hooks/use-stock-realtime";
 import type {
   MainOrderTab,
@@ -32,6 +31,33 @@ import {
 type StockDetailProps = StockOnlyProps & {
   activeTab: StockDetailTab;
 };
+
+const ChartPanel = dynamic(() => import("./order/chart-panel"), {
+  loading: () => (
+    <StockDetailPanelSkeleton
+      className="min-w-0"
+      label="차트를 불러오는 중입니다."
+    />
+  ),
+  ssr: false,
+});
+
+const InfoPanel = dynamic(() => import("./analytics/info-panel"), {
+  loading: () => (
+    <StockDetailPanelSkeleton
+      className="min-w-0"
+      label="주요 정보를 불러오는 중입니다."
+    />
+  ),
+  ssr: false,
+});
+
+const OrderPanel = dynamic(() => import("./order/order-panel"), {
+  loading: () => (
+    <StockDetailPanelSkeleton label="주문 정보를 불러오는 중입니다." />
+  ),
+  ssr: false,
+});
 
 const sideTabs: { label: string; value: StockDetailTab }[] = [
   { label: "차트 / 호가", value: "chart-orderbook" },
