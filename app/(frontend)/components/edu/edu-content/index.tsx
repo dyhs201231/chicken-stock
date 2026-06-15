@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useGetMyInfo } from "../../../apis/auth/queries";
 import { useEducationSummariesQuery } from "../../../apis/edu/queries";
@@ -8,17 +9,17 @@ import EducationCard from "../education-card";
 
 const educationCardStyles = [
   {
-    image: "/images/edu/egg.png",
+    image: "/images/edu/egg.webp",
     className:
       "md:absolute md:top-96 md:left-0 md:z-10 md:h-[359px] md:w-[440px] md:max-w-[500px]",
   },
   {
-    image: "/images/edu/chick.png",
+    image: "/images/edu/chick.webp",
     className:
       "md:absolute md:top-[31rem] md:left-1/2 md:z-30 md:h-[359px] md:w-[440px] md:max-w-[500px] md:-translate-x-1/2",
   },
   {
-    image: "/images/edu/chicken.png",
+    image: "/images/edu/chicken.webp",
     className:
       "md:absolute md:top-96 md:right-0 md:z-10 md:h-[359px] md:w-[440px] md:max-w-[500px]",
   },
@@ -64,11 +65,18 @@ export default function EduContent() {
   const shouldShowCards = !isLoading && !isError && hasEducationCards;
 
   return (
-    <main
-      className="min-h-[calc(100dvh-74px)] overflow-hidden bg-cover bg-center bg-no-repeat px-5"
-      style={{ backgroundImage: "url('/images/edu/edu_background.png')" }}
-    >
-      <section className="relative mx-auto flex min-h-[calc(100dvh-74px)] w-full max-w-7xl flex-col items-center gap-8 pt-16 pb-12 md:block md:min-h-237.5 md:pt-32">
+    <main className="relative min-h-[calc(100dvh-74px)] overflow-hidden px-5">
+      <Image
+        src="/images/edu/edu-background.webp"
+        alt=""
+        aria-hidden="true"
+        fill
+        className="object-cover object-center"
+        priority
+        sizes="100vw"
+      />
+
+      <section className="relative z-10 mx-auto flex min-h-[calc(100dvh-74px)] w-full max-w-7xl flex-col items-center gap-8 pt-16 pb-12 md:block md:min-h-237.5 md:pt-32">
         <div className="mx-auto max-w-5xl text-center text-black">
           <h1 className="text-5xl leading-tight font-bold tracking-normal md:text-8xl">
             레벨별로 학습해보세요!
@@ -92,7 +100,7 @@ export default function EduContent() {
           )}
 
           {shouldShowCards &&
-            educationCards.map((card) => (
+            educationCards.map((card, index) => (
               <EducationCard
                 key={`${card.level}-${openLevel === card.level ? "open" : "idle"}`}
                 level={card.level}
@@ -101,6 +109,7 @@ export default function EduContent() {
                 data={card.data}
                 className={card.className}
                 autoOpenList={openLevel === card.level}
+                priority={index === 0}
               />
             ))}
 

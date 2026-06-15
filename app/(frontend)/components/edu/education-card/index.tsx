@@ -29,6 +29,7 @@ export type EducationCardProps = {
   data: EducationCardData;
   className?: string;
   autoOpenList?: boolean;
+  priority?: boolean;
 };
 
 type OpenPanel = "summary" | "list" | "closed" | null;
@@ -52,6 +53,7 @@ export default function EducationCard({
   data,
   className,
   autoOpenList = false,
+  priority = false,
 }: EducationCardProps) {
   const [openPanel, setOpenPanel] = useState<OpenPanel>(null);
   const hasSummary = data.summary.some((item) => item.trim().length > 0);
@@ -82,9 +84,8 @@ export default function EducationCard({
           alt={`${level} ${title}`}
           fill
           className="object-cover"
-          priority={false}
+          priority={priority}
           sizes="(max-width: 768px) 90vw, 448px"
-          unoptimized
         />
 
         <div className="relative z-10 flex items-start justify-between gap-4">
