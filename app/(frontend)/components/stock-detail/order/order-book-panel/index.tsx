@@ -42,12 +42,15 @@ export default function OrderBookPanel({
     getClientHydrationSnapshot,
     getServerHydrationSnapshot,
   );
+  
   const { data, isError, isLoading } = useStockOrderBookQuery(
     stock.id,
     initialOrderBookSnapshot,
   );
+
   const orderBookSnapshot =
     isHydrated && data !== undefined ? data : initialOrderBookSnapshot;
+
   const snapshot = useMemo(
     () =>
       convertOrderBookSnapshotCurrency(
@@ -125,7 +128,7 @@ export default function OrderBookPanel({
     <section className="flex h-130 flex-col overflow-hidden rounded-3xl bg-white text-sm leading-tight text-zinc-950 tabular-nums shadow-[0_10px_18px_rgba(0,0,0,0.22)]">
       <p className="px-4 pt-3 text-lg">호가</p>
 
-      <div className="grid min-h-0 flex-1 grid-cols-[34%_31%_35%] grid-rows-[repeat(12,minmax(0,1fr))]">
+      <div className="grid min-h-0 flex-1 grid-cols-[34%_31%_35%] grid-rows-12">
         <OrderCountColumn
           className="col-start-1 row-span-6 row-start-1 border-r-2 border-zinc-950"
           rows={askRows}

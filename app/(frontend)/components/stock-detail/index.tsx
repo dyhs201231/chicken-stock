@@ -92,6 +92,7 @@ export default function StockDetail({ stock, activeTab }: StockDetailProps) {
     () => convertStockCurrency(liveStock, selectedCurrencyCode),
     [liveStock, selectedCurrencyCode],
   );
+
   const isUp = displayStock.changeRate >= 0;
   const changeClassName = isUp ? "text-red-500" : "text-blue-500";
   const marketLabel =
