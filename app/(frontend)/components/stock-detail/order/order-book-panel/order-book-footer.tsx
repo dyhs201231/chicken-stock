@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { formatNumber } from "../../../../utils/stock/stock-detail";
 
 type OrderBookFooterProps = {
@@ -5,10 +6,7 @@ type OrderBookFooterProps = {
   totalBidSize: number;
 };
 
-export default function OrderBookFooter({
-  totalAskSize,
-  totalBidSize,
-}: OrderBookFooterProps) {
+function OrderBookFooter({ totalAskSize, totalBidSize }: OrderBookFooterProps) {
   return (
     <div className="grid h-8 shrink-0 grid-cols-2 items-center gap-3 border-t-2 border-zinc-200 px-4 text-xs">
       <p className="truncate text-sky-600">
@@ -22,3 +20,5 @@ export default function OrderBookFooter({
     </div>
   );
 }
+
+export default memo(OrderBookFooter);

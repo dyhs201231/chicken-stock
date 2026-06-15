@@ -1,3 +1,4 @@
+import { memo } from "react";
 import type { StockCurrencyCode } from "../../../../types/stock/stock-detail";
 import {
   formatPercent,
@@ -16,7 +17,7 @@ type PriceLadderProps = {
   selectedPrice: number | null;
 };
 
-export default function PriceLadder({
+function PriceLadder({
   changeRate,
   closestLevelKey,
   currencyCode,
@@ -73,3 +74,5 @@ export default function PriceLadder({
     </div>
   );
 }
+
+export default memo(PriceLadder);

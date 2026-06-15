@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { formatNumber } from "../../../../utils/stock/stock-detail";
 import type { OrderBookLevelRow } from "./types";
 import { getLevelKey } from "./utils";
@@ -8,7 +9,7 @@ type OrderCountColumnProps = {
   side: "ASK" | "BID";
 };
 
-export default function OrderCountColumn({
+function OrderCountColumn({
   className = "",
   rows,
   side,
@@ -31,3 +32,5 @@ export default function OrderCountColumn({
     </div>
   );
 }
+
+export default memo(OrderCountColumn);

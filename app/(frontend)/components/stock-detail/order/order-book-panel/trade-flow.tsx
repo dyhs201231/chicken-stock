@@ -1,3 +1,4 @@
+import { memo } from "react";
 import type {
   StockCurrencyCode,
   StockOrderBookSnapshotData,
@@ -13,7 +14,7 @@ type TradeFlowProps = {
   snapshot: StockOrderBookSnapshotData;
 };
 
-export default function TradeFlow({ currencyCode, snapshot }: TradeFlowProps) {
+function TradeFlow({ currencyCode, snapshot }: TradeFlowProps) {
   const recentOrders = snapshot.recentOrders ?? [];
 
   return (
@@ -56,3 +57,5 @@ export default function TradeFlow({ currencyCode, snapshot }: TradeFlowProps) {
     </section>
   );
 }
+
+export default memo(TradeFlow);
