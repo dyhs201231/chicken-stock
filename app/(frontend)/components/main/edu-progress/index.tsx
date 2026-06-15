@@ -58,13 +58,18 @@ export default function EduProgress() {
       <div className="relative aspect-[2.5] overflow-hidden rounded-2xl">
         <div
           aria-hidden="true"
-          className="absolute inset-0 bg-no-repeat brightness-95 saturate-115"
-          style={{
-            backgroundImage: "url('/images/main/edu-progress.png')",
-            backgroundPosition: "center 35%",
-            backgroundSize: "100% 200%",
-          }}
-        />
+          className="absolute inset-x-0 top-[-35%] h-[200%]"
+        >
+          <Image
+            src="/images/main/edu-progress.webp"
+            alt=""
+            fill
+            priority
+            fetchPriority="high"
+            sizes="(max-width: 768px) calc(100vw - 80px), 50vw"
+            className="object-fill brightness-95 saturate-115"
+          />
+        </div>
 
         <div className="absolute inset-x-0 bottom-8 flex justify-center md:bottom-12">
           <div className="relative h-44 w-56 md:h-60 md:w-72">
