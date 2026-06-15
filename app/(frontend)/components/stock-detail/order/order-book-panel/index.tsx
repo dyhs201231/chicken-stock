@@ -58,6 +58,55 @@ export default function OrderBookPanel({
     [orderBookSnapshot, sourceCurrencyCode, stock.currencyCode],
   );
 
+  const displayStock = useMemo(
+    () =>
+      snapshot
+        ? {
+            ...stock,
+            currentPrice: snapshot.currentPrice ?? stock.currentPrice,
+            previousClose: snapshot.previousClose ?? stock.previousClose,
+            changeRate: snapshot.changeRate ?? stock.changeRate,
+            dayHigh: snapshot.dayHigh ?? stock.dayHigh,
+            dayLow: snapshot.dayLow ?? stock.dayLow,
+            volume: snapshot.volumeAmount ?? stock.volume,
+          }
+        : stock,
+    [snapshot, stock],
+  );
+
+  const { askRows, bidRows, closestLevelKey, priceRows } = useMemo(() => {
+    if (!snapshot) {
+      return {
+        askRows: fillRows([], DISPLAY_LEVEL_COUNT),
+        bidRows: fillRows([], DISPLAY_LEVEL_COUNT),
+        closestLevelKey: null,
+        priceRows: fillRows([], DISPLAY_LEVEL_COUNT * 2),
+      };
+    }
+
+    const { asks, bids } = groupLevels(
+      snapshot.levels,
+      displayStock.currentPrice,
+    );
+    const nextAskRows = fillRows(asks, DISPLAY_LEVEL_COUNT);
+    const nextBidRows = fillRows(bids, DISPLAY_LEVEL_COUNT);
+
+    return {
+      askRows: nextAskRows,
+      bidRows: nextBidRows,
+      closestLevelKey: getClosestLevelKey(
+        [...asks, ...bids],
+        displayStock.currentPrice,
+      ),
+      priceRows: [...nextAskRows, ...nextBidRows],
+    };
+  }, [displayStock.currentPrice, snapshot]);
+
+  const openingPrice =
+    displayStock.candles.at(-1)?.openPrice ?? displayStock.previousClose;
+
+  const volumeChangeRate = getVolumeChangeRate(displayStock);
+
   if (!snapshot) {
     if (isHydrated && data === undefined && isLoading) {
       return <OrderBookStatePanel message="호가 데이터를 불러오는 중입니다." />;
@@ -71,30 +120,6 @@ export default function OrderBookPanel({
 
     return <OrderBookStatePanel message="표시할 호가 데이터가 없습니다." />;
   }
-
-  const displayStock = {
-    ...stock,
-    currentPrice: snapshot.currentPrice ?? stock.currentPrice,
-    previousClose: snapshot.previousClose ?? stock.previousClose,
-    changeRate: snapshot.changeRate ?? stock.changeRate,
-    dayHigh: snapshot.dayHigh ?? stock.dayHigh,
-    dayLow: snapshot.dayLow ?? stock.dayLow,
-    volume: snapshot.volumeAmount ?? stock.volume,
-  };
-  const { asks, bids } = groupLevels(
-    snapshot.levels,
-    displayStock.currentPrice,
-  );
-  const askRows = fillRows(asks, DISPLAY_LEVEL_COUNT);
-  const bidRows = fillRows(bids, DISPLAY_LEVEL_COUNT);
-  const priceRows = [...askRows, ...bidRows];
-  const openingPrice =
-    displayStock.candles.at(-1)?.openPrice ?? displayStock.previousClose;
-  const volumeChangeRate = getVolumeChangeRate(displayStock);
-  const closestLevelKey = getClosestLevelKey(
-    [...asks, ...bids],
-    displayStock.currentPrice,
-  );
 
   return (
     <section className="flex h-130 flex-col overflow-hidden rounded-3xl bg-white text-sm leading-tight text-zinc-950 tabular-nums shadow-[0_10px_18px_rgba(0,0,0,0.22)]">

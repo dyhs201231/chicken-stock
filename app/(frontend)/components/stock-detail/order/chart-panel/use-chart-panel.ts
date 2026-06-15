@@ -26,6 +26,17 @@ import type {
   StockOnlyProps,
 } from "../../../../types/stock/stock-detail";
 
+function getInitialDailyChartCandles({ stock }: StockOnlyProps) {
+  return stock.candles.map((candle) => ({
+    time: new Date(candle.timestamp).toISOString().slice(0, 10),
+    open: candle.openPrice,
+    high: candle.highPrice,
+    low: candle.lowPrice,
+    close: candle.closePrice,
+    volume: candle.volume,
+  }));
+}
+
 export function useChartPanel({ stock }: StockOnlyProps) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
 
@@ -61,9 +72,15 @@ export function useChartPanel({ stock }: StockOnlyProps) {
     return "DAY";
   }, [selectedRange]);
 
+  const initialDailyChartCandles = useMemo(
+    () => getInitialDailyChartCandles({ stock }),
+    [stock],
+  );
+
   const { data: rawChartCandles = [] } = useStockCandlesQuery(
     stock.id,
     selectedInterval,
+    selectedInterval === "DAY" ? initialDailyChartCandles : undefined,
   );
 
   const chartCandles = useMemo(() => {
@@ -230,7 +247,7 @@ export function useChartPanel({ stock }: StockOnlyProps) {
     const handleVisibleTimeRangeChange = (range: IRange<Time> | null) => {
       updateHighLowLabels(range);
     };
-    
+
     const handleVisibleLogicalRangeChange = () => {
       updateAxisTickLabels();
       updatePriceAxisTickLabels();

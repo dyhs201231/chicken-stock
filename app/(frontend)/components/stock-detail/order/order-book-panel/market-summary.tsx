@@ -1,3 +1,4 @@
+import { memo } from "react";
 import type { StockDetailData } from "../../../../types/stock/stock-detail";
 import {
   formatPercent,
@@ -11,7 +12,7 @@ type MarketSummaryProps = {
   volumeChangeRate: number | null;
 };
 
-export default function MarketSummary({
+function MarketSummary({
   openingPrice,
   stock,
   volumeChangeRate,
@@ -61,3 +62,5 @@ export default function MarketSummary({
     </dl>
   );
 }
+
+export default memo(MarketSummary);

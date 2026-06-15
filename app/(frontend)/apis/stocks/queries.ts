@@ -7,6 +7,7 @@ import {
   fetchStocks,
 } from "./api";
 import type { StockCandleInterval } from "./api";
+import type { ChartCandleData } from "../../components/stock-detail/order/chart-panel/types";
 import type { StockOrderBookSnapshotData } from "../../types/stock/stock-detail";
 
 export const stockQueryKeys = {
@@ -36,11 +37,13 @@ export function useStocksInfiniteQuery(market: string, ranking: string) {
 export function useStockCandlesQuery(
   stockId: number,
   interval: StockCandleInterval,
+  initialData?: ChartCandleData[],
 ) {
   return useQuery({
     queryKey: stockQueryKeys.candles(stockId, interval),
     queryFn: () => fetchStockCandles(stockId, interval),
     enabled: Number.isInteger(stockId) && stockId > 0,
+    initialData,
     refetchInterval: STOCK_CANDLES_REFETCH_INTERVAL_MS,
   });
 }
