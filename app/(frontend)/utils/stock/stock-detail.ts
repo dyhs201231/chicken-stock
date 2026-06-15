@@ -50,6 +50,10 @@ export function isUsableImageUrl(value: string | undefined) {
   try {
     const url = new URL(value);
 
+    if (url.hostname.endsWith(".local")) {
+      return false;
+    }
+
     return url.protocol === "http:" || url.protocol === "https:";
   } catch {
     return false;

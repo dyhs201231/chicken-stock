@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { IconMinus, IconPlus } from "@tabler/icons-react";
-import { toast } from "sonner";
 import type {
   CreateStockOrderRequest,
   StockOrderContext,
@@ -14,6 +13,11 @@ import {
   formatPercent,
   formatPrice,
 } from "../../../../utils/stock/stock-detail";
+import {
+  showErrorToast,
+  showSuccessToast,
+  showWarningToast,
+} from "../../../../utils/toast";
 import { SegmentedControl } from "../../../ui";
 import type { SelectedOrderBookLimitPrice } from "./index";
 import {
@@ -80,8 +84,7 @@ export default function NormalSellOrder({
   const quantity = parseQuantityInput(quantityInput);
   const maxQuantity = orderContext.holding.sellableQuantity;
   const orderAmount = price * quantity;
-  const expectedProfit =
-    (price - orderContext.holding.averagePrice) * quantity;
+  const expectedProfit = (price - orderContext.holding.averagePrice) * quantity;
   const expectedProfitRate =
     quantity > 0 && orderContext.holding.averagePrice > 0
       ? ((price - orderContext.holding.averagePrice) /
@@ -110,7 +113,7 @@ export default function NormalSellOrder({
 
   const handleSubmit = () => {
     if (!canSubmit) {
-      toast.warning("판매 가능 수량 안에서 수량을 입력해주세요.");
+      void showWarningToast("판매 가능 수량 안에서 수량을 입력해주세요.");
       return;
     }
 
@@ -128,11 +131,13 @@ export default function NormalSellOrder({
       },
       {
         onError: (error) => {
-          toast.error(getApiErrorMessage(error, "판매 주문에 실패했습니다."));
+          void showErrorToast(
+            getApiErrorMessage(error, "판매 주문에 실패했습니다."),
+          );
         },
         onSuccess: () => {
           setQuantityInput("");
-          toast.success(
+          void showSuccessToast(
             orderPriceType === "MARKET"
               ? "판매 주문이 체결됐습니다."
               : "판매 주문이 등록됐습니다.",
@@ -261,9 +266,7 @@ export default function NormalSellOrder({
                 disabled={maxQuantity <= 0}
                 type="button"
                 onClick={() =>
-                  setClampedQuantity(
-                    getQuantityByPercent(maxQuantity, percent),
-                  )
+                  setClampedQuantity(getQuantityByPercent(maxQuantity, percent))
                 }
               >
                 {percent === 100 ? "최대" : `${percent}%`}
@@ -275,10 +278,7 @@ export default function NormalSellOrder({
         <dl className="mt-4 grid grid-cols-[1fr_auto] gap-y-2 text-base">
           <dt>내 주식 평균</dt>
           <dd className="text-right">
-            {formatPrice(
-              orderContext.holding.averagePrice,
-              stock.currencyCode,
-            )}
+            {formatPrice(orderContext.holding.averagePrice, stock.currencyCode)}
           </dd>
           <dt>현재 수익</dt>
           <dd className={`text-right ${currentProfitTextClassName}`}>

@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { IconMinus, IconPlus } from "@tabler/icons-react";
-import { toast } from "sonner";
 import type {
   CreateStockOrderRequest,
   StockOrderContext,
@@ -17,6 +16,11 @@ import {
   formatPercent,
   formatPrice,
 } from "../../../../utils/stock/stock-detail";
+import {
+  showErrorToast,
+  showSuccessToast,
+  showWarningToast,
+} from "../../../../utils/toast";
 import { SegmentedControl } from "../../../ui";
 import type { SelectedOrderBookLimitPrice } from "./index";
 import {
@@ -115,7 +119,7 @@ export default function NormalBuyOrder({
 
   const handleSubmit = () => {
     if (!canSubmit) {
-      toast.warning("구매 가능 금액 안에서 수량을 입력해주세요.");
+      void showWarningToast("구매 가능 금액 안에서 수량을 입력해주세요.");
       return;
     }
 
@@ -133,11 +137,13 @@ export default function NormalBuyOrder({
       },
       {
         onError: (error) => {
-          toast.error(getApiErrorMessage(error, "구매 주문에 실패했습니다."));
+          void showErrorToast(
+            getApiErrorMessage(error, "구매 주문에 실패했습니다."),
+          );
         },
         onSuccess: () => {
           setQuantityInput("");
-          toast.success(
+          void showSuccessToast(
             orderPriceType === "MARKET"
               ? "구매 주문이 체결됐습니다."
               : "구매 주문이 등록됐습니다.",

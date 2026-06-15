@@ -3,7 +3,6 @@
 import { useEffect } from "react";
 import type { QueryClient } from "@tanstack/react-query";
 import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
 import { portfolioQueryKeys } from "@/app/(frontend)/apis/portfolio/queries";
 import type {
   StockCandleInterval,
@@ -11,6 +10,8 @@ import type {
   StockMutationSync,
 } from "@/app/(frontend)/apis/stocks/api";
 import { stockQueryKeys } from "@/app/(frontend)/apis/stocks/queries";
+import type { StockOrderBookSnapshotData } from "@/app/(frontend)/types/stock/stock-detail";
+import { showSuccessToast } from "@/app/(frontend)/utils/toast";
 
 type UserOrderFilledPayload = {
   executedAt: string;
@@ -102,6 +103,69 @@ function hasMutationSyncPayload(value: unknown): value is StockMutationSync {
   return hasMarketSyncPayload(value) && "orderContext" in value;
 }
 
+function isSameOrderBookSnapshot(
+  previous: StockOrderBookSnapshotData | null | undefined,
+  next: StockOrderBookSnapshotData | null,
+) {
+  if (previous === next) {
+    return true;
+  }
+
+  if (!previous || !next) {
+    return previous === next;
+  }
+
+  if (
+    previous.timestamp !== next.timestamp ||
+    previous.currentPrice !== next.currentPrice ||
+    previous.previousClose !== next.previousClose ||
+    previous.changeRate !== next.changeRate ||
+    previous.dayHigh !== next.dayHigh ||
+    previous.dayLow !== next.dayLow ||
+    previous.volumeAmount !== next.volumeAmount ||
+    previous.totalAskSize !== next.totalAskSize ||
+    previous.totalBidSize !== next.totalBidSize ||
+    previous.volume !== next.volume ||
+    previous.buyVolume !== next.buyVolume ||
+    previous.sellVolume !== next.sellVolume ||
+    previous.executionStrength !== next.executionStrength ||
+    previous.lastTradeVolume !== next.lastTradeVolume ||
+    previous.levels.length !== next.levels.length ||
+    previous.recentOrders.length !== next.recentOrders.length
+  ) {
+    return false;
+  }
+
+  const hasSameLevels = previous.levels.every((level, index) => {
+    const nextLevel = next.levels[index];
+
+    return (
+      level.side === nextLevel.side &&
+      level.levelRank === nextLevel.levelRank &&
+      level.orderCount === nextLevel.orderCount &&
+      level.price === nextLevel.price &&
+      level.quantity === nextLevel.quantity
+    );
+  });
+
+  if (!hasSameLevels) {
+    return false;
+  }
+
+  return previous.recentOrders.every((order, index) => {
+    const nextOrder = next.recentOrders[index];
+
+    return (
+      order.id === nextOrder.id &&
+      order.orderedAt === nextOrder.orderedAt &&
+      order.price === nextOrder.price &&
+      order.quantity === nextOrder.quantity &&
+      order.side === nextOrder.side &&
+      order.status === nextOrder.status
+    );
+  });
+}
+
 function invalidateStockMarketQueries(
   queryClient: QueryClient,
   stockId: number,
@@ -141,9 +205,12 @@ function applyStockMarketSync(
   stockId: number,
   sync: StockMarketSync,
 ) {
-  queryClient.setQueryData(
+  queryClient.setQueryData<StockOrderBookSnapshotData | null>(
     stockQueryKeys.orderBook(stockId),
-    sync.orderBookSnapshot,
+    (previous) =>
+      isSameOrderBookSnapshot(previous, sync.orderBookSnapshot)
+        ? previous
+        : sync.orderBookSnapshot,
   );
 
   Object.entries(sync.candles ?? {}).forEach(([interval, candles]) => {
@@ -181,7 +248,7 @@ function formatNumber(value: number) {
 function showOrderFilledToast(payload: UserOrderFilledPayload) {
   const sideLabel = payload.side === "BUY" ? "매수" : "매도";
 
-  toast.success(`${payload.stockName} ${sideLabel} 체결`, {
+  void showSuccessToast(`${payload.stockName} ${sideLabel} 체결`, {
     description: `${formatNumber(payload.quantity)}주 · ${formatNumber(
       payload.price,
     )} · 총 ${formatNumber(payload.totalAmount)}`,

@@ -1,29 +1,13 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { Toaster } from "sonner";
 import QueryProvider from "../components/providers/query-provider";
 import RealtimeBridge from "../components/providers/realtime-bridge";
+import ToastProvider from "../components/providers/toast-provider";
 import Header from "../components/header";
 
 const atoz = localFont({
   src: [
-    {
-      path: "../fonts/atoz-1-thin.ttf",
-      weight: "100",
-      style: "normal",
-    },
-    {
-      path: "../fonts/atoz-2-extra-light.ttf",
-      weight: "200",
-      style: "normal",
-    },
-    {
-      path: "../fonts/atoz-3-light.ttf",
-      weight: "300",
-      style: "normal",
-    },
     {
       path: "../fonts/atoz-4-regular.ttf",
       weight: "400",
@@ -42,16 +26,6 @@ const atoz = localFont({
     {
       path: "../fonts/atoz-7-bold.ttf",
       weight: "700",
-      style: "normal",
-    },
-    {
-      path: "../fonts/atoz-8-extra-bold.ttf",
-      weight: "800",
-      style: "normal",
-    },
-    {
-      path: "../fonts/atoz-9-black.ttf",
-      weight: "900",
       style: "normal",
     },
   ],
@@ -77,11 +51,10 @@ export default function RootLayout({
       <body className="flex min-h-full flex-col">
         <QueryProvider>
           <RealtimeBridge />
-          <ReactQueryDevtools initialIsOpen={false} />
 
           <Header />
           {children}
-          <Toaster />
+          <ToastProvider />
         </QueryProvider>
       </body>
     </html>
