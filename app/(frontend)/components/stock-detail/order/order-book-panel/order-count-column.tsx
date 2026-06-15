@@ -9,6 +9,23 @@ type OrderCountColumnProps = {
   side: "ASK" | "BID";
 };
 
+type OrderCountRowProps = {
+  level: OrderBookLevelRow;
+  textClassName: string;
+};
+
+function OrderCountRow({ level, textClassName }: OrderCountRowProps) {
+  return (
+    <div
+      className={`flex min-h-0 items-center border-b-2 border-zinc-200 px-3 text-right text-sm font-medium last:border-b-0 ${textClassName}`}
+    >
+      {level && level.quantity > 0 ? formatNumber(level.quantity) : ""}
+    </div>
+  );
+}
+
+const MemoizedOrderCountRow = memo(OrderCountRow);
+
 function OrderCountColumn({
   className = "",
   rows,
@@ -21,14 +38,17 @@ function OrderCountColumn({
     <div
       className={`relative grid min-h-0 grid-rows-6 overflow-hidden ${className}`}
     >
-      {rows.map((level, index) => (
-        <div
-          key={level ? getLevelKey(level) : `empty-${side}-${index}`}
-          className={`flex min-h-0 items-center border-b-2 border-zinc-200 px-3 text-right text-sm font-medium last:border-b-0 ${textClassName}`}
-        >
-          {level && level.quantity > 0 ? formatNumber(level.quantity) : ""}
-        </div>
-      ))}
+      {rows.map((level, index) => {
+        const rowKey = level ? getLevelKey(level) : `empty-${side}-${index}`;
+
+        return (
+          <MemoizedOrderCountRow
+            key={rowKey}
+            level={level}
+            textClassName={textClassName}
+          />
+        );
+      })}
     </div>
   );
 }

@@ -190,10 +190,17 @@ export function getClosestLevelKey(
   levels: StockOrderBookLevelData[],
   currentPrice: number,
 ) {
-  const [closestLevel] = [...levels].sort(
-    (a, b) =>
-      Math.abs(a.price - currentPrice) - Math.abs(b.price - currentPrice),
-  );
+  let closestLevel: StockOrderBookLevelData | null = null;
+  let closestDistance = Number.POSITIVE_INFINITY;
+
+  levels.forEach((level) => {
+    const distance = Math.abs(level.price - currentPrice);
+
+    if (distance < closestDistance) {
+      closestDistance = distance;
+      closestLevel = level;
+    }
+  });
 
   return closestLevel ? getLevelKey(closestLevel) : null;
 }

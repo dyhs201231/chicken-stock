@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { toast } from "sonner";
 import type {
   StockOrderContext,
   StockPendingOrder,
@@ -12,6 +11,11 @@ import {
 } from "../../../../apis/stocks/mutations";
 import type { StockDetailData } from "../../../../types/stock/stock-detail";
 import { formatPrice } from "../../../../utils/stock/stock-detail";
+import {
+  showErrorToast,
+  showSuccessToast,
+  showWarningToast,
+} from "../../../../utils/toast";
 import {
   formatQuantity,
   getApiErrorMessage,
@@ -66,7 +70,7 @@ export default function PendingOrders({
     const pricePerShare = parsePriceInput(editPriceInput);
 
     if (quantity <= 0 || pricePerShare <= 0) {
-      toast.warning("수량과 주문가를 입력해주세요.");
+      void showWarningToast("수량과 주문가를 입력해주세요.");
       return;
     }
 
@@ -81,11 +85,13 @@ export default function PendingOrders({
       },
       {
         onError: (error) => {
-          toast.error(getApiErrorMessage(error, "주문 수정에 실패했습니다."));
+          void showErrorToast(
+            getApiErrorMessage(error, "주문 수정에 실패했습니다."),
+          );
         },
         onSuccess: () => {
           cancelEdit();
-          toast.success("대기 주문을 수정했습니다.");
+          void showSuccessToast("대기 주문을 수정했습니다.");
         },
       },
     );
@@ -99,14 +105,16 @@ export default function PendingOrders({
       },
       {
         onError: (error) => {
-          toast.error(getApiErrorMessage(error, "주문 취소에 실패했습니다."));
+          void showErrorToast(
+            getApiErrorMessage(error, "주문 취소에 실패했습니다."),
+          );
         },
         onSuccess: () => {
           if (editingOrderId === order.orderId) {
             cancelEdit();
           }
 
-          toast.success("대기 주문을 취소했습니다.");
+          void showSuccessToast("대기 주문을 취소했습니다.");
         },
       },
     );

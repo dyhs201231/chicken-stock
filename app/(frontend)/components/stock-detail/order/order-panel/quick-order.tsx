@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { IconMinus, IconPlus } from "@tabler/icons-react";
-import { toast } from "sonner";
 import type {
   CreateStockOrderRequest,
   StockOrderContext,
@@ -18,6 +17,11 @@ import type {
   StockOrderBookSnapshotData,
 } from "../../../../types/stock/stock-detail";
 import { formatPrice } from "../../../../utils/stock/stock-detail";
+import {
+  showErrorToast,
+  showSuccessToast,
+  showWarningToast,
+} from "../../../../utils/toast";
 import {
   formatQuantity,
   getApiErrorMessage,
@@ -91,7 +95,7 @@ export default function QuickOrder({
         : maxSellQuantity;
 
     if (quantity <= 0 || quantity > maxQuantity) {
-      toast.warning(
+      void showWarningToast(
         type === "BUY"
           ? "구매 가능 금액 안에서 수량을 입력해주세요."
           : "판매 가능 수량 안에서 수량을 입력해주세요.",
@@ -114,11 +118,13 @@ export default function QuickOrder({
       },
       {
         onError: (error) => {
-          toast.error(getApiErrorMessage(error, "주문 처리에 실패했습니다."));
+          void showErrorToast(
+            getApiErrorMessage(error, "주문 처리에 실패했습니다."),
+          );
         },
         onSuccess: () => {
           setQuantityInput("");
-          toast.success(
+          void showSuccessToast(
             orderPriceType === "MARKET"
               ? "주문이 체결됐습니다."
               : "대기 주문이 등록됐습니다.",
@@ -131,10 +137,14 @@ export default function QuickOrder({
   const handleCancelAll = () => {
     cancelAllOrders.mutate(undefined, {
       onError: (error) => {
-        toast.error(getApiErrorMessage(error, "주문 취소에 실패했습니다."));
+        void showErrorToast(
+          getApiErrorMessage(error, "주문 취소에 실패했습니다."),
+        );
       },
       onSuccess: (data) => {
-        toast.success(`${data.canceledCount}건의 대기 주문을 취소했습니다.`);
+        void showSuccessToast(
+          `${data.canceledCount}건의 대기 주문을 취소했습니다.`,
+        );
       },
     });
   };

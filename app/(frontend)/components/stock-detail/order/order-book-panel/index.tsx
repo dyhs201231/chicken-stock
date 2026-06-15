@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useSyncExternalStore } from "react";
+import { memo, useMemo, useSyncExternalStore } from "react";
 import { useStockOrderBookQuery } from "../../../../apis/stocks/queries";
 import { DISPLAY_LEVEL_COUNT } from "./constants";
 import MarketSummary from "./market-summary";
@@ -30,7 +30,7 @@ function getServerHydrationSnapshot() {
   return false;
 }
 
-export default function OrderBookPanel({
+function OrderBookPanel({
   initialOrderBookSnapshot,
   onPriceSelect,
   selectedPrice,
@@ -42,7 +42,7 @@ export default function OrderBookPanel({
     getClientHydrationSnapshot,
     getServerHydrationSnapshot,
   );
-  
+
   const { data, isError, isLoading } = useStockOrderBookQuery(
     stock.id,
     initialOrderBookSnapshot,
@@ -174,3 +174,5 @@ export default function OrderBookPanel({
     </section>
   );
 }
+
+export default memo(OrderBookPanel);
