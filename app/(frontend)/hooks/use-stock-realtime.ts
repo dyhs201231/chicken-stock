@@ -11,7 +11,6 @@ import type {
   StockMutationSync,
 } from "@/app/(frontend)/apis/stocks/api";
 import { stockQueryKeys } from "@/app/(frontend)/apis/stocks/queries";
-import { getSupabaseBrowserClient } from "@/app/(frontend)/lib/supabase-client";
 
 type UserOrderFilledPayload = {
   executedAt: string;
@@ -31,6 +30,48 @@ type StockUpdatedPayload = StockMarketSync & {
   sync?: StockMarketSync | null;
   ticker?: string;
 };
+
+type IdleCallbackHandle = ReturnType<Window["requestIdleCallback"]>;
+
+function scheduleRealtimeSubscription(subscribe: () => void | Promise<void>) {
+  let idleCallbackId: IdleCallbackHandle | null = null;
+  let timeoutId: number | null = null;
+
+  const animationFrameId = window.requestAnimationFrame(() => {
+    const requestIdleCallback =
+      typeof window.requestIdleCallback === "function"
+        ? window.requestIdleCallback.bind(window)
+        : null;
+
+    if (requestIdleCallback) {
+      idleCallbackId = requestIdleCallback(
+        () => {
+          void subscribe();
+        },
+        {
+          timeout: 1_500,
+        },
+      );
+      return;
+    }
+
+    timeoutId = window.setTimeout(() => {
+      void subscribe();
+    }, 0);
+  });
+
+  return () => {
+    window.cancelAnimationFrame(animationFrameId);
+
+    if (idleCallbackId !== null) {
+      window.cancelIdleCallback(idleCallbackId);
+    }
+
+    if (timeoutId !== null) {
+      window.clearTimeout(timeoutId);
+    }
+  };
+}
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -155,31 +196,54 @@ export function useUserRealtime(userOrderChannel: string | null | undefined) {
       return;
     }
 
-    const supabase = getSupabaseBrowserClient();
+    let didCancel = false;
+    let removeChannel: (() => void) | null = null;
 
-    if (!supabase) {
-      return;
-    }
+    const cancelSubscriptionStart = scheduleRealtimeSubscription(async () => {
+      const { getSupabaseBrowserClient } =
+        await import("@/app/(frontend)/lib/supabase-client");
 
-    const channel = supabase
-      .channel(userOrderChannel)
-      .on("broadcast", { event: "order_filled" }, ({ payload }) => {
-        if (!isUserOrderFilledPayload(payload)) {
-          return;
-        }
+      if (didCancel) {
+        return;
+      }
 
-        if (hasMutationSyncPayload(payload.sync)) {
-          applyPersonalTradeSync(queryClient, payload.stockId, payload.sync);
-        } else {
-          invalidatePersonalTradeQueries(queryClient, payload.stockId);
-        }
+      const supabase = getSupabaseBrowserClient();
 
-        showOrderFilledToast(payload);
-      })
-      .subscribe();
+      if (!supabase) {
+        return;
+      }
+
+      const channel = supabase
+        .channel(userOrderChannel)
+        .on("broadcast", { event: "order_filled" }, ({ payload }) => {
+          if (!isUserOrderFilledPayload(payload)) {
+            return;
+          }
+
+          if (hasMutationSyncPayload(payload.sync)) {
+            applyPersonalTradeSync(queryClient, payload.stockId, payload.sync);
+          } else {
+            invalidatePersonalTradeQueries(queryClient, payload.stockId);
+          }
+
+          showOrderFilledToast(payload);
+        })
+        .subscribe();
+
+      if (didCancel) {
+        void supabase.removeChannel(channel);
+        return;
+      }
+
+      removeChannel = () => {
+        void supabase.removeChannel(channel);
+      };
+    });
 
     return () => {
-      void supabase.removeChannel(channel);
+      didCancel = true;
+      cancelSubscriptionStart();
+      removeChannel?.();
     };
   }, [queryClient, userOrderChannel]);
 }
@@ -192,34 +256,57 @@ export function useStockRealtime(stockId: number | null | undefined) {
       return;
     }
 
-    const supabase = getSupabaseBrowserClient();
+    let didCancel = false;
+    let removeChannel: (() => void) | null = null;
 
-    if (!supabase) {
-      return;
-    }
+    const cancelSubscriptionStart = scheduleRealtimeSubscription(async () => {
+      const { getSupabaseBrowserClient } =
+        await import("@/app/(frontend)/lib/supabase-client");
 
-    const channel = supabase
-      .channel(`stock:${stockId}`)
-      .on("broadcast", { event: "stock_updated" }, ({ payload }) => {
-        const stockUpdatedPayload = isRecord(payload)
-          ? (payload as StockUpdatedPayload)
-          : null;
-        const sync = stockUpdatedPayload?.sync ?? stockUpdatedPayload;
-        const reason =
-          stockUpdatedPayload?.reason === "ORDER_CHANGED"
-            ? "ORDER_CHANGED"
-            : "TRADE_EXECUTED";
+      if (didCancel) {
+        return;
+      }
 
-        if (hasMarketSyncPayload(sync)) {
-          applyStockMarketSync(queryClient, stockId, sync);
-        } else {
-          invalidateStockMarketQueries(queryClient, stockId, reason);
-        }
-      })
-      .subscribe();
+      const supabase = getSupabaseBrowserClient();
+
+      if (!supabase) {
+        return;
+      }
+
+      const channel = supabase
+        .channel(`stock:${stockId}`)
+        .on("broadcast", { event: "stock_updated" }, ({ payload }) => {
+          const stockUpdatedPayload = isRecord(payload)
+            ? (payload as StockUpdatedPayload)
+            : null;
+          const sync = stockUpdatedPayload?.sync ?? stockUpdatedPayload;
+          const reason =
+            stockUpdatedPayload?.reason === "ORDER_CHANGED"
+              ? "ORDER_CHANGED"
+              : "TRADE_EXECUTED";
+
+          if (hasMarketSyncPayload(sync)) {
+            applyStockMarketSync(queryClient, stockId, sync);
+          } else {
+            invalidateStockMarketQueries(queryClient, stockId, reason);
+          }
+        })
+        .subscribe();
+
+      if (didCancel) {
+        void supabase.removeChannel(channel);
+        return;
+      }
+
+      removeChannel = () => {
+        void supabase.removeChannel(channel);
+      };
+    });
 
     return () => {
-      void supabase.removeChannel(channel);
+      didCancel = true;
+      cancelSubscriptionStart();
+      removeChannel?.();
     };
   }, [queryClient, stockId]);
 }
