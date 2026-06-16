@@ -2,17 +2,7 @@ import Link from "next/link";
 import Logo from "../icons/logo";
 import HeaderSearch from "./header-search";
 import HeaderAuthStatus from "./auth-status";
-
-const NAVIGATION = [
-  {
-    label: "학습",
-    href: "/edu",
-  },
-  {
-    label: "포트폴리오",
-    href: "/portfolio",
-  },
-];
+import HeaderNavigation from "./header-navigation";
 
 export default function Header() {
   return (
@@ -24,17 +14,7 @@ export default function Header() {
             <span className="text-xl text-[#DF2B2E]">치킨스톡</span>
           </Link>
 
-          <div className="flex gap-2">
-            {NAVIGATION.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="flex h-[50px] w-[130px] items-center justify-center text-xl duration-200 hover:font-semibold"
-              >
-                {item.label}
-              </Link>
-            ))}
-          </div>
+          <HeaderNavigation />
         </div>
 
         <div className="flex gap-4">
