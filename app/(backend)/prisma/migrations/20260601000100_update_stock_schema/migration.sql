@@ -14,13 +14,13 @@ CREATE TYPE "InvestmentType" AS ENUM ('AGGRESSIVE', 'ACTIVE', 'BALANCED', 'CONSE
 CREATE TYPE "User_type" AS ENUM ('NORMAL', 'AGENT');
 
 -- CreateEnum
-CREATE TYPE "Trade_order_type" AS ENUM ('매수', '매도');
+CREATE TYPE "Trade_order_type" AS ENUM ('BUY', 'SELL');
 
 -- CreateEnum
 CREATE TYPE "Trade_order_status" AS ENUM ('PENDING', 'COMPLETED', 'CANCELED');
 
 -- CreateEnum
-CREATE TYPE "Order_book_side" AS ENUM ('매도', '매수');
+CREATE TYPE "Order_book_side" AS ENUM ('ASK', 'BID');
 
 -- CreateEnum
 CREATE TYPE "Currency_code" AS ENUM ('KRW', 'USD');

@@ -4,6 +4,7 @@ import {
   fetchStockCandles,
   fetchStockOrderBook,
   fetchStockOrders,
+  fetchStockSearchResults,
   fetchStocks,
 } from "./api";
 import type { StockCandleInterval } from "./api";
@@ -15,6 +16,8 @@ export const stockQueryKeys = {
   list: (market: string, ranking: string) =>
     [...stockQueryKeys.lists(), market, ranking] as const,
   analytics: (stockId: number) => ["stock-analytics", stockId] as const,
+  search: (query: string) =>
+    [...stockQueryKeys.lists(), "search", query] as const,
   candles: (stockId: number, interval: StockCandleInterval) =>
     ["stock-candles", stockId, interval] as const,
   orderBook: (stockId: number) => ["stock-order-book", stockId] as const,
@@ -31,6 +34,17 @@ export function useStocksInfiniteQuery(market: string, ranking: string) {
     queryFn: ({ pageParam }) => fetchStocks(market, ranking, pageParam),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => lastPage.nextPage,
+  });
+}
+
+export function useStockSearchQuery(query: string, enabled = true) {
+  const trimmedQuery = query.trim();
+
+  return useQuery({
+    queryKey: stockQueryKeys.search(trimmedQuery),
+    queryFn: () => fetchStockSearchResults(trimmedQuery),
+    enabled: enabled && trimmedQuery.length > 0,
+    staleTime: 60_000,
   });
 }
 
