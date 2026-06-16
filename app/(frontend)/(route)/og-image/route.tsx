@@ -7,7 +7,7 @@ const size = {
 };
 
 export async function GET(request: Request) {
-  const logoUrl = new URL("/images/logo-og.webp", request.url).toString();
+  const logoUrl = new URL("/images/logo-og.png", request.url).toString();
   const logoResponse = await fetch(logoUrl);
   const logoBuffer = await logoResponse.arrayBuffer();
   const logoDataUrl = `data:image/png;base64,${Buffer.from(logoBuffer).toString("base64")}`;
