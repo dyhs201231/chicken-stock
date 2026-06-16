@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import type { Metadata } from "next";
 import { IconChevronLeft } from "@tabler/icons-react";
 import { getEducationArticle } from "@/app/(frontend)/apis/edu/queries";
 import { getArticleQuizProgress } from "@/app/(frontend)/apis/edu/quizzes/queries";
@@ -12,6 +13,14 @@ import { parseArticleContent } from "../../../../utils/edu/article-content";
 import { isPositiveIntegerString } from "../../../../utils/number";
 import ArticleProgressTracker from "../../../../components/edu/article-progress-tracker";
 import ArticleMessage from "../../../../components/edu/article-message";
+import QuizStartButton from "./quiz-start-button";
+import {
+  createArticleDescription,
+  createCanonicalUrl,
+  createPageMetadata,
+  getArticleSeoData,
+  SITE_NAME,
+} from "../../seo";
 
 type ArticlePageProps = {
   params: Promise<{
@@ -24,6 +33,41 @@ type ArticlePageProps = {
 
 const READING_CHARACTERS_PER_MINUTE = 400;
 const ARTICLE_PROGRESS_TARGET_ID = "article-progress-content";
+
+export async function generateMetadata({
+  params,
+  searchParams,
+}: ArticlePageProps): Promise<Metadata> {
+  const { articlesId } = await params;
+  const { level } = await searchParams;
+  const seoData = await getArticleSeoData(articlesId, level);
+
+  if (!seoData) {
+    return createPageMetadata({
+      title: "학습 글 | 주식 투자 학습 | Chicken Stock",
+      description: "Chicken Stock에서 주식 투자 학습 콘텐츠를 확인해보세요.",
+      url: createCanonicalUrl(`/edu/articles/${articlesId}`),
+      ogType: "article",
+    });
+  }
+
+  const title = `${seoData.article.title} - Level ${seoData.level} 주식 투자 학습 | Chicken Stock`;
+  const description = createArticleDescription(
+    seoData.article.title,
+    seoData.article.content,
+  );
+  const url = createCanonicalUrl(
+    `/edu/articles/${seoData.article.id}`,
+    new URLSearchParams({ level: seoData.level }),
+  );
+
+  return createPageMetadata({
+    title,
+    description,
+    url,
+    ogType: "article",
+  });
+}
 
 function getVisibleContentBlocks(
   contentBlocks: ReturnType<typeof parseArticleContent>,
@@ -135,15 +179,47 @@ export default async function ArticlePage({
   }
 
   const isQuizCompleted = quizProgress?.isCorrect === true;
-  const quizLinkQuery = {
-    level: articleLevel,
-  };
+  const quizHref = `/edu/quizzes/${articlesId}?level=${articleLevel}`;
   const articleListLinkQuery = {
     openLevel: String(article.educationSummary.stage),
   };
 
+  const seoTitle = `${article.title} - Level ${articleLevel} 주식 투자 학습 | Chicken Stock`;
+  const seoDescription = createArticleDescription(
+    article.title,
+    article.content,
+  );
+  const canonicalUrl = createCanonicalUrl(
+    `/edu/articles/${article.id}`,
+    new URLSearchParams({ level: articleLevel }),
+  );
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: article.title,
+    name: seoTitle,
+    description: seoDescription,
+    url: canonicalUrl,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": canonicalUrl,
+    },
+    educationalLevel: `Level ${articleLevel}`,
+    publisher: {
+      "@type": "Organization",
+      name: SITE_NAME,
+    },
+  };
+
   return (
     <main className="relative min-h-[calc(100dvh-74px)] bg-white px-5 pt-36 pb-20 text-zinc-950">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd),
+        }}
+      />
+
       <ArticleProgressTracker
         articleId={articlesId}
         targetId={ARTICLE_PROGRESS_TARGET_ID}
@@ -253,27 +329,11 @@ export default async function ArticlePage({
         )}
 
         <div className="mt-16 flex justify-center">
-          {isQuizCompleted && (
-            <button
-              type="button"
-              className="inline-flex min-h-14 cursor-not-allowed items-center justify-center rounded-lg bg-zinc-300 px-10 text-2xl font-semibold text-zinc-500"
-              disabled
-            >
-              퀴즈 완료
-            </button>
-          )}
-
-          {!isQuizCompleted && (
-            <Link
-              href={{
-                pathname: `/edu/quizzes/${articlesId}`,
-                query: quizLinkQuery,
-              }}
-              className="inline-flex min-h-14 items-center justify-center rounded-lg bg-zinc-950 px-10 text-2xl font-semibold text-white transition-colors hover:bg-zinc-800 focus-visible:ring-2 focus-visible:ring-zinc-500 focus-visible:ring-offset-2 focus-visible:outline-none"
-            >
-              퀴즈 풀러 가기
-            </Link>
-          )}
+          <QuizStartButton
+            href={quizHref}
+            isCompleted={isQuizCompleted}
+            isLoggedIn={Boolean(currentUserIdParam)}
+          />
         </div>
       </article>
     </main>

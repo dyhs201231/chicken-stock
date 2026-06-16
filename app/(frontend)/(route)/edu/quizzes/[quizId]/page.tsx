@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { IconChevronLeft } from "@tabler/icons-react";
 import { getEducationArticle } from "@/app/(frontend)/apis/edu/queries";
 import type { QuizResponse } from "@/app/(frontend)/apis/edu/quizzes/api";
@@ -7,6 +8,12 @@ import { getRequestOrigin } from "../../../../lib/server/request";
 import { isPositiveIntegerString } from "../../../../utils/number";
 import QuizContainer from "@/app/(frontend)/components/edu/quizzes/quiz-container";
 import type { QuizContentData } from "@/app/(frontend)/components/edu/quizzes/quiz-content";
+import {
+  createCanonicalUrl,
+  createPageMetadata,
+  getArticleSeoData,
+  SITE_NAME,
+} from "../../seo";
 
 type QuizPageProps = {
   params: Promise<{
@@ -60,6 +67,39 @@ async function getQuizArticleContext(quizId: string, level?: string) {
   };
 }
 
+function getQuizSeoTitle(articleTitle: string, level?: string | null) {
+  return level
+    ? `${articleTitle} 퀴즈 - Level ${level} | Chicken Stock`
+    : `${articleTitle} 퀴즈 | 주식 투자 퀴즈 | Chicken Stock`;
+}
+
+function getQuizSeoDescription(articleTitle: string) {
+  return `${articleTitle} 개념을 이해했는지 퀴즈로 확인하고, Chicken Stock에서 주식 투자 지식을 단계별로 학습해보세요.`;
+}
+
+export async function generateMetadata({
+  params,
+  searchParams,
+}: QuizPageProps): Promise<Metadata> {
+  const { quizId } = await params;
+  const { level } = await searchParams;
+  const seoData = await getArticleSeoData(quizId, level);
+  const articleTitle = seoData?.article.title ?? "주식 투자";
+  const title = getQuizSeoTitle(articleTitle, seoData?.level ?? level);
+  const description = getQuizSeoDescription(articleTitle);
+  const url = createCanonicalUrl(`/edu/quizzes/${quizId}`);
+
+  return createPageMetadata({
+    title,
+    description,
+    url,
+    robots: {
+      index: false,
+      follow: false,
+    },
+  });
+}
+
 async function getInitialQuizzes(articleId: number) {
   if (articleId <= 0) {
     return [];
@@ -102,9 +142,32 @@ export default async function QuizPage({
     level,
   );
   const initialQuizzes: QuizContentData[] = await getInitialQuizzes(articleId);
+  const quizTitle = getQuizSeoTitle(label.title, level);
+  const quizDescription = getQuizSeoDescription(label.title);
+  const canonicalUrl = createCanonicalUrl(`/edu/quizzes/${articleId}`);
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    name: quizTitle,
+    description: quizDescription,
+    url: canonicalUrl,
+    learningResourceType: "Quiz",
+    educationalLevel: level ? `Level ${level}` : undefined,
+    publisher: {
+      "@type": "Organization",
+      name: SITE_NAME,
+    },
+  };
 
   return (
     <main className="relative min-h-screen bg-white px-16 py-16 text-black">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd),
+        }}
+      />
+
       <Link
         aria-label="뒤로가기"
         className="absolute top-20 left-6 flex size-16 items-center justify-center text-zinc-500 transition-colors hover:text-zinc-800 focus-visible:ring-2 focus-visible:ring-zinc-500 focus-visible:ring-offset-2 focus-visible:outline-none md:top-24 md:left-20"
