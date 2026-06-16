@@ -6,7 +6,6 @@ import RealtimeBridge from "../components/providers/realtime-bridge";
 import ToastProvider from "../components/providers/toast-provider";
 import Header from "../components/header";
 import MiniPortfolio from "../components/mini-portfolio";
-import { Toaster } from "sonner";
 
 const atoz = localFont({
   src: [
@@ -62,7 +61,7 @@ export default function RootLayout({
           {children}
 
           <MiniPortfolio />
-          <Toaster position="top-right" />
+          <ToastProvider position="top-right" />
         </QueryProvider>
       </body>
     </html>
