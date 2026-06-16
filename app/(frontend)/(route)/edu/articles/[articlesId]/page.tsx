@@ -13,6 +13,7 @@ import { parseArticleContent } from "../../../../utils/edu/article-content";
 import { isPositiveIntegerString } from "../../../../utils/number";
 import ArticleProgressTracker from "../../../../components/edu/article-progress-tracker";
 import ArticleMessage from "../../../../components/edu/article-message";
+import QuizStartButton from "./quiz-start-button";
 import {
   createArticleDescription,
   createCanonicalUrl,
@@ -178,9 +179,7 @@ export default async function ArticlePage({
   }
 
   const isQuizCompleted = quizProgress?.isCorrect === true;
-  const quizLinkQuery = {
-    level: articleLevel,
-  };
+  const quizHref = `/edu/quizzes/${articlesId}?level=${articleLevel}`;
   const articleListLinkQuery = {
     openLevel: String(article.educationSummary.stage),
   };
@@ -330,27 +329,11 @@ export default async function ArticlePage({
         )}
 
         <div className="mt-16 flex justify-center">
-          {isQuizCompleted && (
-            <button
-              type="button"
-              className="inline-flex min-h-14 cursor-not-allowed items-center justify-center rounded-lg bg-zinc-300 px-10 text-2xl font-semibold text-zinc-500"
-              disabled
-            >
-              퀴즈 완료
-            </button>
-          )}
-
-          {!isQuizCompleted && (
-            <Link
-              href={{
-                pathname: `/edu/quizzes/${articlesId}`,
-                query: quizLinkQuery,
-              }}
-              className="inline-flex min-h-14 items-center justify-center rounded-lg bg-zinc-950 px-10 text-2xl font-semibold text-white transition-colors hover:bg-zinc-800 focus-visible:ring-2 focus-visible:ring-zinc-500 focus-visible:outline-none"
-            >
-              퀴즈 풀러 가기
-            </Link>
-          )}
+          <QuizStartButton
+            href={quizHref}
+            isCompleted={isQuizCompleted}
+            isLoggedIn={Boolean(currentUserIdParam)}
+          />
         </div>
       </article>
     </main>
