@@ -36,6 +36,9 @@ const atoz = localFont({
 export const metadata: Metadata = {
   title: "Chicken Stock",
   description: "Chicken Stock",
+  verification: {
+    google: "_Rw9venikBySdkKF0Y78BSVhJpXs6JEcX_gsGnGPaqo",
+  },
 };
 
 export default function RootLayout({
