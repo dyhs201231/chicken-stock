@@ -19,6 +19,7 @@ import {
   getProfitClassName,
   getSortOptionLabel,
 } from "./utils";
+import Link from "next/link";
 
 export default function MiniPortfolioPanel() {
   const { data } = useGetPortfolio();
@@ -67,7 +68,7 @@ export default function MiniPortfolioPanel() {
       className={twMerge(
         "fixed right-6 z-40 w-[300px] overflow-hidden border border-[rgba(123,120,120,0.35)] bg-white shadow-[0_4px_18px_rgba(0,0,0,0.18)] transition-all duration-300 ease-out",
         isOpen &&
-          "col bottom-3 h-[min(450px,calc(100dvh-24px))] gap-5 rounded-[8px] p-5",
+          "col bottom-3 h-[min(450px,calc(100dvh-24px))] gap-5 rounded-[8px] py-5",
         !isOpen && "bottom-0 h-[30px] rounded-t-[8px]",
       )}
     >
@@ -75,7 +76,7 @@ export default function MiniPortfolioPanel() {
         type="button"
         aria-expanded={isOpen}
         aria-label={togglePortfolioAriaLabel}
-        className="row h-[30px] w-full cursor-pointer items-center justify-between text-left"
+        className="row h-[30px] w-full cursor-pointer items-center justify-between px-5 text-left"
         onClick={() => setIsOpen((prev) => !prev)}
       >
         <span
@@ -106,9 +107,9 @@ export default function MiniPortfolioPanel() {
 
       <div
         aria-hidden={!isOpen}
-        className="h-[calc(100%-30px)] overflow-y-auto"
+        className="h-[calc(100%-30px)] overflow-y-auto px-5"
       >
-        <div className="grid grid-cols-2 gap-4">
+        <Link href="/portfolio" className="grid grid-cols-2 gap-4">
           <div className="col gap-1">
             <p className="text-[12px] leading-4 font-medium">원화</p>
             <p className="truncate text-[18px] leading-6 font-medium">
@@ -122,7 +123,7 @@ export default function MiniPortfolioPanel() {
               {formatDollar(data.usdBalance)}
             </p>
           </div>
-        </div>
+        </Link>
 
         <section className="col mt-7 gap-1">
           <p className="text-[13px] leading-4 font-medium">내 투자</p>
