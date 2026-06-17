@@ -1,5 +1,6 @@
 import "server-only";
 
+import { getUsdKrwExchangeRate } from "@/app/(backend)/lib/market-indices";
 import { getTotalAvailableOrderAmountKrw } from "@/app/(backend)/lib/portfolio-balance";
 import { getLatestOrderBookSnapshot } from "@/app/(backend)/lib/stock-order-book";
 import {
@@ -148,7 +149,7 @@ export async function getStockOrderContext(userId: bigint, stockId: number) {
     throw new StockOrderContextError("계좌가 없습니다.", 404);
   }
 
-  const [pendingOrders, pendingBuyOrders] = await Promise.all([
+  const [pendingOrders, pendingBuyOrders, usdKrwExchangeRate] = await Promise.all([
     prisma.tradeOrder.findMany({
       orderBy: {
         orderedAt: "desc",
@@ -167,6 +168,7 @@ export async function getStockOrderContext(userId: bigint, stockId: number) {
         type: TradeOrderType.BUY,
       },
     }),
+    getUsdKrwExchangeRate(),
   ]);
   const holding = portfolio.items[0] ?? null;
   const pendingSellQuantity = pendingOrders
@@ -222,6 +224,7 @@ export async function getStockOrderContext(userId: bigint, stockId: number) {
       getTotalAvailableOrderAmountKrw(
         portfolio.krwBalance,
         portfolio.usdBalance,
+        usdKrwExchangeRate,
       ),
     ),
   };

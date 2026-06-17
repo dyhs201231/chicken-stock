@@ -4,6 +4,7 @@ import {
   ACCESS_TOKEN_COOKIE_NAME,
   verifyAuthToken,
 } from "@/app/(backend)/lib/auth";
+import { getUsdKrwExchangeRate } from "@/app/(backend)/lib/market-indices";
 import { prisma } from "@/app/(backend)/lib/prisma";
 import { getTotalAvailableOrderAmountKrw } from "@/app/(backend)/lib/portfolio-balance";
 import { Prisma } from "@/app/(backend)/generated/prisma/client";
@@ -227,6 +228,7 @@ export async function GET(request: NextRequest) {
   }
 
   const investmentAmounts = getPortfolioInvestmentAmounts(portfolio.items);
+  const usdKrwExchangeRate = await getUsdKrwExchangeRate();
 
   return NextResponse.json({
     accountNumber: portfolio.accountNumber,
@@ -256,6 +258,7 @@ export async function GET(request: NextRequest) {
       getTotalAvailableOrderAmountKrw(
         portfolio.krwBalance,
         portfolio.usdBalance,
+        usdKrwExchangeRate,
       ),
     ),
     totalBalance: serializeDecimalNumber(portfolio.totalBalance),

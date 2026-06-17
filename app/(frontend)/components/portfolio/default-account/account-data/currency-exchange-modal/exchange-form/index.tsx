@@ -1,6 +1,5 @@
 import { useGetPortfolio } from "@/app/(frontend)/apis/portfolio/queries";
 import { Button, Input, Tab } from "@/app/(frontend)/components/ui";
-import { EXCHANGE_RATE } from "@/app/(frontend)/constants/portfolio";
 import { usePortfolioStore } from "@/app/(frontend)/stores/portfolio";
 import { ExchangeType } from "@/app/(frontend)/types/portfolio";
 import { IconChevronsDown } from "@tabler/icons-react";
@@ -19,8 +18,10 @@ const TAB = [
 ];
 
 export default function ExchangeForm({
+  exchangeRate,
   setStep,
 }: {
+  exchangeRate: number;
   setStep: React.Dispatch<React.SetStateAction<string>>;
 }) {
   const { exchangeData, setExchangeData } = usePortfolioStore();
@@ -30,8 +31,8 @@ export default function ExchangeForm({
     : "";
   const exchangedValue =
     exchangeData.type === "krwToUsd"
-      ? exchangeData.value / EXCHANGE_RATE
-      : exchangeData.value * EXCHANGE_RATE;
+      ? exchangeData.value / exchangeRate
+      : exchangeData.value * exchangeRate;
   const formattedExchangedValue = exchangedValue.toLocaleString("ko-KR", {
     maximumFractionDigits: exchangeData.type === "krwToUsd" ? 2 : 0,
   });
@@ -159,7 +160,7 @@ export default function ExchangeForm({
           </div>
 
           <div className="text-end">
-            적용 환율 : {EXCHANGE_RATE.toLocaleString()}원
+            적용 환율 : {exchangeRate.toLocaleString()}원
           </div>
         </div>
       </div>

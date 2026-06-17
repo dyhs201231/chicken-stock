@@ -1,14 +1,15 @@
 import { useExchangePortfolio } from "@/app/(frontend)/apis/portfolio/mutations";
 import { Button } from "@/app/(frontend)/components/ui";
-import { EXCHANGE_RATE } from "@/app/(frontend)/constants/portfolio";
 import { usePortfolioStore } from "@/app/(frontend)/stores/portfolio";
 import React from "react";
 import { toast } from "sonner";
 
 export default function ExchangeCheck({
+  exchangeRate,
   onExchangeSuccess,
   setStep,
 }: {
+  exchangeRate: number;
   onExchangeSuccess: () => void;
   setStep: React.Dispatch<React.SetStateAction<string>>;
 }) {
@@ -17,8 +18,8 @@ export default function ExchangeCheck({
     useExchangePortfolio();
   const exchangedValue =
     exchangeData.type === "krwToUsd"
-      ? exchangeData.value / EXCHANGE_RATE
-      : exchangeData.value * EXCHANGE_RATE;
+      ? exchangeData.value / exchangeRate
+      : exchangeData.value * exchangeRate;
   const sourceAmount = exchangeData.value.toLocaleString("ko-KR");
   const targetAmount = exchangedValue.toLocaleString("ko-KR", {
     maximumFractionDigits: exchangeData.type === "krwToUsd" ? 2 : 0,
@@ -57,7 +58,7 @@ export default function ExchangeCheck({
 
         <div className="row justify-between text-xl">
           <p>적용 환율</p>
-          <p>{EXCHANGE_RATE.toLocaleString()} 원</p>
+          <p>{exchangeRate.toLocaleString()} 원</p>
         </div>
 
         <div className="row justify-between text-xl">
