@@ -1,15 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
-import {
-  getCachedMarketIndexSummaries,
-  getFreshMarketIndexSummaries,
-} from "../../lib/market-indices";
+import { NextResponse } from "next/server";
+import { getCachedMarketIndexSummaries } from "../../lib/market-indices";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const shouldRefresh = request.nextUrl.searchParams.get("refresh") === "true";
-    const indices = shouldRefresh
-      ? await getFreshMarketIndexSummaries()
-      : await getCachedMarketIndexSummaries();
+    const indices = await getCachedMarketIndexSummaries();
 
     return NextResponse.json({
       ok: true,

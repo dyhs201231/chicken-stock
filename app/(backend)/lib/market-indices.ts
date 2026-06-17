@@ -163,7 +163,8 @@ const MARKET_INDEX_CONFIGS: MarketIndexConfig[] = [
 ];
 
 const FALLBACK_CANDLE_COUNT = 260;
-const MARKET_INDEX_REVALIDATE_SECONDS = 60 * 60 * 24;
+const MARKET_INDEX_REVALIDATE_SECONDS = 60 * 60;
+const USD_KRW_EXCHANGE_RATE_REVALIDATE_SECONDS = 60 * 10;
 const TWELVE_DATA_API_BASE_URL = "https://api.twelvedata.com";
 const YAHOO_CHART_API_BASE_URL =
   "https://query1.finance.yahoo.com/v8/finance/chart";
@@ -975,15 +976,6 @@ export async function getMarketIndexCandles(
   return getCandlesByInterval(toStockCandleResponse(detail.candles), interval);
 }
 
-export async function getUsdKrwExchangeRate() {
-  const detail = await getCachedMarketIndexDetail("usd-krw");
-
-  return (
-    detail?.currentValue ??
-    getFallbackDetail(MARKET_INDEX_CONFIGS[4]).currentValue
-  );
-}
-
 export async function getFreshUsdKrwMarketIndexDetail() {
   const config = getMarketIndexConfig("usd-krw");
 
@@ -999,8 +991,16 @@ export async function getFreshUsdKrwMarketIndexDetail() {
   );
 }
 
-export async function getFreshUsdKrwExchangeRate() {
-  return (await getFreshUsdKrwMarketIndexDetail()).currentValue;
+export const getCachedUsdKrwMarketIndexDetail = unstable_cache(
+  getFreshUsdKrwMarketIndexDetail,
+  ["usd-krw-exchange-rate-v1"],
+  {
+    revalidate: USD_KRW_EXCHANGE_RATE_REVALIDATE_SECONDS,
+  },
+);
+
+export async function getUsdKrwExchangeRate() {
+  return (await getCachedUsdKrwMarketIndexDetail()).currentValue;
 }
 
 export { parseCandleInterval };

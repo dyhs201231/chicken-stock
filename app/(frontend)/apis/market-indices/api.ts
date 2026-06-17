@@ -43,16 +43,8 @@ type ExchangeRateResponse =
       error: string;
     };
 
-type FetchMarketIndicesOptions = {
-  refresh?: boolean;
-};
-
-export async function fetchMarketIndices(options?: FetchMarketIndicesOptions) {
-  const { data } = await requests.get<MarketIndicesResponse>("/api/indices", {
-    params: {
-      ...(options?.refresh ? { refresh: "true" } : {}),
-    },
-  });
+export async function fetchMarketIndices() {
+  const { data } = await requests.get<MarketIndicesResponse>("/api/indices");
 
   if (!data.ok) {
     throw new Error(data.error);

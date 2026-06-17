@@ -7,7 +7,7 @@ import {
 import {
   getTotalAvailableOrderAmountKrw,
 } from "@/app/(backend)/lib/portfolio-balance";
-import { getFreshUsdKrwExchangeRate } from "@/app/(backend)/lib/market-indices";
+import { getUsdKrwExchangeRate } from "@/app/(backend)/lib/market-indices";
 import { prisma } from "@/app/(backend)/lib/prisma";
 import { lockPortfolioRows } from "@/app/(backend)/lib/stock-order-matching";
 import { Prisma } from "@/app/(backend)/generated/prisma/client";
@@ -227,7 +227,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const usdKrwExchangeRate = await getFreshUsdKrwExchangeRate();
+  const usdKrwExchangeRate = await getUsdKrwExchangeRate();
   const exchangedValue = getExchangedValue(
     payload.type,
     payload.value,

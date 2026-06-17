@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { getFreshUsdKrwMarketIndexDetail } from "../../../lib/market-indices";
+import { getCachedUsdKrwMarketIndexDetail } from "../../../lib/market-indices";
 
 export async function GET() {
   try {
-    const exchangeRate = await getFreshUsdKrwMarketIndexDetail();
+    const exchangeRate = await getCachedUsdKrwMarketIndexDetail();
 
     return NextResponse.json({
       ok: true,

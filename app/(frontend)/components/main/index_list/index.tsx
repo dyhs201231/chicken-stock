@@ -27,9 +27,7 @@ function IndexListFallback() {
 
 export default function IndexList({ initialIndices }: IndexListProps) {
   const isHydrated = useIsHydrated();
-  const { data } = useMarketIndicesQuery(initialIndices, {
-    refreshOnFirstVisit: true,
-  });
+  const { data } = useMarketIndicesQuery(initialIndices);
   const marketIndexes =
     isHydrated && data !== undefined ? data : (initialIndices ?? []);
 

@@ -18,13 +18,7 @@ export const marketIndexQueryKeys = {
   exchangeRate: () => ["market-index-exchange-rate", "usd-krw"] as const,
 };
 
-const MARKET_INDEX_REFETCH_INTERVAL_MS = 1000 * 60 * 60 * 24;
-const MARKET_INDEX_FIRST_VISIT_REFRESH_KEY =
-  "chicken-stock.market-indices.first-visit-refresh";
-
-type UseMarketIndicesQueryOptions = {
-  refreshOnFirstVisit?: boolean;
-};
+const MARKET_INDEX_REFETCH_INTERVAL_MS = 1000 * 60 * 60;
 
 type UseMarketIndexCandlesQueryOptions = {
   hydrateInitialData?: boolean;
@@ -123,7 +117,6 @@ function shouldHydrateCandleQueryData(
 
 export function useMarketIndicesQuery(
   initialData?: MarketIndexSummaryData[],
-  options?: UseMarketIndicesQueryOptions,
 ) {
   const queryClient = useQueryClient();
   const query = useQuery({
@@ -144,44 +137,6 @@ export function useMarketIndicesQuery(
       (currentData) => mergeMarketIndexQueryData(currentData, initialData),
     );
   }, [initialData, queryClient]);
-
-  useEffect(() => {
-    if (!options?.refreshOnFirstVisit) {
-      return;
-    }
-
-    const hasRefreshed = window.sessionStorage.getItem(
-      MARKET_INDEX_FIRST_VISIT_REFRESH_KEY,
-    );
-
-    if (hasRefreshed) {
-      return;
-    }
-
-    window.sessionStorage.setItem(
-      MARKET_INDEX_FIRST_VISIT_REFRESH_KEY,
-      "true",
-    );
-
-    let isActive = true;
-
-    fetchMarketIndices({ refresh: true })
-      .then((marketIndexes) => {
-        if (!isActive) {
-          return;
-        }
-
-        queryClient.setQueryData<MarketIndexSummaryData[]>(
-          marketIndexQueryKeys.lists(),
-          (currentData) => mergeMarketIndexQueryData(currentData, marketIndexes),
-        );
-      })
-      .catch(() => undefined);
-
-    return () => {
-      isActive = false;
-    };
-  }, [options?.refreshOnFirstVisit, queryClient]);
 
   return query;
 }
