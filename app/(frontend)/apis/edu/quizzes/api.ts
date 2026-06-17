@@ -4,12 +4,18 @@ import type { QuizContentData } from "../../../components/edu/quizzes/quiz-conte
 export type QuizResponse =
   | {
       ok: true;
-      data: {
-        source: "ARTICLE" | "SKIPPED" | "CURRENT_STEP";
-        currentLevel?: number;
-        currentStep?: number;
-        quizzes: QuizContentData[];
-      };
+      data:
+        | {
+            source: "ARTICLE" | "SKIPPED" | "CURRENT_STEP";
+            currentLevel?: number;
+            currentStep?: number;
+            quizzes: QuizContentData[];
+          }
+        | {
+            source: "ARTICLE_PROGRESS";
+            isCorrect: boolean;
+            quizzes: QuizContentData[];
+          };
     }
   | {
       ok: false;
@@ -21,8 +27,11 @@ export type SubmitQuizAnswerResponse =
       ok: true;
       data: {
         answer: string;
-        isCorrect: boolean;
         explanation: string;
+        isCorrect: boolean;
+        isRewardPaid: boolean;
+        rewardAmountKrw: number;
+        selectedAnswer: string;
       };
     }
   | {
@@ -35,7 +44,10 @@ type ArticleQuizProgressResponse =
       ok: true;
       data: {
         source: "ARTICLE_PROGRESS";
+        currentLevel?: number;
+        currentStep?: number;
         isCorrect: boolean;
+        quizzes: QuizContentData[];
       };
     }
   | {
@@ -44,15 +56,20 @@ type ArticleQuizProgressResponse =
     };
 
 type SubmitQuizAnswerParams = {
+  articleId?: number;
   quizId: number;
   userAnswer: string;
   userId: string;
 };
 
-export async function fetchQuizzesByArticleId(articleId: number) {
+export async function fetchQuizzesByArticleId(
+  articleId: number,
+  userId?: string,
+) {
   const { data } = await requests.get<QuizResponse>("/api/quizzes", {
     params: {
       articleId,
+      ...(userId ? { userId } : {}),
     },
   });
 

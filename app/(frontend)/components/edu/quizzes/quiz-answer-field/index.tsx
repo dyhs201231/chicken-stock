@@ -6,6 +6,7 @@ export type QuizType = "SHORT_ANSWER" | "TRUE_FALSE" | "MULTIPLE_CHOICE";
 type QuizAnswerFieldProps = {
   quizType: QuizType;
   optionText: string[];
+  disabled?: boolean;
   shortAnswer: string;
   selectedAnswer: string;
   onSelectAnswer: (answer: string) => void;
@@ -31,6 +32,7 @@ function getTrueFalseVariant(option: string): "true" | "false" {
 export default function QuizAnswerField({
   quizType,
   optionText,
+  disabled = false,
   shortAnswer,
   selectedAnswer,
   onSelectAnswer,
@@ -42,6 +44,7 @@ export default function QuizAnswerField({
         <span className="sr-only">주관식 답안</span>
         <Input
           inputClassName="h-24 border-b-2 border-black text-center text-6xl font-black placeholder:text-black placeholder:opacity-100"
+          disabled={disabled}
           value={shortAnswer}
           variant="underline"
           onChange={(event) => onShortAnswerChange(event.target.value)}
@@ -58,6 +61,7 @@ export default function QuizAnswerField({
         {trueFalseOptions.map((option) => (
           <AnswerButton
             key={option}
+            disabled={disabled}
             isSelected={selectedAnswer === option}
             variant={getTrueFalseVariant(option)}
             onClick={() => onSelectAnswer(option)}
@@ -74,6 +78,7 @@ export default function QuizAnswerField({
       {optionText.map((option, index) => (
         <AnswerButton
           key={option}
+          disabled={disabled}
           isSelected={selectedAnswer === option}
           onClick={() => onSelectAnswer(option)}
         >

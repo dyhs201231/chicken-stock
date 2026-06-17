@@ -6,6 +6,7 @@ type AnswerButtonVariant = "default" | "true" | "false";
 
 type AnswerButtonProps = {
   children: ReactNode;
+  disabled?: boolean;
   isSelected: boolean;
   variant?: AnswerButtonVariant;
   onClick: () => void;
@@ -55,6 +56,7 @@ function getTrueFalseIcon(variant: AnswerButtonVariant) {
 
 export default function AnswerButton({
   children,
+  disabled = false,
   isSelected,
   variant = "default",
   onClick,
@@ -68,7 +70,9 @@ export default function AnswerButton({
         "flex items-center transition",
         answerButtonVariants[variant],
         isSelected && selectedAnswerButtonVariants[variant],
+        disabled && "cursor-not-allowed opacity-70",
       )}
+      disabled={disabled}
       onClick={onClick}
     >
       {trueFalseIcon && (

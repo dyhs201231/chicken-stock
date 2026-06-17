@@ -4,7 +4,10 @@ import { IconChevronLeft } from "@tabler/icons-react";
 import { getEducationArticle } from "@/app/(frontend)/apis/edu/queries";
 import type { QuizResponse } from "@/app/(frontend)/apis/edu/quizzes/api";
 import { getCurrentUser } from "../../../../lib/auth-check";
-import { getRequestOrigin } from "../../../../lib/server/request";
+import {
+  getRequestCookieHeader,
+  getRequestOrigin,
+} from "../../../../lib/server/request";
 import { isPositiveIntegerString } from "../../../../utils/number";
 import QuizContainer from "@/app/(frontend)/components/edu/quizzes/quiz-container";
 import type { QuizContentData } from "@/app/(frontend)/components/edu/quizzes/quiz-content";
@@ -100,7 +103,7 @@ export async function generateMetadata({
   });
 }
 
-async function getInitialQuizzes(articleId: number) {
+async function getInitialQuizzes(articleId: number, userId?: string) {
   if (articleId <= 0) {
     return [];
   }
@@ -109,8 +112,18 @@ async function getInitialQuizzes(articleId: number) {
     const url = new URL("/api/quizzes", await getRequestOrigin());
     url.searchParams.set("articleId", String(articleId));
 
+    if (userId) {
+      url.searchParams.set("userId", userId);
+    }
+
+    const cookieHeader = userId ? await getRequestCookieHeader() : null;
     const response = await fetch(url, {
       cache: "no-store",
+      headers: cookieHeader
+        ? {
+            Cookie: cookieHeader,
+          }
+        : undefined,
     });
 
     if (!response.ok) {
@@ -141,7 +154,10 @@ export default async function QuizPage({
     quizId,
     level,
   );
-  const initialQuizzes: QuizContentData[] = await getInitialQuizzes(articleId);
+  const initialQuizzes: QuizContentData[] = await getInitialQuizzes(
+    articleId,
+    currentUserId,
+  );
   const quizTitle = getQuizSeoTitle(label.title, level);
   const quizDescription = getQuizSeoDescription(label.title);
   const canonicalUrl = createCanonicalUrl(`/edu/quizzes/${articleId}`);

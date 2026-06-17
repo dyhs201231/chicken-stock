@@ -1,5 +1,6 @@
 "use client";
 
+import { useSyncExternalStore } from "react";
 import { useArticleQuizzesQuery } from "@/app/(frontend)/apis/edu/quizzes/queries";
 import QuizInteraction from "../quiz-interaction";
 import type { QuizContentData } from "../quiz-content";
@@ -10,19 +11,42 @@ type QuizContainerProps = {
   userId?: string;
 };
 
+function subscribeToHydration(callback: () => void) {
+  const timeoutId = window.setTimeout(callback, 0);
+
+  return () => window.clearTimeout(timeoutId);
+}
+
+function getHydratedSnapshot() {
+  return true;
+}
+
+function getServerSnapshot() {
+  return false;
+}
+
 export default function QuizContainer({
   articleId,
   initialQuizzes,
   userId,
 }: QuizContainerProps) {
+  const isHydrated = useSyncExternalStore(
+    subscribeToHydration,
+    getHydratedSnapshot,
+    getServerSnapshot,
+  );
   const {
     data: quizzes = [],
     error,
     isError,
     isLoading,
-  } = useArticleQuizzesQuery(articleId, { initialData: initialQuizzes });
+  } = useArticleQuizzesQuery(articleId, {
+    initialData: initialQuizzes,
+    userId,
+  });
 
-  const currentQuiz = quizzes[0];
+  const displayedQuizzes = isHydrated ? quizzes : initialQuizzes ?? quizzes;
+  const currentQuiz = displayedQuizzes[0];
   let errorMessage = "퀴즈를 불러오지 못했어요.";
 
   if (error instanceof Error) {
@@ -54,7 +78,13 @@ export default function QuizContainer({
     );
   }
 
+  const interactionKey = [
+    currentQuiz.id,
+    currentQuiz.submission?.selectedAnswer ?? "",
+    currentQuiz.submission?.isCorrect ? "correct" : "pending",
+  ].join(":");
+
   return (
-    <QuizInteraction key={currentQuiz.id} quiz={currentQuiz} userId={userId} />
+    <QuizInteraction key={interactionKey} quiz={currentQuiz} userId={userId} />
   );
 }
