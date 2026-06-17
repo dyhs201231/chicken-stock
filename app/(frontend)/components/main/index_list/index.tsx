@@ -1,54 +1,51 @@
-import MarketIndex, { type MarketIndexData } from "./market_index";
+"use client";
 
-// TODO: 추후 실제 데이터로 변경 예정
-const dummyMarketIndexes: MarketIndexData[] = [
-  {
-    name: "달러 환율",
-    value: "1,478.55",
-    changeValue: "+11.25",
-    changeRate: "0.76%",
-    trend: "up",
-  },
-  {
-    name: "코스피",
-    value: "5,566.98",
-    changeValue: "-42.51",
-    changeRate: "0.75%",
-    trend: "down",
-  },
-  {
-    name: "코스닥",
-    value: "1,478.55",
-    changeValue: "+1.27",
-    changeRate: "0.08%",
-    trend: "up",
-  },
-  {
-    name: "나스닥",
-    value: "22,716.13.55",
-    changeValue: "+19.03",
-    changeRate: "0.08%",
-    trend: "up",
-  },
-  {
-    name: "S&P 500",
-    value: "5,566.98",
-    changeValue: "-42.51",
-    changeRate: "0.75%",
-    trend: "down",
-  },
-];
+import { useMarketIndicesQuery } from "../../../apis/market-indices/queries";
+import { useIsHydrated } from "../../../hooks/use-is-hydrated";
+import type { MarketIndexSummaryData } from "../../../types/market-index";
+import MarketIndex from "./market_index";
 
-export default function IndexList() {
+type IndexListProps = {
+  initialIndices?: MarketIndexSummaryData[];
+};
+
+function IndexListFallback() {
+  return (
+    <div className="flex h-full flex-col justify-between gap-3.5">
+      {Array.from({ length: 5 }, (_, index) => (
+        <div key={index} className="flex items-center gap-3 px-1 py-1">
+          <div className="h-12 w-20 rounded bg-zinc-100" />
+          <div className="flex-1 space-y-2">
+            <div className="h-4 w-20 rounded bg-zinc-100" />
+            <div className="h-4 w-32 rounded bg-zinc-100" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export default function IndexList({ initialIndices }: IndexListProps) {
+  const isHydrated = useIsHydrated();
+  const { data } = useMarketIndicesQuery(initialIndices, {
+    refreshOnFirstVisit: true,
+  });
+  const marketIndexes =
+    isHydrated && data !== undefined ? data : (initialIndices ?? []);
+
   return (
     <section className="w-auto bg-white pt-16 pr-8 pb-8 pl-8">
-      <ul className="flex h-full flex-col justify-between gap-3.5">
-        {dummyMarketIndexes.map((marketIndex) => (
-          <li key={marketIndex.name}>
-            <MarketIndex marketIndex={marketIndex} />
-          </li>
-        ))}
-      </ul>
+      {!isHydrated || marketIndexes.length === 0 ? (
+        <IndexListFallback />
+      ) : (
+        <ul className="flex h-full flex-col justify-between gap-3.5">
+          {marketIndexes.map((marketIndex) => (
+            <li key={marketIndex.id}>
+              <MarketIndex marketIndex={marketIndex} />
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   );
 }

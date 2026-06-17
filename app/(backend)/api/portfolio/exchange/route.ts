@@ -5,9 +5,9 @@ import {
   verifyAuthToken,
 } from "@/app/(backend)/lib/auth";
 import {
-  EXCHANGE_RATE,
   getTotalAvailableOrderAmountKrw,
 } from "@/app/(backend)/lib/portfolio-balance";
+import { getFreshUsdKrwExchangeRate } from "@/app/(backend)/lib/market-indices";
 import { prisma } from "@/app/(backend)/lib/prisma";
 import { lockPortfolioRows } from "@/app/(backend)/lib/stock-order-matching";
 import { Prisma } from "@/app/(backend)/generated/prisma/client";
@@ -170,8 +170,12 @@ function createPortfolioTransactionId() {
   return randomUUID();
 }
 
-function getExchangedValue(type: ExchangeType, value: Prisma.Decimal) {
-  const exchangeRate = new Prisma.Decimal(EXCHANGE_RATE);
+function getExchangedValue(
+  type: ExchangeType,
+  value: Prisma.Decimal,
+  usdKrwExchangeRate: number,
+) {
+  const exchangeRate = new Prisma.Decimal(usdKrwExchangeRate);
 
   return type === "krwToUsd"
     ? value.div(exchangeRate).toDecimalPlaces(2)
@@ -223,7 +227,12 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const exchangedValue = getExchangedValue(payload.type, payload.value);
+  const usdKrwExchangeRate = await getFreshUsdKrwExchangeRate();
+  const exchangedValue = getExchangedValue(
+    payload.type,
+    payload.value,
+    usdKrwExchangeRate,
+  );
 
   try {
     const portfolio = await runSerializablePortfolioTransaction(async (tx) => {
@@ -327,7 +336,7 @@ export async function POST(request: NextRequest) {
       await tx.portfolioTransaction.create({
         data: {
           companyName: getExchangeCompanyName(payload.type),
-          exchangeRate: new Prisma.Decimal(EXCHANGE_RATE),
+          exchangeRate: new Prisma.Decimal(usdKrwExchangeRate),
           exchangeType: payload.type,
           executedAt,
           fee: new Prisma.Decimal(0),
@@ -363,7 +372,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       ok: true,
-      exchangeRate: EXCHANGE_RATE,
+      exchangeRate: usdKrwExchangeRate,
       paidAmount: serializeDecimalNumber(payload.value),
       portfolio: {
         id: portfolio.id.toString(),
@@ -372,6 +381,7 @@ export async function POST(request: NextRequest) {
           getTotalAvailableOrderAmountKrw(
             portfolio.krwBalance,
             portfolio.usdBalance,
+            usdKrwExchangeRate,
           ),
         ),
         totalBalance: serializeDecimalNumber(portfolio.totalBalance),
