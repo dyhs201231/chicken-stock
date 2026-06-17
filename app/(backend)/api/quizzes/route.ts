@@ -5,7 +5,12 @@ import {
   hashAuthToken,
   verifyAuthToken,
 } from "../../lib/auth";
+import { Prisma } from "../../generated/prisma/client";
+import { TransactionType } from "../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
+
+const QUIZ_CORRECT_REWARD_KRW = 10_000;
+const QUIZ_REWARD_COMPANY_NAME = "퀴즈 정답 보상";
 
 function parsePositiveInteger(value: string | null) {
   if (!value) {
@@ -45,6 +50,91 @@ function selectQuizFields() {
     description: true,
     optionText: true,
   } as const;
+}
+
+function createQuizRewardTransactionId(userId: bigint, quizId: number) {
+  return `quiz-reward-${userId.toString()}-${quizId}`;
+}
+
+function serializeQuizSubmission(submission: {
+  answeredAt: Date | null;
+  isCorrect: boolean;
+  isSkip: boolean;
+  selectedAnswer: string;
+}) {
+  return {
+    answeredAt: submission.answeredAt?.toISOString() ?? null,
+    isCorrect: submission.isCorrect,
+    isSkip: submission.isSkip,
+    selectedAnswer: submission.selectedAnswer,
+  };
+}
+
+function normalizeAnswerText(value: string) {
+  return value.trim().replace(/\s+/g, " ");
+}
+
+function getMultipleChoiceOptionIndex(value: string, optionText: string[]) {
+  const normalizedValue = normalizeAnswerText(value);
+  const optionIndex = optionText.findIndex(
+    (option) => normalizeAnswerText(option) === normalizedValue,
+  );
+
+  if (optionIndex >= 0) {
+    return optionIndex;
+  }
+
+  const indexedAnswerMatch = normalizedValue.match(/^(\d+)\s*(?:번)?[.)]?\s*/);
+
+  if (!indexedAnswerMatch) {
+    return null;
+  }
+
+  const parsedIndex = Number(indexedAnswerMatch[1]) - 1;
+
+  if (parsedIndex < 0 || parsedIndex >= optionText.length) {
+    return null;
+  }
+
+  const remainingAnswer = normalizeAnswerText(
+    normalizedValue.slice(indexedAnswerMatch[0].length),
+  );
+
+  if (
+    remainingAnswer.length > 0 &&
+    remainingAnswer !== normalizeAnswerText(optionText[parsedIndex])
+  ) {
+    return null;
+  }
+
+  return parsedIndex;
+}
+
+function isQuizAnswerCorrect(quiz: {
+  answer: string;
+  optionText: string[];
+  quizType: string;
+}, selectedAnswer: string) {
+  if (normalizeAnswerText(selectedAnswer) === normalizeAnswerText(quiz.answer)) {
+    return true;
+  }
+
+  if (quiz.quizType !== "MULTIPLE_CHOICE") {
+    return false;
+  }
+
+  const selectedOptionIndex = getMultipleChoiceOptionIndex(
+    selectedAnswer,
+    quiz.optionText,
+  );
+  const correctOptionIndex = getMultipleChoiceOptionIndex(
+    quiz.answer,
+    quiz.optionText,
+  );
+
+  return (
+    selectedOptionIndex !== null && selectedOptionIndex === correctOptionIndex
+  );
 }
 
 type QuizSubmissionRequestBody = {
@@ -205,24 +295,41 @@ export async function GET(request: NextRequest) {
         return userValidationResponse;
       }
 
-      const correctSubmission = await prisma.userQuizSubmission.findFirst({
-        where: {
-          userId,
-          isCorrect: true,
-          quiz: {
-            articleId,
+      const quizzes = await prisma.quiz.findMany({
+        where: { articleId },
+        orderBy: { id: "asc" },
+        select: {
+          ...selectQuizFields(),
+          submissions: {
+            where: {
+              userId,
+            },
+            select: {
+              answeredAt: true,
+              isCorrect: true,
+              isSkip: true,
+              selectedAnswer: true,
+            },
+            take: 1,
           },
         },
-        select: {
-          quizId: true,
-        },
       });
+      const serializedQuizzes = quizzes.map(({ submissions, ...quiz }) => ({
+        ...quiz,
+        submission: submissions[0]
+          ? serializeQuizSubmission(submissions[0])
+          : null,
+      }));
+      const hasCorrectSubmission = serializedQuizzes.some(
+        (quiz) => quiz.submission?.isCorrect === true,
+      );
 
       return NextResponse.json({
         ok: true,
         data: {
           source: "ARTICLE_PROGRESS",
-          isCorrect: Boolean(correctSubmission),
+          isCorrect: hasCorrectSubmission,
+          quizzes: serializedQuizzes,
         },
       });
     }
@@ -401,82 +508,157 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const quiz = await prisma.quiz.findUnique({
-      where: { id: quizId },
-      select: {
-        answer: true,
-        explanation: true,
-      },
+    const selectedAnswer = hasUserAnswer ? userAnswerValue : "";
+    const result = await prisma.$transaction(async (tx) => {
+      const quiz = await tx.quiz.findUnique({
+        where: { id: quizId },
+        select: {
+          answer: true,
+          explanation: true,
+          optionText: true,
+          quizType: true,
+        },
+      });
+
+      if (!quiz) {
+        return null;
+      }
+
+      const isCorrect =
+        hasUserAnswer && isQuizAnswerCorrect(quiz, selectedAnswer);
+      const existingSubmission = await tx.userQuizSubmission.findUnique({
+        where: {
+          userId_quizId: {
+            userId,
+            quizId,
+          },
+        },
+        select: {
+          answeredAt: true,
+          isCorrect: true,
+          isSkip: true,
+          selectedAnswer: true,
+        },
+      });
+      const alreadyCorrect = existingSubmission?.isCorrect === true;
+      const answeredAt = new Date();
+      const nextSelectedAnswer = alreadyCorrect
+        ? existingSubmission.selectedAnswer
+        : selectedAnswer;
+      const nextIsSkip = alreadyCorrect
+        ? existingSubmission.isSkip
+        : (isSkip ?? false);
+      const nextIsCorrect = alreadyCorrect || isCorrect;
+      const nextAnsweredAt =
+        existingSubmission?.answeredAt ?? (isCorrect ? answeredAt : null);
+
+      const submission = await tx.userQuizSubmission.upsert({
+        where: {
+          userId_quizId: {
+            userId,
+            quizId,
+          },
+        },
+        create: {
+          userId,
+          quizId,
+          selectedAnswer,
+          isSkip: isSkip ?? false,
+          isCorrect,
+          answeredAt: isCorrect ? answeredAt : null,
+        },
+        update: {
+          selectedAnswer: nextSelectedAnswer,
+          isSkip: nextIsSkip,
+          isCorrect: nextIsCorrect,
+          answeredAt: nextAnsweredAt,
+        },
+        select: {
+          answeredAt: true,
+          isCorrect: true,
+          isSkip: true,
+          selectedAnswer: true,
+        },
+      });
+      let isRewardPaid = false;
+
+      if (hasUserAnswer && isCorrect && !alreadyCorrect) {
+        const portfolio = await tx.portfolio.findUnique({
+          where: {
+            userId,
+          },
+          select: {
+            id: true,
+          },
+        });
+
+        if (portfolio) {
+          const rewardAmount = new Prisma.Decimal(QUIZ_CORRECT_REWARD_KRW);
+          const rewardTransaction = await tx.portfolioTransaction.createMany({
+            data: [
+              {
+                companyName: QUIZ_REWARD_COMPANY_NAME,
+                executedAt: answeredAt,
+                fee: new Prisma.Decimal(0),
+                id: createQuizRewardTransactionId(userId, quizId),
+                portfolioId: portfolio.id,
+                receivedAmount: rewardAmount,
+                totalAmount: rewardAmount,
+                totalQuantity: 0,
+                transactionType: TransactionType.DEPOSIT,
+                withdrawalAt: answeredAt,
+              },
+            ],
+            skipDuplicates: true,
+          });
+
+          if (rewardTransaction.count > 0) {
+            await tx.portfolio.update({
+              data: {
+                krwBalance: {
+                  increment: rewardAmount,
+                },
+                totalAvailableOrderAmount: {
+                  increment: rewardAmount,
+                },
+                totalBalance: {
+                  increment: rewardAmount,
+                },
+              },
+              where: {
+                id: portfolio.id,
+              },
+            });
+            isRewardPaid = true;
+          }
+        }
+      }
+
+      return {
+        answer: quiz.answer,
+        explanation: quiz.explanation,
+        isRewardPaid,
+        submission,
+      };
     });
 
-    if (!quiz) {
+    if (!result) {
       return NextResponse.json(
         { ok: false, error: "QUIZ_NOT_FOUND" },
         { status: 404 },
       );
     }
 
-    const selectedAnswer = hasUserAnswer ? userAnswerValue : "";
-    const isCorrect = hasUserAnswer && selectedAnswer === quiz.answer;
-    const existingSubmission = await prisma.userQuizSubmission.findUnique({
-      where: {
-        userId_quizId: {
-          userId,
-          quizId,
-        },
-      },
-      select: {
-        selectedAnswer: true,
-        isCorrect: true,
-        isSkip: true,
-        answeredAt: true,
-      },
-    });
-    const alreadyCorrect = existingSubmission?.isCorrect === true;
-    const nextSelectedAnswer = alreadyCorrect
-      ? existingSubmission.selectedAnswer
-      : selectedAnswer;
-    const nextIsSkip = alreadyCorrect
-      ? existingSubmission.isSkip
-      : (isSkip ?? false);
-    const nextIsCorrect = alreadyCorrect || isCorrect;
-    const nextAnsweredAt =
-      existingSubmission?.answeredAt ?? (isCorrect ? new Date() : null);
-
-    const submission = await prisma.userQuizSubmission.upsert({
-      where: {
-        userId_quizId: {
-          userId,
-          quizId,
-        },
-      },
-      create: {
-        userId,
-        quizId,
-        selectedAnswer,
-        isSkip: isSkip ?? false,
-        isCorrect,
-        answeredAt: isCorrect ? new Date() : null,
-      },
-      update: {
-        selectedAnswer: nextSelectedAnswer,
-        isSkip: nextIsSkip,
-        isCorrect: nextIsCorrect,
-        answeredAt: nextAnsweredAt,
-      },
-      select: {
-        isCorrect: true,
-        isSkip: true,
-      },
-    });
-
     if (hasUserAnswer) {
       return NextResponse.json({
         ok: true,
         data: {
-          answer: quiz.answer,
-          isCorrect: submission.isCorrect,
-          explanation: quiz.explanation,
+          answer: result.answer,
+          explanation: result.explanation,
+          isCorrect: result.submission.isCorrect,
+          isRewardPaid: result.isRewardPaid,
+          rewardAmountKrw: QUIZ_CORRECT_REWARD_KRW,
+          selectedAnswer: result.submission.selectedAnswer,
         },
       });
     }
@@ -484,7 +666,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       ok: true,
       data: {
-        isSkip: submission.isSkip,
+        isSkip: result.submission.isSkip,
       },
     });
   } catch (error) {

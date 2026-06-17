@@ -4,6 +4,13 @@ import { fetchArticleQuizProgress, fetchQuizzesByArticleId } from "./api";
 
 type UseArticleQuizzesQueryOptions = {
   initialData?: QuizContentData[];
+  userId?: string;
+};
+
+export const quizQueryKeys = {
+  article: (articleId: number, userId?: string) =>
+    ["quizzes", "article", articleId, userId ?? null] as const,
+  root: ["quizzes"] as const,
 };
 
 export function useArticleQuizzesQuery(
@@ -11,8 +18,8 @@ export function useArticleQuizzesQuery(
   options?: UseArticleQuizzesQueryOptions,
 ) {
   return useQuery({
-    queryKey: ["quizzes", "article", articleId],
-    queryFn: () => fetchQuizzesByArticleId(articleId),
+    queryKey: quizQueryKeys.article(articleId, options?.userId),
+    queryFn: () => fetchQuizzesByArticleId(articleId, options?.userId),
     enabled: articleId > 0,
     initialData: options?.initialData,
   });

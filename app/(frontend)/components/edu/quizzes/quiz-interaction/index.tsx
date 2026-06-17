@@ -14,6 +14,8 @@ type SubmissionResult = {
   answer: string;
   explanation: string;
   isCorrect?: boolean;
+  isRewardPaid?: boolean;
+  rewardAmountKrw?: number;
 };
 
 function isPositiveIntegerText(value?: string) {
@@ -48,33 +50,75 @@ function getSubmitButtonLabel(
   return "확인";
 }
 
+function getInitialAnswerState(quiz: QuizContentData) {
+  const submittedAnswer = quiz.submission?.selectedAnswer ?? "";
+
+  if (quiz.quizType === "SHORT_ANSWER") {
+    return {
+      selectedAnswer: "",
+      shortAnswer: submittedAnswer,
+      submittedAnswer,
+    };
+  }
+
+  return {
+    selectedAnswer: submittedAnswer,
+    shortAnswer: "",
+    submittedAnswer,
+  };
+}
+
+function formatRewardAmount(value: number) {
+  return value.toLocaleString("ko-KR");
+}
+
 export default function QuizInteraction({
   quiz,
   userId,
 }: QuizInteractionProps) {
-  const [shortAnswer, setShortAnswer] = useState("");
-  const [selectedAnswer, setSelectedAnswer] = useState("");
+  const initialAnswerState = getInitialAnswerState(quiz);
+  const [shortAnswer, setShortAnswer] = useState(
+    initialAnswerState.shortAnswer,
+  );
+  const [selectedAnswer, setSelectedAnswer] = useState(
+    initialAnswerState.selectedAnswer,
+  );
   const [isResultModalOpen, setIsResultModalOpen] = useState(false);
   const [submissionResult, setSubmissionResult] =
     useState<SubmissionResult | null>(null);
-  const [submittedAnswer, setSubmittedAnswer] = useState("");
-  const [hasCorrectSubmission, setHasCorrectSubmission] = useState(false);
+  const [submittedAnswer, setSubmittedAnswer] = useState(
+    initialAnswerState.submittedAnswer,
+  );
+  const [hasCorrectSubmission, setHasCorrectSubmission] = useState(
+    quiz.submission?.isCorrect === true,
+  );
   const submitAnswer = useSubmitQuizAnswerMutation();
   const answerValue = getAnswerValue(quiz, selectedAnswer, shortAnswer);
   const isAlreadySubmitted =
-    answerValue.length > 0 && answerValue === submittedAnswer;
+    hasCorrectSubmission &&
+    answerValue.length > 0 &&
+    answerValue === submittedAnswer;
   const canSubmit =
     answerValue.length > 0 &&
     isPositiveIntegerText(userId) &&
     !isAlreadySubmitted &&
     !hasCorrectSubmission;
+  const isAnswerLocked = hasCorrectSubmission || submitAnswer.isPending;
 
   const handleSelectAnswer = (answer: string) => {
+    if (isAnswerLocked) {
+      return;
+    }
+
     setSelectedAnswer(answer);
     setSubmissionResult(null);
   };
 
   const handleShortAnswerChange = (answer: string) => {
+    if (isAnswerLocked) {
+      return;
+    }
+
     setShortAnswer(answer);
     setSubmissionResult(null);
   };
@@ -87,13 +131,14 @@ export default function QuizInteraction({
     setSubmissionResult(null);
     submitAnswer.mutate(
       {
+        articleId: quiz.articleId,
         quizId: quiz.id,
         userAnswer: answerValue,
         userId,
       },
       {
         onSuccess: (result) => {
-          setSubmittedAnswer(answerValue);
+          setSubmittedAnswer(result.selectedAnswer);
           setHasCorrectSubmission(result.isCorrect);
           setSubmissionResult({
             answer: result.answer,
@@ -101,6 +146,8 @@ export default function QuizInteraction({
               ? result.explanation
               : "아쉬워요! 다시 한 번 생각해 볼까요?",
             isCorrect: result.isCorrect,
+            isRewardPaid: result.isRewardPaid,
+            rewardAmountKrw: result.rewardAmountKrw,
           });
           setIsResultModalOpen(true);
         },
@@ -128,6 +175,7 @@ export default function QuizInteraction({
           quiz={quiz}
           selectedAnswer={selectedAnswer}
           shortAnswer={shortAnswer}
+          isAnswerLocked={isAnswerLocked}
           onSelectAnswer={handleSelectAnswer}
           onShortAnswerChange={handleShortAnswerChange}
         />
@@ -173,6 +221,16 @@ export default function QuizInteraction({
                   <p className="text-xl leading-9 whitespace-pre-line text-black">
                     {submissionResult.explanation}
                   </p>
+
+                  {submissionResult.isCorrect &&
+                    submissionResult.isRewardPaid &&
+                    submissionResult.rewardAmountKrw !== undefined && (
+                      <p className="mt-4 text-xl leading-9 font-bold text-sky-700">
+                        보상으로{" "}
+                        {formatRewardAmount(submissionResult.rewardAmountKrw)}
+                        원이 지급되었어요.
+                      </p>
+                    )}
                 </div>
               </div>
             )}

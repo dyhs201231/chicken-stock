@@ -2,6 +2,13 @@
 
 import QuizAnswerField, { type QuizType } from "../quiz-answer-field";
 
+export type QuizSubmissionData = {
+  answeredAt: string | null;
+  isCorrect: boolean;
+  isSkip: boolean;
+  selectedAnswer: string;
+};
+
 export type QuizContentData = {
   id: number;
   educationLevelId: number;
@@ -10,12 +17,14 @@ export type QuizContentData = {
   description: string;
   quizType: QuizType;
   optionText: string[];
+  submission?: QuizSubmissionData | null;
 };
 
 type QuizContentProps = {
   quiz: QuizContentData;
   selectedAnswer: string;
   shortAnswer: string;
+  isAnswerLocked?: boolean;
   onSelectAnswer: (answer: string) => void;
   onShortAnswerChange: (answer: string) => void;
 };
@@ -24,6 +33,7 @@ export default function QuizContent({
   quiz,
   selectedAnswer,
   shortAnswer,
+  isAnswerLocked = false,
   onSelectAnswer,
   onShortAnswerChange,
 }: QuizContentProps) {
@@ -51,6 +61,7 @@ export default function QuizContent({
         <QuizAnswerField
           optionText={quiz.optionText}
           quizType={quiz.quizType}
+          disabled={isAnswerLocked}
           selectedAnswer={selectedAnswer}
           shortAnswer={shortAnswer}
           onSelectAnswer={onSelectAnswer}
