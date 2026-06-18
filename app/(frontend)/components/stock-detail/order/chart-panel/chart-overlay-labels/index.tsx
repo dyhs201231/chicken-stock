@@ -32,7 +32,7 @@ export function ChartOverlayLabels({
     <>
       {highLabelPosition && (
         <span
-          className="pointer-events-none absolute z-10 text-xs font-medium whitespace-nowrap text-[#FF0505]"
+          className="pointer-events-none absolute z-10 text-xs font-medium whitespace-nowrap text-(--cs-color-red-500)"
           style={{
             left: highLabelPosition.left,
             top: highLabelPosition.top,
@@ -44,7 +44,7 @@ export function ChartOverlayLabels({
 
       {lowLabelPosition && (
         <span
-          className="pointer-events-none absolute z-10 text-xs font-medium whitespace-nowrap text-[#0084FF]"
+          className="pointer-events-none absolute z-10 text-xs font-medium whitespace-nowrap text-(--cs-color-blue-700)"
           style={{
             left: lowLabelPosition.left,
             top: lowLabelPosition.top,
@@ -56,7 +56,7 @@ export function ChartOverlayLabels({
 
       {crosshairDateLabel && (
         <span
-          className="pointer-events-none absolute bottom-8 z-10 rounded-sm bg-[#75D291] px-2 py-1 text-sm text-black"
+          className="pointer-events-none absolute bottom-8 z-10 rounded-sm bg-(--cs-color-green-100) px-2 py-1 text-sm text-black"
           style={{
             left: crosshairDateLabel.left,
           }}
@@ -67,7 +67,7 @@ export function ChartOverlayLabels({
 
       {crosshairPriceLabel && (
         <span
-          className="pointer-events-none absolute right-0 z-30 rounded-sm bg-[#75D291] px-2 py-1 text-sm text-black"
+          className="pointer-events-none absolute right-0 z-30 rounded-sm bg-(--cs-color-green-100) px-2 py-1 text-sm text-black"
           style={{
             top: crosshairPriceLabel.top,
           }}

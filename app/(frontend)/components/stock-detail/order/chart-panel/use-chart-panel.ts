@@ -150,9 +150,9 @@ export function useChartPanel({ stock }: StockOnlyProps) {
 
   const currentPriceLabelClassName =
     stock.changeRate > 0
-      ? "bg-[#FF0505]"
+      ? "bg-(--cs-color-red-500)"
       : stock.changeRate < 0
-        ? "bg-[#0084FF]"
+        ? "bg-(--cs-color-blue-700)"
         : "bg-zinc-500";
 
   const handleRangeChange = (nextRange: CandleRange) => {

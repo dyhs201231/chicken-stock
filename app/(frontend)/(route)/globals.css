@@ -4,6 +4,70 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --cs-color-blue-100: #c6d2ff;
+  --cs-color-blue-200: #9bcbde;
+  --cs-color-blue-300: #2b9dd1;
+  --cs-color-blue-400: #3698bc;
+  --cs-color-blue-500: #1b8cc0;
+  --cs-color-blue-600: #0881ba;
+  --cs-color-blue-700: #0084ff;
+  --cs-color-blue-800: #4d61f5;
+  --cs-color-blue-900: #2365ea;
+  --cs-color-gray-100: #e8e6e6;
+  --cs-color-gray-200: #d9d9d9;
+  --cs-color-gray-300: #d7d5d5;
+  --cs-color-gray-400: #c6c6c6;
+  --cs-color-gray-500: #bababa;
+  --cs-color-gray-600: #868686;
+  --cs-color-gray-700: #7b7878;
+  --cs-color-gray-800: #615e5e;
+  --cs-color-gray-900: #454545;
+  --cs-color-green-100: #75d291;
+  --cs-color-green-200: #65c883;
+  --cs-color-red-100: #ffc9c7;
+  --cs-color-red-200: #f8babc;
+  --cs-color-red-300: #ee9294;
+  --cs-color-red-400: #ff6262;
+  --cs-color-red-500: #ff0505;
+  --cs-color-red-600: #ff0000;
+  --cs-color-red-700: #e91418;
+  --cs-color-red-800: #df2b2e;
+  --cs-color-red-900: #bc366a;
+  --cs-color-yellow-100: #ffc107;
+  --cs-radius-sm: 4px;
+  --cs-radius-md: 6px;
+  --cs-radius-lg: 8px;
+  --cs-radius-xl: 12px;
+  --cs-radius-2xl: 16px;
+  --cs-radius-3xl: 24px;
+  --cs-radius-full: 9999px;
+  --cs-typography-regular-10-font-size: 10px;
+  --cs-typography-regular-11-font-size: 11px;
+  --cs-typography-regular-12-font-size: 12px;
+  --cs-typography-regular-13-font-size: 13px;
+  --cs-typography-regular-14-font-size: 14px;
+  --cs-typography-regular-15-font-size: 15px;
+  --cs-typography-regular-16-font-size: 16px;
+  --cs-typography-regular-18-font-size: 18px;
+  --cs-typography-regular-20-font-size: 20px;
+  --cs-typography-regular-24-font-size: 24px;
+  --cs-typography-medium-12-font-size: 12px;
+  --cs-typography-medium-13-font-size: 13px;
+  --cs-typography-medium-14-font-size: 14px;
+  --cs-typography-medium-16-font-size: 16px;
+  --cs-typography-medium-18-font-size: 18px;
+  --cs-typography-medium-20-font-size: 20px;
+  --cs-typography-medium-24-font-size: 24px;
+  --cs-typography-semibold-14-font-size: 14px;
+  --cs-typography-semibold-20-font-size: 20px;
+  --cs-typography-semibold-24-font-size: 24px;
+  --cs-typography-semibold-40-font-size: 40px;
+  --cs-typography-bold-24-font-size: 24px;
+  --cs-typography-bold-48-font-size: 48px;
+  --cs-typography-regular-font-weight: 400;
+  --cs-typography-medium-font-weight: 500;
+  --cs-typography-semibold-font-weight: 600;
+  --cs-typography-bold-font-weight: 700;
 }
 
 @theme inline {
@@ -39,6 +103,36 @@ body {
 @utility center {
   align-items: center;
   justify-content: center;
+}
+
+@utility typography-medium-12 {
+  font-size: var(--cs-typography-medium-12-font-size);
+  font-weight: var(--cs-typography-medium-font-weight);
+}
+
+@utility typography-medium-13 {
+  font-size: var(--cs-typography-medium-13-font-size);
+  font-weight: var(--cs-typography-medium-font-weight);
+}
+
+@utility typography-medium-14 {
+  font-size: var(--cs-typography-medium-14-font-size);
+  font-weight: var(--cs-typography-medium-font-weight);
+}
+
+@utility typography-medium-18 {
+  font-size: var(--cs-typography-medium-18-font-size);
+  font-weight: var(--cs-typography-medium-font-weight);
+}
+
+@utility typography-semibold-40 {
+  font-size: var(--cs-typography-semibold-40-font-size);
+  font-weight: var(--cs-typography-semibold-font-weight);
+}
+
+@utility typography-bold-24 {
+  font-size: var(--cs-typography-bold-24-font-size);
+  font-weight: var(--cs-typography-bold-font-weight);
 }
 
 @utility scrollbar-hide {
@@ -108,10 +202,10 @@ body {
   align-items: center;
   justify-content: center;
   margin: 0;
-  border-radius: 6px;
+  border-radius: var(--cs-radius-md);
   color: #18181b;
-  font-size: 14px;
-  font-weight: 500;
+  font-size: var(--cs-typography-medium-14-font-size);
+  font-weight: var(--cs-typography-medium-font-weight);
   line-height: 1;
   transition:
     background-color 150ms ease,
@@ -124,7 +218,7 @@ body {
 }
 
 .income-month-calendar .react-datepicker__month-text--today {
-  font-weight: 700;
+  font-weight: var(--cs-typography-bold-font-weight);
 }
 
 .income-month-calendar .react-datepicker__month-text--keyboard-selected {
@@ -142,6 +236,6 @@ body {
 /* 
 TODO: 테마 색상 논의 필요
 @theme {
-  --color-custom-gray: #d9d9d9;
+  --cs-color-custom-gray: #d9d9d9;
 } 
 */

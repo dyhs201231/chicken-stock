@@ -89,7 +89,7 @@ export function getTransactionToneClassName(type: PortfolioTransactionType) {
   }
 
   if (type === "BUY" || type === "WITHDRAWAL") {
-    return "text-[#ff0000]";
+    return "text-(--cs-color-red-600)";
   }
 
   if (type === "SELL") {

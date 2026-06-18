@@ -66,7 +66,7 @@ const itemTypeClassName: Record<TabType, string> = {
 };
 
 const itemActiveClassName: Record<TabType, string> = {
-  fill: "bg-[#D9D9D9]",
+  fill: "bg-(--cs-color-gray-200)",
   underline: "border-black",
 };
 

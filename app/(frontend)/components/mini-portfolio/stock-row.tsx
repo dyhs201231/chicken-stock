@@ -47,13 +47,13 @@ export default function StockRow({
     <li>
       <Link
         href={`/stock/${item.stockId}/order`}
-        className="row items-center justify-between gap-3 rounded-[6px] transition-colors hover:bg-zinc-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-950"
+        className="row items-center justify-between gap-3 rounded-(--cs-radius-md) transition-colors hover:bg-zinc-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-950"
       >
         <div className="row min-w-0 items-center gap-2">
           <StockLogo item={item} />
 
           <div className="col min-w-0 gap-0.5">
-            <p className="truncate text-[13px] leading-4 font-medium">
+            <p className="truncate typography-medium-13 leading-4">
               {item.companyName}
             </p>
             <p className="text-[12px] leading-4 text-[#111111]">
@@ -63,7 +63,7 @@ export default function StockRow({
         </div>
 
         <div className="col shrink-0 items-end gap-0.5 text-right">
-          <p className="text-[14px] leading-4 font-medium">
+          <p className="typography-medium-14 leading-4">
             {formatCurrencyAmount(displayAmount, displayCurrency)}
           </p>
           <p

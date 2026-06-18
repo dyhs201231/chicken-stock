@@ -5,6 +5,7 @@ import type {
   PriceLineOptions,
   SeriesPartialOptionsMap,
 } from "lightweight-charts";
+import { colorToken } from "@/app/(frontend)/constants/design-token";
 import { formatTimeLabel } from "./chart-format";
 import {
   CROSSHAIR_COLOR,
@@ -25,7 +26,7 @@ export function getChartOptions(
     autoSize: false,
     layout: {
       background: { type: ColorType.Solid, color: "#FFFFFF" },
-      textColor: "#7B7878",
+      textColor: colorToken.gray[700],
       fontFamily: "var(--font-atoz), Arial, Helvetica, sans-serif",
       fontSize: 16,
       attributionLogo: false,

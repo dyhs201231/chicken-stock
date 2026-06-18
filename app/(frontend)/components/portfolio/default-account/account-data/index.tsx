@@ -22,7 +22,7 @@ export default function AccountData({ initialPortfolio }: AccountDataProps) {
       <div className="w-fit border px-3 py-2 text-xl">{data.accountNumber}</div>
 
       <div className="row items-center justify-between">
-        <p className="text-[40px] font-semibold">
+        <p className="typography-semibold-40">
           {(
             data.totalAvailableOrderAmount + data.totalInvestmentAmount
           ).toLocaleString()}

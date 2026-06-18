@@ -47,21 +47,21 @@ export default function AssetSection({
           className="row cursor-pointer items-center gap-1"
           onClick={() => onToggle(assetType)}
         >
-          <span className="text-[12px] leading-4 font-medium">
+          <span className="typography-medium-12 leading-4">
             {ASSET_LABELS[assetType]}
           </span>
 
           {isCollapsed && (
             <IconChevronDown
               aria-hidden="true"
-              className="size-3.5 text-[#cccccc]"
+              className="size-3.5 text-(--cs-color-gray-400)"
               stroke={3}
             />
           )}
           {!isCollapsed && (
             <IconChevronUp
               aria-hidden="true"
-              className="size-3.5 text-[#cccccc]"
+              className="size-3.5 text-(--cs-color-gray-400)"
               stroke={3}
             />
           )}
@@ -72,7 +72,7 @@ export default function AssetSection({
             <button
               type="button"
               className={twMerge(
-                "cursor-pointer text-[12px] leading-4 font-medium text-[#777777]",
+                "typography-medium-12 cursor-pointer leading-4 text-(--cs-color-gray-700)",
                 foreignStockCurrency === "KRW" && "text-black underline",
               )}
               onClick={() => onForeignStockCurrencyChange("KRW")}
@@ -82,7 +82,7 @@ export default function AssetSection({
             <button
               type="button"
               className={twMerge(
-                "cursor-pointer text-[12px] leading-4 font-medium text-[#777777]",
+                "typography-medium-12 cursor-pointer leading-4 text-(--cs-color-gray-700)",
                 foreignStockCurrency === "USD" && "text-black underline",
               )}
               onClick={() => onForeignStockCurrencyChange("USD")}
@@ -107,7 +107,7 @@ export default function AssetSection({
       )}
 
       {shouldShowEmptyAssetMessage && (
-        <p className="py-1 text-[12px] leading-4 text-[#888888]">
+        <p className="py-1 text-[12px] leading-4 text-(--cs-color-gray-600)">
           보유 중인 종목이 없습니다.
         </p>
       )}

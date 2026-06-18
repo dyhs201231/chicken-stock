@@ -17,7 +17,7 @@ export default function MyInfo() {
 
   return (
     <div className="w-full">
-      <h1 className="mb-9 w-full border-b border-[#BABABA] pb-4 text-[40px]">
+      <h1 className="mb-9 w-full border-b border-(--cs-color-gray-500) pb-4 text-[40px]">
         내 정보
       </h1>
 
@@ -36,7 +36,7 @@ export default function MyInfo() {
 
           <div className="flex gap-7">
             <p className="w-25 text-lg">내 투자유형</p>
-            <p className="text-lg font-semibold text-[#1B8CC0]">
+            <p className="text-lg font-semibold text-(--cs-color-blue-500)">
               {data.user.investmentType
                 ? getInvestmentTypeLabel(data.user.investmentType)
                 : "미정"}

@@ -91,7 +91,7 @@ export default function CreateAccountModal() {
       setIsOpen={handleOpenChange}
       closeOnOverlayClick={false}
     >
-      <Modal.Trigger className="cursor-pointer rounded-[10px] bg-[#D9D9D9]/40 px-3.5 py-2.5 text-xl font-semibold">
+      <Modal.Trigger className="cursor-pointer rounded-[10px] bg-(--cs-color-gray-200)/40 px-3.5 py-2.5 text-xl font-semibold">
         계좌 개설하기
       </Modal.Trigger>
 

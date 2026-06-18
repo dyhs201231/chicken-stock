@@ -36,7 +36,7 @@ export default function AvatarButton() {
 
       <Popover.Content align="right">
         <div className="flex min-w-[380px] flex-col px-9 py-7 whitespace-nowrap">
-          <div className="flex items-center gap-3 border-b border-[#BABABA] py-2">
+          <div className="flex items-center gap-3 border-b border-(--cs-color-gray-500) py-2">
             <Avatar
               type="header"
               src={data.user.profileImageUrl || "/test-image.png"}

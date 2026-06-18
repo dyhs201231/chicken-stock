@@ -16,9 +16,9 @@ export function OhlcSummary({ currencyCode, items }: OhlcSummaryProps) {
       {items.map((item) => {
         const rateColorClassName =
           item.rate > 0
-            ? "text-[#FF0505]"
+            ? "text-(--cs-color-red-500)"
             : item.rate < 0
-              ? "text-[#0084FF]"
+              ? "text-(--cs-color-blue-700)"
               : "text-zinc-500";
 
         return (

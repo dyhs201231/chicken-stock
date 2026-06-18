@@ -58,7 +58,7 @@ export function formatProfit(
 
 export function getProfitClassName(value: number) {
   if (value > 0) {
-    return "text-[#ff0000]";
+    return "text-(--cs-color-red-600)";
   }
 
   if (value < 0) {

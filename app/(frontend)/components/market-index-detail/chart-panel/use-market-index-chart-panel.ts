@@ -198,9 +198,9 @@ export function useMarketIndexChartPanel({
   }, [chartCandles]);
   const currentPriceLabelClassName =
     marketIndex.changeRate > 0
-      ? "bg-[#FF0505]"
+      ? "bg-(--cs-color-red-500)"
       : marketIndex.changeRate < 0
-        ? "bg-[#0084FF]"
+        ? "bg-(--cs-color-blue-700)"
         : "bg-zinc-500";
 
   const handleRangeChange = (nextRange: CandleRange) => {
