@@ -78,13 +78,7 @@ export default function QuizContainer({
     );
   }
 
-  const interactionKey = [
-    currentQuiz.id,
-    currentQuiz.submission?.selectedAnswer ?? "",
-    currentQuiz.submission?.isCorrect ? "correct" : "pending",
-  ].join(":");
-
   return (
-    <QuizInteraction key={interactionKey} quiz={currentQuiz} userId={userId} />
+    <QuizInteraction key={currentQuiz.id} quiz={currentQuiz} userId={userId} />
   );
 }
