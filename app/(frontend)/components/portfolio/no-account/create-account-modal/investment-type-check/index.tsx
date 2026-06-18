@@ -7,7 +7,7 @@ import { twMerge } from "tailwind-merge";
 import { isInvestmentTypeSurveyComplete } from "../../../../../lib/classify-investment-type";
 
 const SELECT_TRIGGER_CLASS_NAME =
-  "h-8 rounded-[10px] border-2 border-[#D9D9D9] px-4  shadow-none hover:border-zinc-300 focus-visible:border-zinc-400 focus-visible:ring-0 [&_svg]:size-7 [&_svg]:text-[#C6C6C6]";
+  "h-8 rounded-[10px] border-2 border-(--cs-color-gray-200) px-4  shadow-none hover:border-zinc-300 focus-visible:border-zinc-400 focus-visible:ring-0 [&_svg]:size-7 [&_svg]:text-(--cs-color-gray-400)";
 const SELECT_TRIGGER_ERROR_CLASS_NAME =
   "border-red-500 bg-red-50 hover:border-red-500 focus-visible:border-red-500";
 
@@ -61,7 +61,7 @@ export default function InvestmentTypeCheck() {
                   !createAccountInfo[field].trim() &&
                   SELECT_TRIGGER_ERROR_CLASS_NAME,
               )}
-              contentClassName="rounded-[10px] border-2 border-[#D9D9D9] py-1 shadow-[0_8px_24px_rgba(0,0,0,0.08)]"
+              contentClassName="rounded-[10px] border-2 border-(--cs-color-gray-200) py-1 shadow-[0_8px_24px_rgba(0,0,0,0.08)]"
               optionClassName="min-h-11 px-4 text-base"
               options={options}
               value={createAccountInfo[field]}

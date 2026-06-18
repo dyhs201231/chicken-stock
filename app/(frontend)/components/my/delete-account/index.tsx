@@ -27,7 +27,7 @@ export default function DeleteAccount() {
         showCloseButton={false}
       >
         <h1
-          className="row mb-9 w-full cursor-pointer items-center justify-between border-b border-[#BABABA] pb-4 text-[40px]"
+          className="row mb-9 w-full cursor-pointer items-center justify-between border-b border-(--cs-color-gray-500) pb-4 text-[40px]"
           onClick={() => setIsOpen(true)}
         >
           <p>회원 탈퇴</p>

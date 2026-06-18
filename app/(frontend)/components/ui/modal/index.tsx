@@ -72,7 +72,7 @@ const defaultContentClassName =
   "relative max-h-[min(720px,calc(100dvh-48px))] w-[min(100%,480px)] transform-gpu overflow-auto rounded-lg bg-white p-10 text-zinc-950 shadow-[0_24px_80px_rgb(0_0_0/0.24),0_4px_16px_rgb(0_0_0/0.12)] outline-none transition-[opacity,transform] will-change-[opacity,transform] motion-reduce:transform-none motion-reduce:transition-none";
 
 const defaultCloseButtonClassName =
-  "absolute right-3 top-3 inline-flex size-8 cursor-pointer items-center justify-center rounded border-0 bg-transparent font-[inherit] leading-none text-[#C6C6C6] transition-colors hover:bg-zinc-100 hover:text-zinc-950 disabled:cursor-not-allowed disabled:opacity-50 ";
+  "absolute right-3 top-3 inline-flex size-8 cursor-pointer items-center justify-center rounded border-0 bg-transparent font-[inherit] leading-none text-(--cs-color-gray-400) transition-colors hover:bg-zinc-100 hover:text-zinc-950 disabled:cursor-not-allowed disabled:opacity-50 ";
 
 const modalExitAnimationMs = 180;
 

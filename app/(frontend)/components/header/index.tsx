@@ -11,7 +11,7 @@ export default function Header() {
         <div className="flex gap-18">
           <Link href="/" className="flex shrink-0 items-center gap-1">
             <Logo />
-            <span className="text-xl text-[#DF2B2E]">치킨스톡</span>
+            <span className="text-xl text-(--cs-color-red-800)">치킨스톡</span>
           </Link>
 
           <HeaderNavigation />

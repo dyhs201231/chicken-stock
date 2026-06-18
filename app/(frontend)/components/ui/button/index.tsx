@@ -28,30 +28,30 @@ type ButtonProps = {
 };
 
 const buttonVariants: Record<ButtonVariant, string> = {
-  buy: "bg-[#FF0000] text-white max-w-30 h-[45px] flex items-center justify-center rounded-[10px] text-xl w-full flex-1",
-  sell: "bg-[#2B9DD1] text-white max-w-30 h-[45px] flex items-center justify-center rounded-[10px] text-xl w-full flex-1",
+  buy: "bg-(--cs-color-red-600) text-white max-w-30 h-[45px] flex items-center justify-center rounded-[10px] text-xl w-full flex-1",
+  sell: "bg-(--cs-color-blue-300) text-white max-w-30 h-[45px] flex items-center justify-center rounded-[10px] text-xl w-full flex-1",
   "buy-wide":
-    "bg-[#FF0000] text-white max-w-[268px] h-9 flex items-center justify-center rounded-[10px] text-lg w-full flex-1",
+    "bg-(--cs-color-red-600) text-white max-w-[268px] h-9 flex items-center justify-center rounded-[10px] text-lg w-full flex-1",
   "sell-wide":
-    "bg-[#2B9DD1] text-white max-w-[268px] h-9 flex items-center justify-center rounded-[10px] text-lg w-full flex-1",
+    "bg-(--cs-color-blue-300) text-white max-w-[268px] h-9 flex items-center justify-center rounded-[10px] text-lg w-full flex-1",
   "cancel-wide":
-    "bg-[#D9D9D9] text-[#615E5E] disabled:text-white max-w-[268px] h-9 flex items-center justify-center rounded-[10px] text-lg w-full flex-1",
+    "bg-(--cs-color-gray-200) text-(--cs-color-gray-800) disabled:text-white max-w-[268px] h-9 flex items-center justify-center rounded-[10px] text-lg w-full flex-1",
   "portfolio-wide":
-    "bg-[#75D291] text-white max-w-[268px] h-9 flex items-center justify-center rounded-[10px] text-lg w-full flex-1",
+    "bg-(--cs-color-green-100) text-white max-w-[268px] h-9 flex items-center justify-center rounded-[10px] text-lg w-full flex-1",
   "buy-subtle":
-    "bg-[#DF2B2E]/50 text-[#E91418] disabled:text-[#E91418]/30 max-w-[128px] h-[50px] flex items-center justify-center rounded-[10px] w-full flex-1",
+    "bg-(--cs-color-red-800)/50 text-(--cs-color-red-700) disabled:text-(--cs-color-red-700)/30 max-w-[128px] h-[50px] flex items-center justify-center rounded-[10px] w-full flex-1",
   "sell-subtle":
-    "bg-[#3698BC]/50 text-[#0881BA] disabled:text-[#0881BA]/30 max-w-[128px] h-[50px] flex items-center justify-center rounded-[10px] w-full flex-1",
+    "bg-(--cs-color-blue-400)/50 text-(--cs-color-blue-600) disabled:text-(--cs-color-blue-600)/30 max-w-[128px] h-[50px] flex items-center justify-center rounded-[10px] w-full flex-1",
   "stock-count":
-    "bg-[#D9D9D9] text-[#454545] max-w-15 h-[35px] flex items-center justify-center rounded-[10px] w-full flex-1",
+    "bg-(--cs-color-gray-200) text-(--cs-color-gray-900) max-w-15 h-[35px] flex items-center justify-center rounded-[10px] w-full flex-1",
   "quantity-left":
-    "bg-[#D9D9D9] text-[#BABABA] w-[29px] h-[29px] border-r-[0.5px] border-[#BABABA] flex items-center justify-center rounded-l-[10px]",
+    "bg-(--cs-color-gray-200) text-(--cs-color-gray-500) w-[29px] h-[29px] border-r-[0.5px] border-(--cs-color-gray-500) flex items-center justify-center rounded-l-[10px]",
   "quantity-right":
-    "bg-[#D9D9D9] text-[#BABABA] w-[29px] h-[29px] border-l-[0.5px] border-[#BABABA] flex items-center justify-center rounded-r-[10px]",
+    "bg-(--cs-color-gray-200) text-(--cs-color-gray-500) w-[29px] h-[29px] border-l-[0.5px] border-(--cs-color-gray-500) flex items-center justify-center rounded-r-[10px]",
   percentage:
-    "bg-[#D9D9D9] text-[#615E5E] max-w-[35px] h-[30px] flex items-center justify-center rounded-[10px] w-full flex-1 text-sm",
+    "bg-(--cs-color-gray-200) text-(--cs-color-gray-800) max-w-[35px] h-[30px] flex items-center justify-center rounded-[10px] w-full flex-1 text-sm",
   "step-controls":
-    "bg-[#D9D9D9]/40 text-black max-w-[90px] h-[45px] flex items-center justify-center rounded-[10px] w-full flex-1 text-xl",
+    "bg-(--cs-color-gray-200)/40 text-black max-w-[90px] h-[45px] flex items-center justify-center rounded-[10px] w-full flex-1 text-xl",
   custom: "",
 };
 

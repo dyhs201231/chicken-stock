@@ -13,7 +13,7 @@ export default function PortfolioTab() {
       defaultValue={selectedTab}
       direction="row"
       type="fill"
-      className="w-fit rounded-none border-b border-[#D9D9D9] p-0"
+      className="w-fit rounded-none border-b border-(--cs-color-gray-200) p-0"
     >
       {PORTFOLIO_TAB.map((tab) => (
         <Tab.Item

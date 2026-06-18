@@ -68,8 +68,8 @@ export default function MiniPortfolioPanel() {
       className={twMerge(
         "fixed right-6 z-40 w-[300px] overflow-hidden border border-[rgba(123,120,120,0.35)] bg-white shadow-[0_4px_18px_rgba(0,0,0,0.18)] transition-all duration-300 ease-out",
         isOpen &&
-          "col bottom-3 h-[min(450px,calc(100dvh-24px))] gap-5 rounded-[8px] py-5",
-        !isOpen && "bottom-0 h-[30px] rounded-t-[8px]",
+          "col bottom-3 h-[min(450px,calc(100dvh-24px))] gap-5 rounded-(--cs-radius-lg) py-5",
+        !isOpen && "bottom-0 h-[30px] rounded-t-(--cs-radius-lg)",
       )}
     >
       <button
@@ -92,14 +92,14 @@ export default function MiniPortfolioPanel() {
         {isOpen && (
           <IconChevronDown
             aria-hidden="true"
-            className="text-[#cccccc]"
+            className="text-(--cs-color-gray-400)"
             size={20}
           />
         )}
         {!isOpen && (
           <IconChevronUp
             aria-hidden="true"
-            className="mr-5 ml-auto text-[#cccccc]"
+            className="mr-5 ml-auto text-(--cs-color-gray-400)"
             size={20}
           />
         )}
@@ -111,28 +111,28 @@ export default function MiniPortfolioPanel() {
       >
         <Link href="/portfolio" className="grid grid-cols-2 gap-4">
           <div className="col gap-1">
-            <p className="text-[12px] leading-4 font-medium">원화</p>
-            <p className="truncate text-[18px] leading-6 font-medium">
+            <p className="typography-medium-12 leading-4">원화</p>
+            <p className="truncate typography-medium-18 leading-6">
               {formatWon(data.krwBalance)}
             </p>
           </div>
 
           <div className="col gap-1">
-            <p className="text-[12px] leading-4 font-medium">달러</p>
-            <p className="truncate text-[18px] leading-6 font-medium">
+            <p className="typography-medium-12 leading-4">달러</p>
+            <p className="truncate typography-medium-18 leading-6">
               {formatDollar(data.usdBalance)}
             </p>
           </div>
         </Link>
 
         <section className="col mt-7 gap-1">
-          <p className="text-[13px] leading-4 font-medium">내 투자</p>
-          <p className="text-[24px] leading-7 font-bold tracking-normal">
+          <p className="typography-medium-13 leading-4">내 투자</p>
+          <p className="typography-bold-24 leading-7 tracking-normal">
             {formatWon(data.totalInvestmentAmount)}
           </p>
           <p
             className={twMerge(
-              "text-[13px] leading-4 font-medium",
+              "typography-medium-13 leading-4",
               getProfitClassName(totalProfit),
             )}
           >
@@ -140,14 +140,14 @@ export default function MiniPortfolioPanel() {
           </p>
         </section>
 
-        <div className="row mt-7 items-center justify-between gap-3 text-[12px] leading-4 font-medium">
+        <div className="row mt-7 items-center justify-between gap-3 typography-medium-12 leading-4">
           <div className="row relative w-fit shrink-0 items-center gap-1">
-            <span className="text-[12px] leading-4 font-medium">
+            <span className="typography-medium-12 leading-4">
               {selectedSortOptionLabel}
             </span>
             <IconChevronDown
               aria-hidden="true"
-              className="size-3.5 shrink-0 text-[#cccccc]"
+              className="size-3.5 shrink-0 text-(--cs-color-gray-400)"
               stroke={3}
             />
 
@@ -171,7 +171,7 @@ export default function MiniPortfolioPanel() {
             <button
               type="button"
               className={twMerge(
-                "cursor-pointer text-[12px] leading-4 font-medium text-[#777777]",
+                "cursor-pointer typography-medium-12 leading-4 text-(--cs-color-gray-700)",
                 amountView === "currentPrice" && "text-black underline",
               )}
               onClick={() => setAmountView("currentPrice")}
@@ -181,7 +181,7 @@ export default function MiniPortfolioPanel() {
             <button
               type="button"
               className={twMerge(
-                "cursor-pointer text-[12px] leading-4 font-medium text-[#777777]",
+                "cursor-pointer typography-medium-12 leading-4 text-(--cs-color-gray-700)",
                 amountView === "evaluationAmount" && "text-black underline",
               )}
               onClick={() => setAmountView("evaluationAmount")}

@@ -80,7 +80,7 @@ export default function SaleIncomeTable({ rows }: SaleIncomeTableProps) {
     <div className="-mx-4 overflow-x-auto px-4 pb-4 sm:mx-0 sm:px-2">
       <div className="min-w-[70.5rem] py-1" role="table" aria-label="판매수익">
         <div
-          className="px-8 pb-4 text-sm font-medium text-[#777777]"
+          className="px-8 pb-4 text-sm font-medium text-(--cs-color-gray-700)"
           role="rowgroup"
         >
           {table.getHeaderGroups().map((headerGroup) => (
@@ -103,7 +103,7 @@ export default function SaleIncomeTable({ rows }: SaleIncomeTableProps) {
           role="rowgroup"
         >
           {rows.length === 0 && (
-            <div className="row center h-60 text-lg text-[#777777]" role="row">
+            <div className="row center h-60 text-lg text-(--cs-color-gray-700)" role="row">
               <span role="cell" aria-colspan={saleIncomeColumns.length}>
                 판매수익이 없습니다.
               </span>

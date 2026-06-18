@@ -3,7 +3,7 @@ import React from "react";
 export default function FeesBenefits() {
   return (
     <div className="w-full">
-      <h1 className="mb-9 w-full border-b border-[#BABABA] pb-4 text-[40px]">
+      <h1 className="mb-9 w-full border-b border-(--cs-color-gray-500) pb-4 text-[40px]">
         수수료 및 혜택
       </h1>
 

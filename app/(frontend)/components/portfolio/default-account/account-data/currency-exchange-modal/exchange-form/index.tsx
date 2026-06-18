@@ -1,5 +1,6 @@
 import { useGetPortfolio } from "@/app/(frontend)/apis/portfolio/queries";
 import { Button, Input, Tab } from "@/app/(frontend)/components/ui";
+import { colorToken } from "@/app/(frontend)/constants/design-token";
 import { usePortfolioStore } from "@/app/(frontend)/stores/portfolio";
 import { ExchangeType } from "@/app/(frontend)/types/portfolio";
 import { IconChevronsDown } from "@tabler/icons-react";
@@ -131,7 +132,7 @@ export default function ExchangeForm({
           </div>
         </div>
 
-        <IconChevronsDown size={80} color={"#868686"} />
+        <IconChevronsDown size={80} color={colorToken.gray[600]} />
 
         <div className="col w-full gap-5">
           <div className="row center w-full gap-2">

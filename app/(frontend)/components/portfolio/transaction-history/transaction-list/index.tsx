@@ -20,7 +20,7 @@ export default function TransactionList({
 }: TransactionListProps) {
   if (transactions.length === 0) {
     return (
-      <div className="row center min-h-60 text-lg text-[#777777]">
+      <div className="row center min-h-60 text-lg text-(--cs-color-gray-700)">
         표시할 내역이 없습니다.
       </div>
     );

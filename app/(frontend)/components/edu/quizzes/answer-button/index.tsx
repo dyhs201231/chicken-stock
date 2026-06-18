@@ -15,7 +15,7 @@ type AnswerButtonProps = {
 const answerButtonVariants: Record<AnswerButtonVariant, string> = {
   default:
     "w-fit justify-start rounded-md border-2 border-transparent bg-white px-1.5 py-0.5 text-left text-3xl leading-tight font-medium",
-  true: "h-44 w-full justify-center rounded-xl border-8 border-[#4D61F5] bg-white px-6 text-8xl font-black text-[#4D61F5]",
+  true: "h-44 w-full justify-center rounded-xl border-8 border-(--cs-color-blue-800) bg-white px-6 text-8xl font-black text-(--cs-color-blue-800)",
   false:
     "h-44 w-full justify-center rounded-2xl border-8 border-[#FF5A60] bg-white px-6 text-8xl font-black text-[#FF5A60]",
 };

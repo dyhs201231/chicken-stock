@@ -45,11 +45,11 @@ export function formatMarketIndexVolume(value: number) {
 
 export function getMarketIndexTrendTextColor(trend: MarketIndexTrend) {
   if (trend === "up") {
-    return "text-[#FF0505]";
+    return "text-(--cs-color-red-500)";
   }
 
   if (trend === "down") {
-    return "text-[#0084FF]";
+    return "text-(--cs-color-blue-700)";
   }
 
   return "text-zinc-500";

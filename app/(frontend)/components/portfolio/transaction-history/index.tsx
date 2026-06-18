@@ -79,7 +79,7 @@ export default function TransactionHistory() {
           )}
 
           {!selectedTransaction && (
-            <div className="row center h-full text-lg text-[#777777]">
+            <div className="row center h-full text-lg text-(--cs-color-gray-700)">
               거래를 선택해 주세요.
             </div>
           )}
