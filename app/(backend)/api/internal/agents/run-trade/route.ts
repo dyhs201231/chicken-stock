@@ -13,6 +13,12 @@ function isAuthorized(request: NextRequest) {
   return request.headers.get("authorization") === `Bearer ${token}`;
 }
 
+function getJobSource(request: NextRequest) {
+  return request.nextUrl.searchParams.get("source") === "scheduler"
+    ? "scheduler"
+    : "manual";
+}
+
 export async function POST(request: NextRequest) {
   if (!isAuthorized(request)) {
     return NextResponse.json(
@@ -27,7 +33,7 @@ export async function POST(request: NextRequest) {
   try {
     const job = await runAgentTradeJob({
       includeAdk: request.nextUrl.searchParams.get("adk") !== "false",
-      source: "manual",
+      source: getJobSource(request),
     });
 
     if (job.status === "SKIPPED") {

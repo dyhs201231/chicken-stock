@@ -10,6 +10,7 @@ import type {
   StockMutationSync,
 } from "@/app/(frontend)/apis/stocks/api";
 import { stockQueryKeys } from "@/app/(frontend)/apis/stocks/queries";
+import type { ChartCandleData } from "@/app/(frontend)/components/stock-detail/order/chart-panel/types";
 import type { StockOrderBookSnapshotData } from "@/app/(frontend)/types/stock/stock-detail";
 import { showSuccessToast } from "@/app/(frontend)/utils/toast";
 
@@ -166,6 +167,44 @@ function isSameOrderBookSnapshot(
   });
 }
 
+function mergeLatestCandle(
+  previousCandles: ChartCandleData[] | undefined,
+  nextCandles: ChartCandleData[],
+) {
+  const latestCandle = nextCandles.at(-1);
+
+  if (!latestCandle) {
+    return previousCandles ?? nextCandles;
+  }
+
+  if (!previousCandles || previousCandles.length === 0) {
+    return nextCandles;
+  }
+
+  const existingIndex = previousCandles.findIndex(
+    (candle) => candle.time === latestCandle.time,
+  );
+
+  if (existingIndex >= 0) {
+    const nextMergedCandles = [...previousCandles];
+    nextMergedCandles[existingIndex] = latestCandle;
+
+    return nextMergedCandles;
+  }
+
+  const previousLatestCandle = previousCandles.at(-1);
+
+  if (
+    !previousLatestCandle ||
+    String(latestCandle.time).localeCompare(String(previousLatestCandle.time)) >
+      0
+  ) {
+    return [...previousCandles, latestCandle];
+  }
+
+  return previousCandles;
+}
+
 function invalidateStockMarketQueries(
   queryClient: QueryClient,
   stockId: number,
@@ -214,9 +253,9 @@ function applyStockMarketSync(
   );
 
   Object.entries(sync.candles ?? {}).forEach(([interval, candles]) => {
-    queryClient.setQueryData(
+    queryClient.setQueryData<ChartCandleData[]>(
       stockQueryKeys.candles(stockId, interval as StockCandleInterval),
-      candles,
+      (previousCandles) => mergeLatestCandle(previousCandles, candles),
     );
   });
 

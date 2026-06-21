@@ -19,8 +19,8 @@ function getIntegerEnv(name: string, fallback: number) {
   return Number.isInteger(value) && value > 0 ? value : fallback;
 }
 
-function isSchedulerEnabled() {
-  return process.env.AGENT_TRADE_SCHEDULER_ENABLED === "true";
+function isIntervalFallbackEnabled() {
+  return process.env.AGENT_TRADE_INTERVAL_FALLBACK_ENABLED === "true";
 }
 
 async function runScheduledAgentTrade() {
@@ -46,8 +46,10 @@ async function runScheduledAgentTrade() {
 }
 
 export function startAgentTradeScheduler() {
-  if (!isSchedulerEnabled()) {
-    console.info("Agent trade scheduler is disabled");
+  if (!isIntervalFallbackEnabled()) {
+    console.info("Agent trade interval fallback is disabled; use external scheduler", {
+      targetPath: "/api/internal/agents/run-trade?source=scheduler",
+    });
     return;
   }
 
@@ -71,6 +73,7 @@ export function startAgentTradeScheduler() {
 
   console.info("Agent trade scheduler started", {
     intervalMinutes,
+    mode: "interval-fallback",
   });
 }
 
@@ -78,10 +81,16 @@ export function getAgentTradeSchedulerStatus() {
   const schedulerState = globalForAgentTradeScheduler.agentTradeSchedulerState;
 
   return {
-    enabled: isSchedulerEnabled(),
-    intervalMinutes: schedulerState?.intervalMinutes ?? null,
+    externalScheduler: {
+      targetPath: "/api/internal/agents/run-trade?source=scheduler",
+    },
+    intervalFallback: {
+      enabled: isIntervalFallbackEnabled(),
+      intervalMinutes: schedulerState?.intervalMinutes ?? null,
+      started: Boolean(schedulerState),
+      startedAt: schedulerState?.startedAt ?? null,
+    },
     job: getAgentTradeJobState(),
-    startedAt: schedulerState?.startedAt ?? null,
-    started: Boolean(schedulerState),
+    mode: "external-scheduler",
   };
 }

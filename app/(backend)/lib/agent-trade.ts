@@ -14,6 +14,10 @@ import type {
 } from "@/app/(backend)/types/agent-trade-intent";
 import { prisma } from "@/app/(backend)/lib/prisma";
 import {
+  getAdkRunWindowStatus,
+  getMarketSessionStatus,
+} from "@/app/(backend)/lib/market-hours";
+import {
   createStockOrderForUser,
   StockOrderServiceError,
 } from "@/app/(backend)/lib/stock-order-service";
@@ -47,6 +51,7 @@ export type AgentTradeRunResult = {
   adkCandidateLimit: number;
   adkEnabled: boolean;
   adkFailedCount: number;
+  adkSkippedReason?: "ADK_TIME_WINDOW_CLOSED" | "NO_MARKET_OPEN_CANDIDATES";
   executedCount: number;
   failedCount: number;
   rejectedCount: number;
@@ -616,6 +621,23 @@ async function validateAgentTradeIntent(intent: AgentTradeIntent) {
     return "INVALID_STOCK";
   }
 
+  if (intent.decisionSource === "RULE_BASED") {
+    const marketSession = await getMarketSessionStatus(stock.countryCode);
+
+    if (marketSession && !marketSession.isOpen) {
+      console.info("Rule-based agent trade skipped outside market hours", {
+        agentUserId: intent.agentUserId,
+        checkedAt: marketSession.checkedAt,
+        countryCode: marketSession.countryCode,
+        reason: marketSession.reason,
+        stockId: intent.stockId,
+        timeZone: marketSession.timeZone,
+      });
+
+      return "MARKET_CLOSED";
+    }
+  }
+
   const portfolio = agent.user.portfolio;
 
   if (!portfolio) {
@@ -793,6 +815,65 @@ function selectAdkCandidates(ruleDecisions: RuleBasedDecision[]) {
         .slice(0, ADK_CANDIDATE_LIMIT),
     ]),
   );
+}
+
+async function getMarketOpenRuleDecisions(
+  ruleDecisions: RuleBasedDecision[],
+  stocks: TradableStock[],
+) {
+  const marketSessionsByStockId = new Map<number, boolean>();
+
+  for (const stock of stocks) {
+    const marketSession = await getMarketSessionStatus(stock.countryCode);
+
+    marketSessionsByStockId.set(stock.id, marketSession?.isOpen === true);
+  }
+
+  return ruleDecisions.filter((decision) => {
+    return marketSessionsByStockId.get(decision.stockId) === true;
+  });
+}
+
+async function getAdkRunnableRuleDecisions(
+  ruleDecisions: RuleBasedDecision[],
+  stocks: TradableStock[],
+) {
+  const adkRunWindow = getAdkRunWindowStatus();
+
+  if (!adkRunWindow.isOpen) {
+    console.info("ADK agent trade skipped outside ADK run window", {
+      checkedAt: adkRunWindow.checkedAt,
+      reason: adkRunWindow.reason,
+      timeZone: adkRunWindow.timeZone,
+    });
+
+    return {
+      ruleDecisions: [],
+      skippedReason: "ADK_TIME_WINDOW_CLOSED" as const,
+    };
+  }
+
+  const marketOpenRuleDecisions = await getMarketOpenRuleDecisions(
+    ruleDecisions,
+    stocks,
+  );
+
+  if (marketOpenRuleDecisions.length === 0) {
+    console.info("ADK agent trade skipped because no candidate market is open", {
+      checkedAt: adkRunWindow.checkedAt,
+      timeZone: adkRunWindow.timeZone,
+    });
+
+    return {
+      ruleDecisions: [],
+      skippedReason: "NO_MARKET_OPEN_CANDIDATES" as const,
+    };
+  }
+
+  return {
+    ruleDecisions: marketOpenRuleDecisions,
+    skippedReason: undefined,
+  };
 }
 
 function validateAdkIntent(
@@ -1057,13 +1138,19 @@ export async function runAgentTrade(options: AgentTradeRunOptions = {}) {
       .map((stock) => createRuleBasedDecision(agent, stock))
       .filter((decision): decision is RuleBasedDecision => decision !== null),
   );
-  const adkCandidates = includeAdk ? selectAdkCandidates(ruleDecisions) : new Map();
-  const { failedKeys, intentsByKey } = includeAdk
+  const adkRunnableRuleDecisions = includeAdk
+    ? await getAdkRunnableRuleDecisions(ruleDecisions, stocks)
+    : { ruleDecisions: [], skippedReason: undefined };
+  const adkCandidates = includeAdk
+    ? selectAdkCandidates(adkRunnableRuleDecisions.ruleDecisions)
+    : new Map();
+  const shouldRunAdk = includeAdk && adkCandidates.size > 0;
+  const { failedKeys, intentsByKey } = shouldRunAdk
     ? await runAdkForCandidates(adkCandidates)
     : { failedKeys: new Set<string>(), intentsByKey: new Map<string, AgentTradeIntent>() };
   const adkCandidateKeys = getCandidateKeys(adkCandidates);
 
-  if (includeAdk) {
+  if (shouldRunAdk) {
     await recordAdkFailures(failedKeys, ruleDecisions);
   }
 
@@ -1078,8 +1165,9 @@ export async function runAgentTrade(options: AgentTradeRunOptions = {}) {
   }));
   const result: AgentTradeRunResult = {
     adkCandidateLimit: ADK_CANDIDATE_LIMIT,
-    adkEnabled: includeAdk,
+    adkEnabled: shouldRunAdk,
     adkFailedCount: failedKeys.size,
+    adkSkippedReason: adkRunnableRuleDecisions.skippedReason,
     executedCount: 0,
     failedCount: 0,
     rejectedCount: 0,
