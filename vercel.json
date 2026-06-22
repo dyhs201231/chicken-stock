@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/internal/agents/run-trade",
+      "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/internal/agents/match-pending",
+      "schedule": "*/10 * * * *"
+    }
+  ]
+}

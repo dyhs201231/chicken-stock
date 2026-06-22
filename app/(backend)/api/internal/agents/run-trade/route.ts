@@ -4,13 +4,18 @@ import { runAgentTradeJob } from "@/app/(backend)/lib/agent-trade-runner";
 export const runtime = "nodejs";
 
 function isAuthorized(request: NextRequest) {
-  const token = process.env.AGENT_INTERNAL_TOKEN;
+  const tokens = [
+    process.env.AGENT_INTERNAL_TOKEN,
+    process.env.CRON_SECRET,
+  ].filter((token): token is string => Boolean(token));
 
-  if (!token) {
+  if (tokens.length === 0) {
     return true;
   }
 
-  return request.headers.get("authorization") === `Bearer ${token}`;
+  const authorization = request.headers.get("authorization");
+
+  return tokens.some((token) => authorization === `Bearer ${token}`);
 }
 
 function getJobSource(request: NextRequest) {
@@ -19,7 +24,10 @@ function getJobSource(request: NextRequest) {
     : "manual";
 }
 
-export async function POST(request: NextRequest) {
+async function handleRunTradeRequest(
+  request: NextRequest,
+  source: "manual" | "scheduler",
+) {
   if (!isAuthorized(request)) {
     return NextResponse.json(
       {
@@ -33,7 +41,7 @@ export async function POST(request: NextRequest) {
   try {
     const job = await runAgentTradeJob({
       includeAdk: request.nextUrl.searchParams.get("adk") !== "false",
-      source: getJobSource(request),
+      source,
     });
 
     if (job.status === "SKIPPED") {
@@ -58,4 +66,12 @@ export async function POST(request: NextRequest) {
       { status: 500 },
     );
   }
+}
+
+export async function GET(request: NextRequest) {
+  return handleRunTradeRequest(request, "scheduler");
+}
+
+export async function POST(request: NextRequest) {
+  return handleRunTradeRequest(request, getJobSource(request));
 }

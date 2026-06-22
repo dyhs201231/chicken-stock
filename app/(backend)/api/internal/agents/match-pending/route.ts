@@ -4,13 +4,18 @@ import { matchPendingStockOrders } from "@/app/(backend)/lib/stock-order-service
 export const runtime = "nodejs";
 
 function isAuthorized(request: NextRequest) {
-  const token = process.env.AGENT_INTERNAL_TOKEN;
+  const tokens = [
+    process.env.AGENT_INTERNAL_TOKEN,
+    process.env.CRON_SECRET,
+  ].filter((token): token is string => Boolean(token));
 
-  if (!token) {
+  if (tokens.length === 0) {
     return true;
   }
 
-  return request.headers.get("authorization") === `Bearer ${token}`;
+  const authorization = request.headers.get("authorization");
+
+  return tokens.some((token) => authorization === `Bearer ${token}`);
 }
 
 function parsePositiveInteger(value: string | null) {
@@ -23,7 +28,7 @@ function parsePositiveInteger(value: string | null) {
   return Number.isInteger(parsed) && parsed > 0 ? parsed : undefined;
 }
 
-export async function POST(request: NextRequest) {
+async function handleMatchPendingRequest(request: NextRequest) {
   if (!isAuthorized(request)) {
     return NextResponse.json(
       {
@@ -55,4 +60,12 @@ export async function POST(request: NextRequest) {
       { status: 500 },
     );
   }
+}
+
+export async function GET(request: NextRequest) {
+  return handleMatchPendingRequest(request);
+}
+
+export async function POST(request: NextRequest) {
+  return handleMatchPendingRequest(request);
 }
