@@ -719,3 +719,35 @@ model MarketIndexCandle {
   @@id([ticker, intervalCode, timestamp])
   @@map("Market_index_candle")
 }
+
+model MarketPriceSnapshot {
+  id             BigInt       @id @default(autoincrement())
+  instrumentType String       @map("instrument_type") @db.VarChar(32)
+  ticker         String       @db.VarChar(255)
+  timestamp      BigInt
+  price          Decimal      @db.Decimal(20, 4)
+  volume         Decimal?     @db.Decimal(30, 4)
+  provider       String       @db.VarChar(64)
+  observedAt     DateTime     @map("observed_at")
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime     @updatedAt @map("updated_at")
+  @@unique([instrumentType, ticker, provider, timestamp], map: "Market_price_snapshot_instrument_ticker_provider_timestamp_key")
+  @@index([instrumentType, ticker, timestamp])
+  @@index([ticker, timestamp])
+  @@map("Market_price_snapshot")
+}
+
+model MarketHoliday {
+  id          BigInt   @id @default(autoincrement())
+  countryCode String   @map("country_code") @db.VarChar(8)
+  marketDate  DateTime @map("market_date") @db.Date
+  isClosed    Boolean  @default(true) @map("is_closed")
+  openTime    String?  @map("open_time") @db.VarChar(5)
+  closeTime   String?  @map("close_time") @db.VarChar(5)
+  reason      String   @db.VarChar(255)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@unique([countryCode, marketDate])
+  @@map("Market_holiday")
+}
