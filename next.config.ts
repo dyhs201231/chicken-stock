@@ -4,7 +4,6 @@ const agentTraceExcludes = [
   "./AGENTS.md",
   "./CLAUDE.md",
   "./.git/**/*",
-  "./.next/**/*",
   "./adk-worker/**/*",
   "./next.config.ts",
 ];
@@ -17,6 +16,8 @@ const nextConfig: NextConfig = {
     ],
   },
   outputFileTracingExcludes: {
+    "/*": agentTraceExcludes,
+    "/instrumentation": agentTraceExcludes,
     "/api/internal/agents/run-trade": agentTraceExcludes,
     "/api/internal/agents/scheduler": agentTraceExcludes,
   },
