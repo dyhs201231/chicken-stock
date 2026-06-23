@@ -45,7 +45,8 @@ select cron.schedule(
         where name = 'chicken_stock_cron_secret'
       )
     ),
-    body := jsonb_build_object('scheduler', 'supabase-pg-cron')
+    body := jsonb_build_object('scheduler', 'supabase-pg-cron'),
+    timeout_milliseconds := 120000
   );
   $$
 );
@@ -68,7 +69,8 @@ select cron.schedule(
         where name = 'chicken_stock_cron_secret'
       )
     ),
-    body := jsonb_build_object('scheduler', 'supabase-pg-cron')
+    body := jsonb_build_object('scheduler', 'supabase-pg-cron'),
+    timeout_milliseconds := 30000
   );
   $$
 );
