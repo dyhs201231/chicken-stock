@@ -7,6 +7,7 @@ import {
   TradeOrderType,
 } from "@/app/(backend)/generated/prisma/enums";
 import { prisma } from "@/app/(backend)/lib/prisma";
+import { getMarketSessionStatus } from "@/app/(backend)/lib/market-hours";
 import {
   publishOrderFilledEventsForOrder,
   scheduleStockUpdated,
@@ -279,6 +280,128 @@ function toStockOrderServiceError(error: unknown) {
   throw error;
 }
 
+async function getPendingStockOrders({
+  limit,
+  stockId,
+}: {
+  limit: number;
+  stockId?: number;
+}) {
+  return prisma.$queryRaw<
+    Array<{
+      agentDecisionLogId: bigint | null;
+      filledQuantity: number;
+      orderId: bigint;
+      orderedAt: Date;
+      portfolioUserId: bigint;
+      remainingQuantity: number;
+      stockId: number;
+      ticker: string;
+    }>
+  >`
+    WITH pending_orders AS (
+      SELECT
+        "Trade_order"."filled_quantity" AS "filledQuantity",
+        "Trade_order"."order_id" AS "orderId",
+        "Trade_order"."ordered_at" AS "orderedAt",
+        "Trade_order"."portfolio_id" AS "portfolioId",
+        "Trade_order"."price_per_share" AS "pricePerShare",
+        "Trade_order"."remaining_quantity" AS "remainingQuantity",
+        "Trade_order"."stock_id" AS "stockId",
+        "Trade_order"."ticker",
+        "Trade_order"."type",
+        "Portfolio"."user_id" AS "portfolioUserId",
+        "Agent_decision_log"."id" AS "agentDecisionLogId",
+        CASE
+          WHEN "Agent_decision_log"."id" IS NOT NULL
+            AND (
+              ("Trade_order"."type" = 'BUY'::"Trade_order_type"
+                AND "Trade_order"."price_per_share" >= "Stock"."current_price")
+              OR
+              ("Trade_order"."type" = 'SELL'::"Trade_order_type"
+                AND "Trade_order"."price_per_share" <= "Stock"."current_price")
+            )
+          THEN 0
+          WHEN EXISTS (
+            SELECT 1
+            FROM "Trade_order" "Opposite_order"
+            WHERE "Opposite_order"."portfolio_id" <> "Trade_order"."portfolio_id"
+              AND "Opposite_order"."remaining_quantity" > 0
+              AND "Opposite_order"."status" = ${TradeOrderStatus.PENDING}::"Trade_order_status"
+              AND "Opposite_order"."stock_id" = "Trade_order"."stock_id"
+              AND (
+                ("Trade_order"."type" = 'BUY'::"Trade_order_type"
+                  AND "Opposite_order"."type" = 'SELL'::"Trade_order_type"
+                  AND "Opposite_order"."price_per_share" <= "Trade_order"."price_per_share")
+                OR
+                ("Trade_order"."type" = 'SELL'::"Trade_order_type"
+                  AND "Opposite_order"."type" = 'BUY'::"Trade_order_type"
+                  AND "Opposite_order"."price_per_share" >= "Trade_order"."price_per_share")
+              )
+          )
+          THEN 1
+          WHEN "Agent_decision_log"."id" IS NOT NULL THEN 2
+          ELSE 3
+        END AS "matchPriority"
+      FROM "Trade_order"
+      INNER JOIN "Portfolio"
+        ON "Portfolio"."id" = "Trade_order"."portfolio_id"
+      INNER JOIN "Stock"
+        ON "Stock"."id" = "Trade_order"."stock_id"
+      LEFT JOIN LATERAL (
+        SELECT "id"
+        FROM "Agent_decision_log"
+        WHERE "Agent_decision_log"."executed_order_id" = "Trade_order"."order_id"
+        ORDER BY "id" ASC
+        LIMIT 1
+      ) "Agent_decision_log" ON TRUE
+      WHERE "Trade_order"."remaining_quantity" > 0
+        AND "Trade_order"."status" = ${TradeOrderStatus.PENDING}::"Trade_order_status"
+        ${stockId ? Prisma.sql`AND "Trade_order"."stock_id" = ${stockId}` : Prisma.empty}
+    )
+    SELECT
+      "agentDecisionLogId",
+      "filledQuantity",
+      "orderId",
+      "orderedAt",
+      "portfolioUserId",
+      "remainingQuantity",
+      "stockId",
+      "ticker"
+    FROM pending_orders
+    ORDER BY "matchPriority" ASC, "orderedAt" ASC, "orderId" ASC
+    LIMIT ${limit}
+  `;
+}
+
+async function filterOpenMarketPendingOrders<T extends { stockId: number }>(
+  pendingOrders: T[],
+) {
+  const stockIds = Array.from(new Set(pendingOrders.map((order) => order.stockId)));
+  const stocks = await prisma.stock.findMany({
+    select: {
+      countryCode: true,
+      id: true,
+    },
+    where: {
+      id: {
+        in: stockIds,
+      },
+    },
+  });
+  const openStockIds = new Set<number>();
+
+  for (const stock of stocks) {
+    const marketSession = await getMarketSessionStatus(stock.countryCode);
+
+    if (marketSession?.isOpen === true) {
+      openStockIds.add(stock.id);
+    }
+  }
+
+  return pendingOrders.filter((order) => openStockIds.has(order.stockId));
+}
+
 export async function createStockOrderForUser({
   allowExternalLiquidity = false,
   orderPriceType,
@@ -494,38 +617,18 @@ export async function matchPendingStockOrders({
     });
     lastMark = now;
   };
-  const pendingOrders = await prisma.tradeOrder.findMany({
-    include: {
-      agentDecisionLogs: {
-        select: {
-          id: true,
-        },
-        take: 1,
-      },
-      portfolio: {
-        select: {
-          userId: true,
-        },
-      },
-    },
-    orderBy: {
-      orderedAt: "asc",
-    },
-    take: limit,
-    where: {
-      remainingQuantity: {
-        gt: 0,
-      },
-      status: TradeOrderStatus.PENDING,
-      ...(stockId ? { stockId } : {}),
-    },
+  const pendingOrderCandidates = await getPendingStockOrders({
+    limit,
+    stockId,
   });
+  const pendingOrders = await filterOpenMarketPendingOrders(pendingOrderCandidates);
   let matchedCount = 0;
   let failedCount = 0;
 
   markDuration("load-pending-orders", {
+    marketOpenPendingOrderCount: pendingOrders.length,
     limit,
-    pendingOrderCount: pendingOrders.length,
+    pendingOrderCount: pendingOrderCandidates.length,
     stockId: stockId ?? null,
   });
 
@@ -574,7 +677,7 @@ export async function matchPendingStockOrders({
         }
 
         return matchStockOrder(tx, {
-          allowExternalLiquidity: pendingOrder.agentDecisionLogs.length > 0,
+          allowExternalLiquidity: pendingOrder.agentDecisionLogId !== null,
           orderId: pendingOrder.orderId,
           orderPriceType: "LIMIT",
           stock,
@@ -587,7 +690,7 @@ export async function matchPendingStockOrders({
           getSafeStockMutationSync({
             reason: "TRADE_EXECUTED",
             stockId: pendingOrder.stockId,
-            userId: pendingOrder.portfolio.userId,
+            userId: pendingOrder.portfolioUserId,
           }),
           publishOrderFilledEventsForOrder(pendingOrder.orderId, {
             since: pendingOrder.orderedAt,
@@ -606,6 +709,7 @@ export async function matchPendingStockOrders({
             matchedOrder.filledQuantity > pendingOrder.filledQuantity,
         ),
         orderId: pendingOrder.orderId.toString(),
+        priority: pendingOrder.agentDecisionLogId ? "AGENT" : "REGULAR",
         stockId: pendingOrder.stockId,
       });
     } catch (error) {

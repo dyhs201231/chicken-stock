@@ -84,7 +84,7 @@ const MAX_EXECUTABLE_INTENTS_PER_RUN = getIntegerEnv(
   "AGENT_MAX_EXECUTABLE_INTENTS_PER_RUN",
   MAX_DAILY_TRADES,
 );
-const EXECUTION_CONCURRENCY = getIntegerEnv("AGENT_TRADE_EXECUTION_CONCURRENCY", 5);
+const EXECUTION_CONCURRENCY = getIntegerEnv("AGENT_TRADE_EXECUTION_CONCURRENCY", 1);
 const ADK_WORKER_CONCURRENCY = getIntegerEnv("ADK_WORKER_CONCURRENCY", 5);
 const ADK_WORKER_TIMEOUT_MS = getIntegerEnv("ADK_WORKER_TIMEOUT_MS", 90_000);
 const ADK_CANDIDATE_LIMIT = clamp(
@@ -96,6 +96,14 @@ const ADK_WORKER_PATH = "adk-worker/main.py";
 const ADK_WORKER_PACKAGE_PATH = "adk-worker/.python_packages";
 const MARKET_SESSION_COUNTRY_CODES: MarketSessionCountryCode[] = ["KR", "US"];
 const ADK_FAILURE_REASON_MAX_LENGTH = 800;
+const DECISION_LOG_UPDATE_MAX_ATTEMPTS = getIntegerEnv(
+  "AGENT_DECISION_LOG_UPDATE_MAX_ATTEMPTS",
+  3,
+);
+const DECISION_LOG_UPDATE_RETRY_DELAY_MS = getIntegerEnv(
+  "AGENT_DECISION_LOG_UPDATE_RETRY_DELAY_MS",
+  200,
+);
 
 function getIntegerEnv(name: string, fallback: number) {
   const value = Number(process.env[name]);
@@ -578,6 +586,40 @@ function sanitizeJson(value: unknown): Prisma.InputJsonValue {
   return JSON.parse(JSON.stringify(value ?? {}));
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function getErrorCode(error: unknown) {
+  if (!isRecord(error)) {
+    return null;
+  }
+
+  if (typeof error.code === "string") {
+    return error.code;
+  }
+
+  if (isRecord(error.meta) && typeof error.meta.code === "string") {
+    return error.meta.code;
+  }
+
+  return null;
+}
+
+function isRetryablePrismaError(error: unknown) {
+  const code = getErrorCode(error);
+
+  return code === "P2024" || code === "P2034" || code === "40001" || code === "40P01";
+}
+
+function serializeError(error: unknown) {
+  return error instanceof Error ? error.message : String(error);
+}
+
+function wait(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 function toAdkFailureReason(code: string, detail?: string) {
   const normalizedDetail = detail?.trim();
   const reason = normalizedDetail ? `${code}: ${normalizedDetail}` : code;
@@ -600,6 +642,40 @@ async function createDecisionLog(intent: AgentTradeIntent) {
       stockId: intent.stockId,
     },
   });
+}
+
+async function updateDecisionLogWithRetry(
+  id: bigint,
+  data: Prisma.AgentDecisionLogUncheckedUpdateInput,
+) {
+  let lastError: unknown;
+
+  for (let attempt = 1; attempt <= DECISION_LOG_UPDATE_MAX_ATTEMPTS; attempt += 1) {
+    try {
+      return await prisma.agentDecisionLog.update({
+        data,
+        where: {
+          id,
+        },
+      });
+    } catch (error) {
+      lastError = error;
+
+      if (!isRetryablePrismaError(error) || attempt >= DECISION_LOG_UPDATE_MAX_ATTEMPTS) {
+        throw error;
+      }
+
+      console.warn("Agent decision log update retrying", {
+        attempt,
+        error: serializeError(error),
+        id: id.toString(),
+      });
+
+      await wait(DECISION_LOG_UPDATE_RETRY_DELAY_MS * attempt);
+    }
+  }
+
+  throw lastError;
 }
 
 function getKstDayStart(date = new Date()) {
@@ -767,47 +843,32 @@ async function getOrderLimitPrice(stockId: number) {
 async function executeIntent(intent: AgentTradeIntent) {
   const log = await createDecisionLog(intent);
 
-  if (intent.side === "HOLD") {
-    await prisma.agentDecisionLog.update({
-      data: {
+  try {
+    if (intent.side === "HOLD") {
+      await updateDecisionLogWithRetry(log.id, {
         status: DecisionStatus.SKIPPED,
-      },
-      where: {
-        id: log.id,
-      },
-    });
+      });
 
-    return "SKIPPED";
-  }
+      return "SKIPPED";
+    }
 
-  const rejectReason = await validateAgentTradeIntent(intent);
+    const rejectReason = await validateAgentTradeIntent(intent);
 
-  if (rejectReason) {
-    await prisma.agentDecisionLog.update({
-      data: {
+    if (rejectReason) {
+      await updateDecisionLogWithRetry(log.id, {
         rejectReason,
         status: DecisionStatus.REJECTED,
-      },
-      where: {
-        id: log.id,
-      },
-    });
+      });
 
-    return "REJECTED";
-  }
+      return "REJECTED";
+    }
 
-  try {
     const pricePerShare = await getOrderLimitPrice(intent.stockId);
 
     if (!pricePerShare) {
-      await prisma.agentDecisionLog.update({
-        data: {
-          rejectReason: "INVALID_STOCK",
-          status: DecisionStatus.REJECTED,
-        },
-        where: {
-          id: log.id,
-        },
+      await updateDecisionLogWithRetry(log.id, {
+        rejectReason: "INVALID_STOCK",
+        status: DecisionStatus.REJECTED,
       });
 
       return "REJECTED";
@@ -823,33 +884,34 @@ async function executeIntent(intent: AgentTradeIntent) {
       userId: BigInt(intent.agentUserId),
     });
 
-    await prisma.agentDecisionLog.update({
-      data: {
-        executedOrderId: order.orderId,
-        status: DecisionStatus.EXECUTED,
-      },
-      where: {
-        id: log.id,
-      },
+    await updateDecisionLogWithRetry(log.id, {
+      executedOrderId: order.orderId,
+      status: DecisionStatus.EXECUTED,
     });
 
     return "EXECUTED";
   } catch (error) {
     const rejectReason =
-      error instanceof StockOrderServiceError ? error.code : "TRADE_EXECUTION_FAILED";
+      error instanceof StockOrderServiceError
+        ? error.code
+        : `TRADE_EXECUTION_FAILED: ${serializeError(error)}`;
 
-    await prisma.agentDecisionLog.update({
-      data: {
+    try {
+      await updateDecisionLogWithRetry(log.id, {
         rejectReason,
         status:
           error instanceof StockOrderServiceError
             ? DecisionStatus.REJECTED
             : DecisionStatus.FAILED,
-      },
-      where: {
-        id: log.id,
-      },
-    });
+      });
+    } catch (updateError) {
+      console.error("Agent decision log final status update failed", {
+        error: serializeError(updateError),
+        intent,
+        logId: log.id.toString(),
+        rejectReason,
+      });
+    }
 
     return error instanceof StockOrderServiceError ? "REJECTED" : "FAILED";
   }
@@ -1202,14 +1264,9 @@ async function recordAdkFailures(
       reason: "ADK 실패로 Rule-based 판단을 fallback으로 사용",
     });
 
-    await prisma.agentDecisionLog.update({
-      data: {
-        rejectReason: failureReason,
-        status: DecisionStatus.FAILED,
-      },
-      where: {
-        id: log.id,
-      },
+    await updateDecisionLogWithRetry(log.id, {
+      rejectReason: failureReason,
+      status: DecisionStatus.FAILED,
     });
   }
 }
@@ -1257,7 +1314,17 @@ async function mapWithConcurrency<T, R>(
     while (nextIndex < values.length) {
       const currentIndex = nextIndex;
       nextIndex += 1;
-      results[currentIndex] = await mapper(values[currentIndex]);
+
+      try {
+        results[currentIndex] = await mapper(values[currentIndex]);
+      } catch (error) {
+        console.error("Agent trade intent processing failed", {
+          error: serializeError(error),
+          index: currentIndex,
+          value: values[currentIndex],
+        });
+        results[currentIndex] = "FAILED" as R;
+      }
     }
   }
 
