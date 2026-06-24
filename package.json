@@ -6,9 +6,8 @@
     "node": "24.x"
   },
   "scripts": {
-    "dev": "PYTHON_BIN=adk-worker/.venv/bin/python next dev",
+    "dev": "next dev",
     "predev": "npm run prisma:generate",
-    "prebuild": "node scripts/install-adk-worker-deps.mjs",
     "build": "npm run prisma:generate && next build",
     "start": "next start",
     "lint": "eslint",

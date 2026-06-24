@@ -15,9 +15,12 @@ Google ADK 기반 매매 의도 생성 워커입니다.
 adk-worker/
 ├── .env.example
 ├── .python-version
+├── Dockerfile
 ├── README.md
+├── cloud-run.md
 ├── requirements.txt
 ├── main.py
+├── server.py
 ├── examples/
 │   └── run_test_agent.py
 ├── test_agent/
@@ -43,8 +46,11 @@ adk-worker/
 
 - `.env.example`: 워커 실행에 필요한 환경 변수 예시입니다. `GOOGLE_API_KEY`, `GEMINI_MODEL`, 1회 후보 종목 수 제한 등을 관리합니다.
 - `.python-version`: 이 워커가 Python 3.11 기준으로 작성되었음을 표시합니다.
+- `Dockerfile`: Cloud Run 배포용 컨테이너 이미지 정의입니다.
+- `cloud-run.md`: Cloud Run 배포와 로컬 Docker smoke test 절차입니다.
 - `requirements.txt`: Python 의존성 목록입니다. Google ADK 사용을 위해 `google-adk`가 포함되어 있습니다.
 - `main.py`: 워커 실행 진입점입니다. `python main.py --mock`처럼 실행하면 에이전트 3개의 매매 의도 JSON을 출력합니다.
+- `server.py`: Cloud Run에서 실행할 FastAPI HTTP 서버입니다.
 - `README.md`: 워커의 목적, 실행 방법, 파일 구조를 설명하는 문서입니다.
 - `examples/run_test_agent.py`: DB 없이 mock 종목 하나로 TEST_AGENT를 실행하고 `AgentTradeIntent` JSON을 출력하는 예제입니다.
 - `test_agent/agent.py`: `adk web`이 인식하는 Playground용 진입점입니다. 여기에서 `root_agent`를 export합니다.

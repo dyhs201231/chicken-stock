@@ -1,4 +1,3 @@
-import { spawn } from "node:child_process";
 import { Prisma } from "@/app/(backend)/generated/prisma/client";
 import {
   AgentType as PrismaAgentType,
@@ -85,15 +84,15 @@ const MAX_EXECUTABLE_INTENTS_PER_RUN = getIntegerEnv(
   MAX_DAILY_TRADES,
 );
 const EXECUTION_CONCURRENCY = getIntegerEnv("AGENT_TRADE_EXECUTION_CONCURRENCY", 1);
-const ADK_WORKER_CONCURRENCY = getIntegerEnv("ADK_WORKER_CONCURRENCY", 5);
 const ADK_WORKER_TIMEOUT_MS = getIntegerEnv("ADK_WORKER_TIMEOUT_MS", 90_000);
+const ADK_WORKER_URL = process.env.ADK_WORKER_URL?.replace(/\/+$/, "");
+const ADK_WORKER_TOKEN = process.env.ADK_WORKER_TOKEN;
+const ADK_WORKER_USE_MOCK = process.env.ADK_WORKER_USE_MOCK === "true";
 const ADK_CANDIDATE_LIMIT = clamp(
   getIntegerEnv("ADK_CANDIDATE_LIMIT", 10),
   5,
   15,
 );
-const ADK_WORKER_PATH = "adk-worker/main.py";
-const ADK_WORKER_PACKAGE_PATH = "adk-worker/.python_packages";
 const MARKET_SESSION_COUNTRY_CODES: MarketSessionCountryCode[] = ["KR", "US"];
 const ADK_FAILURE_REASON_MAX_LENGTH = 800;
 const DECISION_LOG_UPDATE_MAX_ATTEMPTS = getIntegerEnv(
@@ -1051,40 +1050,46 @@ function getFailureReasonsForAllCandidates(
   );
 }
 
-function parseWorkerCandidateErrors(stderr: string) {
+function parseWorkerResponseCandidateErrors(value: unknown) {
   const errors = new Map<string, string>();
 
-  for (const line of stderr.split(/\r?\n/)) {
-    if (!line.trim()) {
+  if (!Array.isArray(value)) {
+    return errors;
+  }
+
+  for (const item of value) {
+    if (typeof item !== "object" || item === null) {
       continue;
     }
 
-    try {
-      const parsed = JSON.parse(line) as unknown;
+    const record = item as Record<string, unknown>;
 
-      if (typeof parsed !== "object" || parsed === null) {
-        continue;
-      }
-
-      const record = parsed as Record<string, unknown>;
-
-      if (
-        typeof record.agentType === "string" &&
-        typeof record.stockId === "number" &&
-        typeof record.error === "string"
-      ) {
-        errors.set(
-          `${record.agentType}:${record.stockId}`,
-          toAdkFailureReason("ADK_AGENT_ERROR", record.error),
-        );
-      }
-    } catch {
-      // Worker stderr can also include runtime diagnostics; non-JSON lines are kept
-      // for process-level failure reasons instead of candidate-level errors.
+    if (
+      typeof record.agentType === "string" &&
+      typeof record.stockId === "number" &&
+      typeof record.error === "string"
+    ) {
+      errors.set(
+        `${record.agentType}:${record.stockId}`,
+        toAdkFailureReason("ADK_AGENT_ERROR", record.error),
+      );
     }
   }
 
   return errors;
+}
+
+function isAdkWorkerResponse(value: unknown): value is {
+  data: unknown[];
+  errors?: unknown;
+  ok?: unknown;
+  tookMs?: unknown;
+} {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    Array.isArray((value as Record<string, unknown>).data)
+  );
 }
 
 async function runAdkForCandidates(
@@ -1106,128 +1111,140 @@ async function runAdkForCandidates(
         ruleBasedScore: decision.score,
       })),
     })),
+    useMock: ADK_WORKER_USE_MOCK,
   };
-  const python = process.env.PYTHON_BIN ?? "python3";
-  const pythonPath = [ADK_WORKER_PACKAGE_PATH, process.env.PYTHONPATH]
-    .filter((value): value is string => Boolean(value))
-    .join(":");
 
-  return new Promise<AdkRunResult>((resolve) => {
-    let settled = false;
-    const resolveOnce = (result: AdkRunResult) => {
-      if (settled) {
-        return;
-      }
-
-      settled = true;
-      clearTimeout(timeout);
-      resolve(result);
+  if (!ADK_WORKER_URL) {
+    return {
+      failureReasonsByKey: getFailureReasonsForAllCandidates(
+        candidates,
+        toAdkFailureReason("ADK_WORKER_URL_MISSING"),
+      ),
+      intentsByKey: new Map(),
     };
-    const child = spawn(python, [
-      /* turbopackIgnore: true */ ADK_WORKER_PATH,
-      "--stdin",
-    ], {
-      env: {
-        ...process.env,
-        ADK_WORKER_CONCURRENCY: String(ADK_WORKER_CONCURRENCY),
-        GEMINI_MODEL:
-          process.env.GEMINI_MODEL ?? "gemini-2.5-flash-lite",
-        MAX_CANDIDATES_PER_RUN: String(ADK_CANDIDATE_LIMIT),
-        PYTHONPATH: pythonPath,
+  }
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => {
+    controller.abort();
+  }, ADK_WORKER_TIMEOUT_MS);
+
+  try {
+    const response = await fetch(`${ADK_WORKER_URL}/run-trade-intents`, {
+      body: JSON.stringify(payload),
+      headers: {
+        "Content-Type": "application/json",
+        ...(ADK_WORKER_TOKEN
+          ? { Authorization: `Bearer ${ADK_WORKER_TOKEN}` }
+          : {}),
       },
-      stdio: ["pipe", "pipe", "pipe"],
+      method: "POST",
+      signal: controller.signal,
     });
-    let stdout = "";
-    let stderr = "";
+    const responseText = await response.text();
 
-    child.stdout.on("data", (chunk) => {
-      stdout += String(chunk);
-    });
-    child.stderr.on("data", (chunk) => {
-      stderr += String(chunk);
-    });
-    const timeout = setTimeout(() => {
-      console.error(
-        `ADK worker timed out after ${ADK_WORKER_TIMEOUT_MS}ms`,
-        stderr,
-      );
-      child.kill("SIGTERM");
-      resolveOnce({
+    if (!response.ok) {
+      console.error("ADK worker HTTP request failed", {
+        body: responseText,
+        status: response.status,
+      });
+
+      return {
         failureReasonsByKey: getFailureReasonsForAllCandidates(
           candidates,
-          toAdkFailureReason("ADK_WORKER_TIMEOUT", `${ADK_WORKER_TIMEOUT_MS}ms`),
+          toAdkFailureReason(`ADK_WORKER_HTTP_${response.status}`, responseText),
         ),
         intentsByKey: new Map(),
-      });
-    }, ADK_WORKER_TIMEOUT_MS);
-    child.on("error", (error) => {
-      resolveOnce({
+      };
+    }
+
+    let parsed: unknown;
+
+    try {
+      parsed = JSON.parse(responseText);
+    } catch (error) {
+      console.error("ADK worker HTTP response parse failed", error, responseText);
+
+      return {
         failureReasonsByKey: getFailureReasonsForAllCandidates(
           candidates,
-          toAdkFailureReason("ADK_WORKER_SPAWN_ERROR", error.message),
-        ),
-        intentsByKey: new Map(),
-      });
-    });
-    child.on("close", (code) => {
-      if (code !== 0) {
-        console.error("ADK worker failed", stderr);
-        resolveOnce({
-          failureReasonsByKey: getFailureReasonsForAllCandidates(
-            candidates,
-            toAdkFailureReason(`ADK_WORKER_EXIT_${code ?? "UNKNOWN"}`, stderr),
+          toAdkFailureReason(
+            "ADK_WORKER_RESPONSE_PARSE_FAILED",
+            error instanceof Error ? error.message : String(error),
           ),
-          intentsByKey: new Map(),
-        });
-        return;
-      }
+        ),
+        intentsByKey: new Map(),
+      };
+    }
 
-      try {
-        const parsed = JSON.parse(stdout) as unknown[];
-        const intentsByKey = new Map<string, AgentTradeIntent>();
-        const failureReasonsByKey = parseWorkerCandidateErrors(stderr);
+    if (!isAdkWorkerResponse(parsed)) {
+      console.error("ADK worker HTTP response shape invalid", parsed);
 
-        for (const [agentType, decisions] of candidates) {
-          for (const decision of decisions) {
-            const rawIntent = parsed.find(
-              (item) =>
-                typeof item === "object" &&
-                item !== null &&
-                (item as Record<string, unknown>).agentType === agentType &&
-                (item as Record<string, unknown>).stockId === decision.stockId,
-            );
-            const intent = validateAdkIntent(rawIntent, decision);
-            const key = getDecisionKey(decision);
+      return {
+        failureReasonsByKey: getFailureReasonsForAllCandidates(
+          candidates,
+          toAdkFailureReason("ADK_WORKER_INVALID_RESPONSE_SHAPE"),
+        ),
+        intentsByKey: new Map(),
+      };
+    }
 
-            if (intent) {
-              intentsByKey.set(key, intent);
-            } else {
-              failureReasonsByKey.set(
-                key,
-                failureReasonsByKey.get(key) ??
-                  toAdkFailureReason("INVALID_ADK_RESPONSE"),
-              );
-            }
-          }
+    const intentsByKey = new Map<string, AgentTradeIntent>();
+    const failureReasonsByKey = parseWorkerResponseCandidateErrors(parsed.errors);
+
+    for (const [agentType, decisions] of candidates) {
+      for (const decision of decisions) {
+        const rawIntent = parsed.data.find(
+          (item) =>
+            typeof item === "object" &&
+            item !== null &&
+            (item as Record<string, unknown>).agentType === agentType &&
+            (item as Record<string, unknown>).stockId === decision.stockId,
+        );
+        const intent = validateAdkIntent(rawIntent, decision);
+        const key = getDecisionKey(decision);
+
+        if (intent) {
+          intentsByKey.set(key, intent);
+        } else {
+          failureReasonsByKey.set(
+            key,
+            failureReasonsByKey.get(key) ??
+              toAdkFailureReason("INVALID_ADK_RESPONSE"),
+          );
         }
-
-        resolveOnce({ failureReasonsByKey, intentsByKey });
-      } catch (error) {
-        console.error("ADK worker response parse failed", error, stdout);
-        resolveOnce({
-          failureReasonsByKey: getFailureReasonsForAllCandidates(
-            candidates,
-            toAdkFailureReason(
-              "ADK_WORKER_RESPONSE_PARSE_FAILED",
-              error instanceof Error ? error.message : String(error),
-            ),
-          ),
-          intentsByKey: new Map(),
-        });
       }
+    }
+
+    console.info("ADK worker HTTP request completed", {
+      adkCandidateGroupCount: candidates.size,
+      adkFailedCount: failureReasonsByKey.size,
+      adkIntentCount: intentsByKey.size,
+      tookMs: parsed.tookMs,
     });
-    child.stdin.end(JSON.stringify(payload));
-  });
+
+    return { failureReasonsByKey, intentsByKey };
+  } catch (error) {
+    const code =
+      error instanceof Error && error.name === "AbortError"
+        ? "ADK_WORKER_TIMEOUT"
+        : "ADK_WORKER_FETCH_ERROR";
+
+    console.error("ADK worker HTTP request errored", {
+      code,
+      error: serializeError(error),
+    });
+
+    return {
+      failureReasonsByKey: getFailureReasonsForAllCandidates(
+        candidates,
+        toAdkFailureReason(code, serializeError(error)),
+      ),
+      intentsByKey: new Map(),
+    };
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 function getDecisionKey(decision: Pick<AgentTradeIntent, "agentType" | "stockId">) {

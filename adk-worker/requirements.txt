@@ -1,3 +1,5 @@
+fastapi
 google-adk
 pydantic
 python-dotenv
+uvicorn[standard]
