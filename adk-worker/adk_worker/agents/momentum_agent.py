@@ -10,18 +10,34 @@ when recent momentum is negative or volume support is weak.
 """
 
 
+def get_max_quantity(candidate: StockCandidate, side: str, fallback: int) -> int:
+    key = "maxBuyQuantity" if side == "BUY" else "maxSellQuantity"
+    value = candidate.get(key, fallback)
+
+    return value if isinstance(value, int) and value >= 0 else 0
+
+
 def decide_momentum_mock(candidates: list[StockCandidate]) -> AgentTradeIntent:
     selected = max(candidates, key=lambda candidate: candidate["priceChangeRate20d"] or -1)
     change_rate = selected["priceChangeRate20d"] or 0
     side = "BUY" if change_rate >= 10 else "SELL"
-    reason = "20일 상승 모멘텀이 강해 매수 판단" if side == "BUY" else "상승 모멘텀이 약해 매도 판단"
+    quantity = min(5, get_max_quantity(selected, side, 5))
+    if quantity <= 0:
+        side = "HOLD"
+    reason = (
+        "20일 상승 모멘텀이 강해 매수 판단"
+        if side == "BUY"
+        else "상승 모멘텀이 약해 매도 판단"
+        if side == "SELL"
+        else "실행 가능 수량이 없어 보류"
+    )
     return AgentTradeIntent(
         agentUserId=selected["agentUserId"],
         agentType="MOMENTUM",
         decisionSource="ADK",
         stockId=selected["stockId"],
         side=side,
-        quantity=5,
+        quantity=quantity,
         reason=reason,
         score=selected.get("ruleBasedScore"),
     )

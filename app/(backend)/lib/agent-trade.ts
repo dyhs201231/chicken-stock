@@ -26,12 +26,16 @@ type TradingAgent = Awaited<ReturnType<typeof getActiveTradingAgents>>[number];
 type TradableStock = Awaited<ReturnType<typeof getTradableStocks>>[number];
 type RuleBasedDecision = AgentTradeIntent & {
   candidateInput: AdkStockCandidate;
+  maxBuyQuantity: number;
+  maxSellQuantity: number;
 };
 type AdkRunResult = {
   failureReasonsByKey: Map<string, string>;
   intentsByKey: Map<string, AgentTradeIntent>;
 };
 type AdkStockCandidate = {
+  maxBuyQuantity?: number;
+  maxSellQuantity?: number;
   stockId: number;
   symbol: string;
   name: string;
@@ -349,11 +353,9 @@ function calculateQuantity({
     const holding = agent.user.portfolio?.items.find(
       (item) => item.stockId === stock.id,
     );
+    const availableQuantity = holding?.quantity ?? 0;
 
-    return Math.max(
-      1,
-      Math.min(holding?.quantity ?? DEFAULT_ORDER_QUANTITY, MAX_ORDER_QUANTITY),
-    );
+    return Math.min(availableQuantity, MAX_ORDER_QUANTITY);
   }
 
   const portfolio = agent.user.portfolio;
@@ -375,10 +377,7 @@ function calculateQuantity({
   const positionBudget = Math.max(0, totalBalance * maxPositionRatio);
   const budget = Math.min(riskBudget, positionBudget);
 
-  return Math.max(
-    1,
-    Math.min(Math.floor(budget / currentPrice), MAX_ORDER_QUANTITY),
-  );
+  return Math.min(Math.floor(budget / currentPrice), MAX_ORDER_QUANTITY);
 }
 
 function scoreValue(metrics: AdkStockCandidate, stock: TradableStock) {
@@ -471,19 +470,40 @@ function createRuleBasedDecision(
         ? scoreGrowth(metrics, stock)
         : scoreMomentum(metrics);
   const score = Math.round(result.totalScore * 100) / 100;
-  const side = getDecisionSide(score);
+  const initialSide = getDecisionSide(score);
+  const maxBuyQuantity = calculateQuantity({ agent, side: "BUY", stock });
+  const maxSellQuantity = calculateQuantity({ agent, side: "SELL", stock });
+  const initialQuantity =
+    initialSide === "BUY"
+      ? maxBuyQuantity
+      : initialSide === "SELL"
+        ? maxSellQuantity
+        : 0;
+  const side = initialQuantity > 0 ? initialSide : "HOLD";
+  const quantity = side === "HOLD" ? 0 : initialQuantity;
 
   return {
     agentType,
     agentUserId: Number(agent.userId),
-    candidateInput: metrics,
+    candidateInput: {
+      ...metrics,
+      maxBuyQuantity,
+      maxSellQuantity,
+    },
     decisionSource: "RULE_BASED",
-    quantity: calculateQuantity({ agent, side, stock }),
+    maxBuyQuantity,
+    maxSellQuantity,
+    quantity,
     rawResponse: {
+      maxBuyQuantity,
+      maxSellQuantity,
       rules: result.rules,
       totalScore: score,
     },
-    reason: `${agentType} rule score ${score}`,
+    reason:
+      side === "HOLD" && initialSide !== "HOLD"
+        ? `${agentType} rule score ${score}; 실행 가능 수량 없어 보류`
+        : `${agentType} rule score ${score}`,
     score,
     side,
     stockId: stock.id,
@@ -1039,6 +1059,54 @@ function validateAdkIntent(
   };
 }
 
+function normalizeAdkIntentForExecution(
+  intent: AgentTradeIntent,
+  fallback: RuleBasedDecision,
+): AgentTradeIntent {
+  if (intent.side === "HOLD") {
+    return {
+      ...intent,
+      quantity: 0,
+    };
+  }
+
+  const maxSideQuantity =
+    intent.side === "BUY" ? fallback.maxBuyQuantity : fallback.maxSellQuantity;
+  const quantity = Math.min(intent.quantity, maxSideQuantity, MAX_ORDER_QUANTITY);
+
+  if (quantity >= 1) {
+    if (quantity === intent.quantity) {
+      return intent;
+    }
+
+    return {
+      ...intent,
+      quantity,
+      rawResponse: {
+        adjustedByBackend: true,
+        maxSideQuantity,
+        originalRawResponse: intent.rawResponse,
+        originalQuantity: intent.quantity,
+      },
+      reason: `${intent.reason}; 실행 가능 수량 ${quantity}주로 조정`,
+    };
+  }
+
+  return {
+    ...intent,
+    quantity: 0,
+    rawResponse: {
+      adjustedByBackend: true,
+      maxSideQuantity,
+      originalRawResponse: intent.rawResponse,
+      originalQuantity: intent.quantity,
+      originalSide: intent.side,
+    },
+    reason: `${intent.reason}; 실행 가능 수량 없어 보류`,
+    side: "HOLD",
+  };
+}
+
 function getFailureReasonsForAllCandidates(
   candidates: Map<AgentType, RuleBasedDecision[]>,
   reason: string,
@@ -1205,7 +1273,7 @@ async function runAdkForCandidates(
         const key = getDecisionKey(decision);
 
         if (intent) {
-          intentsByKey.set(key, intent);
+          intentsByKey.set(key, normalizeAdkIntentForExecution(intent, decision));
         } else {
           failureReasonsByKey.set(
             key,

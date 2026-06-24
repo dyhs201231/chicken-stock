@@ -10,18 +10,34 @@ is negative or valuation appears excessive relative to the given data.
 """
 
 
+def get_max_quantity(candidate: StockCandidate, side: str, fallback: int) -> int:
+    key = "maxBuyQuantity" if side == "BUY" else "maxSellQuantity"
+    value = candidate.get(key, fallback)
+
+    return value if isinstance(value, int) and value >= 0 else 0
+
+
 def decide_growth_mock(candidates: list[StockCandidate]) -> AgentTradeIntent:
     selected = max(candidates, key=lambda candidate: candidate["revenueGrowthRate"] or -1)
     growth_rate = selected["revenueGrowthRate"] or 0
     side = "BUY" if growth_rate >= 20 else "SELL"
-    reason = "매출 성장률이 높아 매수 판단" if side == "BUY" else "성장성이 약해 매도 판단"
+    quantity = min(8, get_max_quantity(selected, side, 8))
+    if quantity <= 0:
+        side = "HOLD"
+    reason = (
+        "매출 성장률이 높아 매수 판단"
+        if side == "BUY"
+        else "성장성이 약해 매도 판단"
+        if side == "SELL"
+        else "실행 가능 수량이 없어 보류"
+    )
     return AgentTradeIntent(
         agentUserId=selected["agentUserId"],
         agentType="GROWTH",
         decisionSource="ADK",
         stockId=selected["stockId"],
         side=side,
-        quantity=8,
+        quantity=quantity,
         reason=reason,
         score=selected.get("ruleBasedScore"),
     )

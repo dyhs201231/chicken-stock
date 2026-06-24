@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Literal, TypedDict
+from typing import Literal, NotRequired, TypedDict
 
 from pydantic import BaseModel
 
@@ -13,6 +13,8 @@ TradeSide = Literal["BUY", "SELL", "HOLD"]
 
 class StockCandidate(TypedDict):
     agentUserId: int
+    maxBuyQuantity: NotRequired[int]
+    maxSellQuantity: NotRequired[int]
     stockId: int
     symbol: str
     name: str

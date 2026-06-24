@@ -4,6 +4,11 @@ import { matchPendingStockOrders } from "@/app/(backend)/lib/stock-order-service
 export const runtime = "nodejs";
 export const maxDuration = 300;
 
+const SCHEDULER_MATCH_PENDING_LIMIT = getPositiveIntegerEnv(
+  "AGENT_SCHEDULER_MATCH_PENDING_LIMIT",
+  5,
+);
+
 function isAuthorized(request: NextRequest) {
   const tokens = [
     process.env.AGENT_INTERNAL_TOKEN,
@@ -29,6 +34,12 @@ function parsePositiveInteger(value: string | null) {
   return Number.isInteger(parsed) && parsed > 0 ? parsed : undefined;
 }
 
+function getPositiveIntegerEnv(name: string, fallback: number) {
+  const value = Number(process.env[name]);
+
+  return Number.isInteger(value) && value > 0 ? value : fallback;
+}
+
 async function handleMatchPendingRequest(request: NextRequest) {
   if (!isAuthorized(request)) {
     return NextResponse.json(
@@ -40,11 +51,13 @@ async function handleMatchPendingRequest(request: NextRequest) {
     );
   }
 
+  const source = request.nextUrl.searchParams.get("source");
   const options = {
-    limit: parsePositiveInteger(request.nextUrl.searchParams.get("limit")) ?? 10,
+    limit:
+      parsePositiveInteger(request.nextUrl.searchParams.get("limit")) ??
+      (source === "scheduler" ? SCHEDULER_MATCH_PENDING_LIMIT : 10),
     stockId: parsePositiveInteger(request.nextUrl.searchParams.get("stockId")),
   };
-  const source = request.nextUrl.searchParams.get("source");
 
   if (source === "scheduler") {
     after(async () => {

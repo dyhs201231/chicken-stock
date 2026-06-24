@@ -23,15 +23,25 @@ function isIntervalFallbackEnabled() {
   return process.env.AGENT_TRADE_INTERVAL_FALLBACK_ENABLED === "true";
 }
 
+const SCHEDULER_MAX_EXECUTABLE_INTENTS = getIntegerEnv(
+  "AGENT_SCHEDULER_MAX_EXECUTABLE_INTENTS",
+  3,
+);
+const SCHEDULER_STOCK_LIMIT = getIntegerEnv("AGENT_SCHEDULER_STOCK_LIMIT", 30);
+const SCHEDULER_TARGET_PATH =
+  `/api/internal/agents/run-trade?source=scheduler` +
+  `&limit=${SCHEDULER_MAX_EXECUTABLE_INTENTS}` +
+  `&stockLimit=${SCHEDULER_STOCK_LIMIT}`;
+
 async function runScheduledAgentTrade() {
   try {
     const job = await runAgentTradeJob({
       includeAdk: true,
-      maxExecutableIntents: 5,
+      maxExecutableIntents: SCHEDULER_MAX_EXECUTABLE_INTENTS,
       openMarketsOnly: true,
       recordSkippedIntents: false,
       source: "scheduler",
-      stockLimit: 30,
+      stockLimit: SCHEDULER_STOCK_LIMIT,
     });
 
     if (job.status === "SKIPPED") {
@@ -52,7 +62,7 @@ async function runScheduledAgentTrade() {
 export function startAgentTradeScheduler() {
   if (!isIntervalFallbackEnabled()) {
     console.info("Agent trade interval fallback is disabled; use external scheduler", {
-      targetPath: "/api/internal/agents/run-trade?source=scheduler&limit=5&stockLimit=30",
+      targetPath: SCHEDULER_TARGET_PATH,
     });
     return;
   }
@@ -86,7 +96,7 @@ export function getAgentTradeSchedulerStatus() {
 
   return {
     externalScheduler: {
-      targetPath: "/api/internal/agents/run-trade?source=scheduler&limit=5&stockLimit=30",
+      targetPath: SCHEDULER_TARGET_PATH,
     },
     intervalFallback: {
       enabled: isIntervalFallbackEnabled(),

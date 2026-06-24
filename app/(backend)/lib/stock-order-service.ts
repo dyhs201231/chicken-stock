@@ -51,8 +51,22 @@ export class StockOrderServiceError extends Error {
   }
 }
 
-const ORDER_TRANSACTION_MAX_ATTEMPTS = 3;
-const ORDER_TRANSACTION_RETRY_DELAY_MS = 30;
+const ORDER_TRANSACTION_MAX_ATTEMPTS = getPositiveIntegerEnv(
+  "ORDER_TRANSACTION_MAX_ATTEMPTS",
+  5,
+);
+const ORDER_TRANSACTION_RETRY_DELAY_MS = getPositiveIntegerEnv(
+  "ORDER_TRANSACTION_RETRY_DELAY_MS",
+  100,
+);
+const ORDER_TRANSACTION_MAX_WAIT_MS = getPositiveIntegerEnv(
+  "ORDER_TRANSACTION_MAX_WAIT_MS",
+  10_000,
+);
+const ORDER_TRANSACTION_TIMEOUT_MS = getPositiveIntegerEnv(
+  "ORDER_TRANSACTION_TIMEOUT_MS",
+  20_000,
+);
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
@@ -88,6 +102,12 @@ function wait(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function getPositiveIntegerEnv(name: string, fallback: number) {
+  const value = Number(process.env[name]);
+
+  return Number.isInteger(value) && value > 0 ? value : fallback;
+}
+
 async function runSerializableOrderTransaction<T>(
   operation: (tx: TransactionClient) => Promise<T>,
 ) {
@@ -95,8 +115,8 @@ async function runSerializableOrderTransaction<T>(
     try {
       return await prisma.$transaction(operation, {
         isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
-        maxWait: 5000,
-        timeout: 10000,
+        maxWait: ORDER_TRANSACTION_MAX_WAIT_MS,
+        timeout: ORDER_TRANSACTION_TIMEOUT_MS,
       });
     } catch (error) {
       if (

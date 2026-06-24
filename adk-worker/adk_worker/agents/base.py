@@ -13,11 +13,13 @@ You generate trade intent only. Never claim that an order was placed, filled, sa
 or reflected in a balance. Return exactly one JSON object with this shape:
 {"agentUserId":1,"agentType":"VALUE","decisionSource":"ADK","stockId":1,"side":"BUY","quantity":10,"reason":"...","score":72}
 Use only BUY, SELL, or HOLD. BUY and SELL quantity must be a positive integer. HOLD quantity may be 0.
+If maxBuyQuantity is 0, do not return BUY. If maxSellQuantity is 0, do not return SELL.
+For BUY quantity must be <= maxBuyQuantity. For SELL quantity must be <= maxSellQuantity.
 decisionSource MUST be "ADK". Never return "RULE_BASED".
 Keep reason under 80 Korean characters.
 """
 
-GEMINI_RETRY_DELAYS_SECONDS = (3, 10)
+GEMINI_RETRY_DELAYS_SECONDS = (3, 10, 25)
 
 
 def create_adk_agent(agent_type: AgentType, model: str, strategy_instruction: str):
@@ -36,6 +38,8 @@ def build_candidate_prompt(agent_type: AgentType, candidates: list[StockCandidat
         f"{agent_type} 전략으로 입력 후보 종목의 매매 의도 JSON을 생성하세요.\n"
         "백엔드가 이미 후보를 5~15개로 필터링했고, 이 호출은 단일 후보 판단이라고 가정합니다.\n"
         "agentUserId, agentType, decisionSource, stockId는 입력값과 동일해야 합니다.\n"
+        "maxBuyQuantity/maxSellQuantity는 백엔드가 계산한 최대 실행 가능 수량입니다.\n"
+        "가능 수량이 0인 방향은 선택하지 말고 HOLD를 고려하세요.\n"
         "입력 데이터:\n"
         f"{json.dumps(candidates, ensure_ascii=False)}"
     )
@@ -92,15 +96,20 @@ def parse_trade_intent(raw: dict, expected_agent_type: AgentType) -> AgentTradeI
     if side not in ("BUY", "SELL", "HOLD"):
         raise ValueError(f"Invalid trade side: {side}")
 
-    quantity = int(raw.get("quantity", 0))
+    try:
+        quantity = int(raw.get("quantity", 0))
+    except (TypeError, ValueError):
+        quantity = 0
+
     if side in ("BUY", "SELL") and quantity <= 0:
-        raise ValueError("Quantity must be positive")
+        side = "HOLD"
+        quantity = 0
     if side == "HOLD" and quantity < 0:
-        raise ValueError("Quantity cannot be negative")
+        quantity = 0
 
     reason = str(raw.get("reason", "")).strip()
     if not reason:
-        raise ValueError("Reason is required")
+        reason = "실행 가능한 매매 판단이 없어 보류"
 
     return AgentTradeIntent(
         agentUserId=int(raw["agentUserId"]),

@@ -4,6 +4,15 @@ import { runAgentTradeJob } from "@/app/(backend)/lib/agent-trade-runner";
 export const runtime = "nodejs";
 export const maxDuration = 300;
 
+const SCHEDULER_MAX_EXECUTABLE_INTENTS = getPositiveIntegerEnv(
+  "AGENT_SCHEDULER_MAX_EXECUTABLE_INTENTS",
+  3,
+);
+const SCHEDULER_STOCK_LIMIT = getPositiveIntegerEnv(
+  "AGENT_SCHEDULER_STOCK_LIMIT",
+  30,
+);
+
 function isAuthorized(request: NextRequest) {
   const tokens = [
     process.env.AGENT_INTERNAL_TOKEN,
@@ -35,6 +44,12 @@ function parsePositiveInteger(value: string | null) {
   return Number.isInteger(parsed) && parsed > 0 ? parsed : undefined;
 }
 
+function getPositiveIntegerEnv(name: string, fallback: number) {
+  const value = Number(process.env[name]);
+
+  return Number.isInteger(value) && value > 0 ? value : fallback;
+}
+
 async function handleRunTradeRequest(
   request: NextRequest,
   source: "manual" | "scheduler",
@@ -53,13 +68,13 @@ async function handleRunTradeRequest(
     includeAdk: request.nextUrl.searchParams.get("adk") !== "false",
     maxExecutableIntents:
       parsePositiveInteger(request.nextUrl.searchParams.get("limit")) ??
-      (source === "scheduler" ? 5 : undefined),
+      (source === "scheduler" ? SCHEDULER_MAX_EXECUTABLE_INTENTS : undefined),
     openMarketsOnly: source === "scheduler",
     recordSkippedIntents: source !== "scheduler",
     source,
     stockLimit:
       parsePositiveInteger(request.nextUrl.searchParams.get("stockLimit")) ??
-      (source === "scheduler" ? 30 : undefined),
+      (source === "scheduler" ? SCHEDULER_STOCK_LIMIT : undefined),
   };
 
   if (source === "scheduler") {
