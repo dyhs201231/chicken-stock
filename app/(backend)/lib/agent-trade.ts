@@ -28,6 +28,10 @@ type TradableStock = Awaited<ReturnType<typeof getTradableStocks>>[number];
 type RuleBasedDecision = AgentTradeIntent & {
   candidateInput: AdkStockCandidate;
 };
+type AdkRunResult = {
+  failureReasonsByKey: Map<string, string>;
+  intentsByKey: Map<string, AgentTradeIntent>;
+};
 type AdkStockCandidate = {
   stockId: number;
   symbol: string;
@@ -89,7 +93,9 @@ const ADK_CANDIDATE_LIMIT = clamp(
   15,
 );
 const ADK_WORKER_PATH = "adk-worker/main.py";
+const ADK_WORKER_PACKAGE_PATH = "adk-worker/.python_packages";
 const MARKET_SESSION_COUNTRY_CODES: MarketSessionCountryCode[] = ["KR", "US"];
+const ADK_FAILURE_REASON_MAX_LENGTH = 800;
 
 function getIntegerEnv(name: string, fallback: number) {
   const value = Number(process.env[name]);
@@ -572,6 +578,13 @@ function sanitizeJson(value: unknown): Prisma.InputJsonValue {
   return JSON.parse(JSON.stringify(value ?? {}));
 }
 
+function toAdkFailureReason(code: string, detail?: string) {
+  const normalizedDetail = detail?.trim();
+  const reason = normalizedDetail ? `${code}: ${normalizedDetail}` : code;
+
+  return reason.slice(0, ADK_FAILURE_REASON_MAX_LENGTH);
+}
+
 async function createDecisionLog(intent: AgentTradeIntent) {
   return prisma.agentDecisionLog.create({
     data: {
@@ -801,6 +814,7 @@ async function executeIntent(intent: AgentTradeIntent) {
     }
 
     const order = await createStockOrderForUser({
+      allowExternalLiquidity: true,
       orderPriceType: "LIMIT",
       pricePerShare,
       quantity: intent.quantity,
@@ -964,10 +978,59 @@ function validateAdkIntent(
   };
 }
 
-async function runAdkForCandidates(candidates: Map<AgentType, RuleBasedDecision[]>) {
+function getFailureReasonsForAllCandidates(
+  candidates: Map<AgentType, RuleBasedDecision[]>,
+  reason: string,
+) {
+  return new Map(
+    Array.from(candidates.values())
+      .flat()
+      .map((decision) => [getDecisionKey(decision), reason]),
+  );
+}
+
+function parseWorkerCandidateErrors(stderr: string) {
+  const errors = new Map<string, string>();
+
+  for (const line of stderr.split(/\r?\n/)) {
+    if (!line.trim()) {
+      continue;
+    }
+
+    try {
+      const parsed = JSON.parse(line) as unknown;
+
+      if (typeof parsed !== "object" || parsed === null) {
+        continue;
+      }
+
+      const record = parsed as Record<string, unknown>;
+
+      if (
+        typeof record.agentType === "string" &&
+        typeof record.stockId === "number" &&
+        typeof record.error === "string"
+      ) {
+        errors.set(
+          `${record.agentType}:${record.stockId}`,
+          toAdkFailureReason("ADK_AGENT_ERROR", record.error),
+        );
+      }
+    } catch {
+      // Worker stderr can also include runtime diagnostics; non-JSON lines are kept
+      // for process-level failure reasons instead of candidate-level errors.
+    }
+  }
+
+  return errors;
+}
+
+async function runAdkForCandidates(
+  candidates: Map<AgentType, RuleBasedDecision[]>,
+): Promise<AdkRunResult> {
   if (candidates.size === 0) {
     return {
-      failedKeys: new Set<string>(),
+      failureReasonsByKey: new Map<string, string>(),
       intentsByKey: new Map<string, AgentTradeIntent>(),
     };
   }
@@ -983,16 +1046,13 @@ async function runAdkForCandidates(candidates: Map<AgentType, RuleBasedDecision[
     })),
   };
   const python = process.env.PYTHON_BIN ?? "python3";
+  const pythonPath = [ADK_WORKER_PACKAGE_PATH, process.env.PYTHONPATH]
+    .filter((value): value is string => Boolean(value))
+    .join(":");
 
-  return new Promise<{
-    failedKeys: Set<string>;
-    intentsByKey: Map<string, AgentTradeIntent>;
-  }>((resolve) => {
+  return new Promise<AdkRunResult>((resolve) => {
     let settled = false;
-    const resolveOnce = (result: {
-      failedKeys: Set<string>;
-      intentsByKey: Map<string, AgentTradeIntent>;
-    }) => {
+    const resolveOnce = (result: AdkRunResult) => {
       if (settled) {
         return;
       }
@@ -1011,6 +1071,7 @@ async function runAdkForCandidates(candidates: Map<AgentType, RuleBasedDecision[
         GEMINI_MODEL:
           process.env.GEMINI_MODEL ?? "gemini-2.5-flash-lite",
         MAX_CANDIDATES_PER_RUN: String(ADK_CANDIDATE_LIMIT),
+        PYTHONPATH: pythonPath,
       },
       stdio: ["pipe", "pipe", "pipe"],
     });
@@ -1029,22 +1090,40 @@ async function runAdkForCandidates(candidates: Map<AgentType, RuleBasedDecision[
         stderr,
       );
       child.kill("SIGTERM");
-      resolveOnce({ failedKeys: getCandidateKeys(candidates), intentsByKey: new Map() });
+      resolveOnce({
+        failureReasonsByKey: getFailureReasonsForAllCandidates(
+          candidates,
+          toAdkFailureReason("ADK_WORKER_TIMEOUT", `${ADK_WORKER_TIMEOUT_MS}ms`),
+        ),
+        intentsByKey: new Map(),
+      });
     }, ADK_WORKER_TIMEOUT_MS);
-    child.on("error", () => {
-      resolveOnce({ failedKeys: getCandidateKeys(candidates), intentsByKey: new Map() });
+    child.on("error", (error) => {
+      resolveOnce({
+        failureReasonsByKey: getFailureReasonsForAllCandidates(
+          candidates,
+          toAdkFailureReason("ADK_WORKER_SPAWN_ERROR", error.message),
+        ),
+        intentsByKey: new Map(),
+      });
     });
     child.on("close", (code) => {
       if (code !== 0) {
         console.error("ADK worker failed", stderr);
-        resolveOnce({ failedKeys: getCandidateKeys(candidates), intentsByKey: new Map() });
+        resolveOnce({
+          failureReasonsByKey: getFailureReasonsForAllCandidates(
+            candidates,
+            toAdkFailureReason(`ADK_WORKER_EXIT_${code ?? "UNKNOWN"}`, stderr),
+          ),
+          intentsByKey: new Map(),
+        });
         return;
       }
 
       try {
         const parsed = JSON.parse(stdout) as unknown[];
         const intentsByKey = new Map<string, AgentTradeIntent>();
-        const failedKeys = new Set<string>();
+        const failureReasonsByKey = parseWorkerCandidateErrors(stderr);
 
         for (const [agentType, decisions] of candidates) {
           for (const decision of decisions) {
@@ -1061,15 +1140,28 @@ async function runAdkForCandidates(candidates: Map<AgentType, RuleBasedDecision[
             if (intent) {
               intentsByKey.set(key, intent);
             } else {
-              failedKeys.add(key);
+              failureReasonsByKey.set(
+                key,
+                failureReasonsByKey.get(key) ??
+                  toAdkFailureReason("INVALID_ADK_RESPONSE"),
+              );
             }
           }
         }
 
-        resolveOnce({ failedKeys, intentsByKey });
+        resolveOnce({ failureReasonsByKey, intentsByKey });
       } catch (error) {
         console.error("ADK worker response parse failed", error, stdout);
-        resolveOnce({ failedKeys: getCandidateKeys(candidates), intentsByKey: new Map() });
+        resolveOnce({
+          failureReasonsByKey: getFailureReasonsForAllCandidates(
+            candidates,
+            toAdkFailureReason(
+              "ADK_WORKER_RESPONSE_PARSE_FAILED",
+              error instanceof Error ? error.message : String(error),
+            ),
+          ),
+          intentsByKey: new Map(),
+        });
       }
     });
     child.stdin.end(JSON.stringify(payload));
@@ -1089,11 +1181,13 @@ function getCandidateKeys(candidates: Map<AgentType, RuleBasedDecision[]>) {
 }
 
 async function recordAdkFailures(
-  failures: Set<string>,
+  failureReasonsByKey: Map<string, string>,
   ruleDecisions: RuleBasedDecision[],
 ) {
   for (const decision of ruleDecisions) {
-    if (!failures.has(getDecisionKey(decision))) {
+    const failureReason = failureReasonsByKey.get(getDecisionKey(decision));
+
+    if (!failureReason) {
       continue;
     }
 
@@ -1102,7 +1196,7 @@ async function recordAdkFailures(
       decisionSource: "ADK",
       rawResponse: {
         fallback: "RULE_BASED",
-        reason: "ADK_CALL_FAILED_OR_INVALID_RESPONSE",
+        reason: failureReason,
         ruleBasedRawResponse: decision.rawResponse,
       },
       reason: "ADK 실패로 Rule-based 판단을 fallback으로 사용",
@@ -1110,7 +1204,7 @@ async function recordAdkFailures(
 
     await prisma.agentDecisionLog.update({
       data: {
-        rejectReason: "ADK_CALL_FAILED",
+        rejectReason: failureReason,
         status: DecisionStatus.FAILED,
       },
       where: {
@@ -1236,20 +1330,23 @@ export async function runAgentTrade(options: AgentTradeRunOptions = {}) {
     ? selectAdkCandidates(adkRunnableRuleDecisions.ruleDecisions)
     : new Map();
   const shouldRunAdk = includeAdk && adkCandidates.size > 0;
-  const { failedKeys, intentsByKey } = shouldRunAdk
+  const { failureReasonsByKey, intentsByKey } = shouldRunAdk
     ? await runAdkForCandidates(adkCandidates)
-    : { failedKeys: new Set<string>(), intentsByKey: new Map<string, AgentTradeIntent>() };
+    : {
+        failureReasonsByKey: new Map<string, string>(),
+        intentsByKey: new Map<string, AgentTradeIntent>(),
+      };
   const adkCandidateKeys = getCandidateKeys(adkCandidates);
 
   markDuration("run-adk", {
     adkCandidateGroupCount: adkCandidates.size,
-    adkFailedCount: failedKeys.size,
+    adkFailedCount: failureReasonsByKey.size,
     adkIntentCount: intentsByKey.size,
     shouldRunAdk,
   });
 
   if (shouldRunAdk) {
-    await recordAdkFailures(failedKeys, ruleDecisions);
+    await recordAdkFailures(failureReasonsByKey, ruleDecisions);
   }
 
   const mergedIntents = capExecutableIntents(ruleDecisions.map((decision) => {
@@ -1266,7 +1363,7 @@ export async function runAgentTrade(options: AgentTradeRunOptions = {}) {
   const result: AgentTradeRunResult = {
     adkCandidateLimit: ADK_CANDIDATE_LIMIT,
     adkEnabled: shouldRunAdk,
-    adkFailedCount: failedKeys.size,
+    adkFailedCount: failureReasonsByKey.size,
     adkSkippedReason: adkRunnableRuleDecisions.skippedReason,
     executedCount: 0,
     failedCount: 0,

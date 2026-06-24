@@ -49,5 +49,6 @@ next-env.d.ts
 
 # google adk
 .venv/
+.python_packages/
 __pycache__/
 *.pyc

@@ -29,6 +29,7 @@ export type StockOrderPriceType = "LIMIT" | "MARKET";
 type TransactionClient = Prisma.TransactionClient;
 
 export type CreateStockOrderInput = {
+  allowExternalLiquidity?: boolean;
   orderPriceType: StockOrderPriceType;
   pricePerShare?: Prisma.Decimal | null;
   quantity: number;
@@ -279,6 +280,7 @@ function toStockOrderServiceError(error: unknown) {
 }
 
 export async function createStockOrderForUser({
+  allowExternalLiquidity = false,
   orderPriceType,
   pricePerShare: inputPricePerShare = null,
   quantity,
@@ -440,6 +442,7 @@ export async function createStockOrderForUser({
 
       return (
         (await matchStockOrder(tx, {
+          allowExternalLiquidity,
           executedAt: orderedAt,
           orderId: createdOrder.orderId,
           orderPriceType,
@@ -493,6 +496,12 @@ export async function matchPendingStockOrders({
   };
   const pendingOrders = await prisma.tradeOrder.findMany({
     include: {
+      agentDecisionLogs: {
+        select: {
+          id: true,
+        },
+        take: 1,
+      },
       portfolio: {
         select: {
           userId: true,
@@ -565,6 +574,7 @@ export async function matchPendingStockOrders({
         }
 
         return matchStockOrder(tx, {
+          allowExternalLiquidity: pendingOrder.agentDecisionLogs.length > 0,
           orderId: pendingOrder.orderId,
           orderPriceType: "LIMIT",
           stock,

@@ -40,6 +40,7 @@ type MatchingOrder = {
 };
 
 type MatchStockOrderParams = {
+  allowExternalLiquidity?: boolean;
   executedAt?: Date;
   orderId: bigint;
   orderPriceType: StockOrderPriceType;
@@ -833,9 +834,84 @@ async function executeInternalFill(
     : updatedSellOrder;
 }
 
+function canFillWithExternalLiquidity(
+  order: MatchingOrder,
+  orderPriceType: StockOrderPriceType,
+  stock: MatchingStock,
+) {
+  if (orderPriceType === "MARKET") {
+    return true;
+  }
+
+  return order.type === TradeOrderType.BUY
+    ? order.pricePerShare.gte(stock.currentPrice)
+    : order.pricePerShare.lte(stock.currentPrice);
+}
+
+async function executeExternalLiquidityFill(
+  tx: TransactionClient,
+  {
+    executedAt,
+    incomingOrder,
+    stock,
+  }: {
+    executedAt: Date;
+    incomingOrder: MatchingOrder;
+    stock: MatchingStock;
+  },
+) {
+  const fillQuantity = incomingOrder.remainingQuantity;
+  const executionPrice = stock.currentPrice.toDecimalPlaces(2);
+
+  await lockPortfolioRows(tx, [incomingOrder.portfolioId]);
+
+  if (incomingOrder.type === TradeOrderType.BUY) {
+    await applyBuyFill(tx, {
+      executedAt,
+      executionPrice,
+      orderId: incomingOrder.orderId,
+      portfolioId: incomingOrder.portfolioId,
+      quantity: fillQuantity,
+      stock,
+    });
+  } else {
+    await applySellFill(tx, {
+      executedAt,
+      executionPrice,
+      orderId: incomingOrder.orderId,
+      portfolioId: incomingOrder.portfolioId,
+      quantity: fillQuantity,
+      stock,
+    });
+  }
+
+  const updatedOrder = await updateOrderAfterFill(
+    tx,
+    incomingOrder,
+    fillQuantity,
+    executionPrice,
+    executedAt,
+  );
+
+  await recordTradeExecution(tx, {
+    aggressorSide: incomingOrder.type,
+    buyOrderId:
+      incomingOrder.type === TradeOrderType.BUY ? incomingOrder.orderId : null,
+    executedAt,
+    executionPrice,
+    quantity: fillQuantity,
+    sellOrderId:
+      incomingOrder.type === TradeOrderType.SELL ? incomingOrder.orderId : null,
+    stock,
+  });
+
+  return updatedOrder;
+}
+
 export async function matchStockOrder(
   tx: TransactionClient,
   {
+    allowExternalLiquidity = false,
     executedAt = new Date(),
     orderId,
     orderPriceType,
@@ -877,6 +953,18 @@ export async function matchStockOrder(
       executedAt,
       incomingOrder,
       quantity: fillQuantity,
+      stock,
+    });
+  }
+
+  if (
+    allowExternalLiquidity &&
+    incomingOrder.remainingQuantity > 0 &&
+    canFillWithExternalLiquidity(incomingOrder, orderPriceType, stock)
+  ) {
+    incomingOrder = await executeExternalLiquidityFill(tx, {
+      executedAt,
+      incomingOrder,
       stock,
     });
   }
