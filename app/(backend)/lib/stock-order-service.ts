@@ -7,6 +7,7 @@ import {
   TradeOrderType,
 } from "@/app/(backend)/generated/prisma/enums";
 import { prisma } from "@/app/(backend)/lib/prisma";
+import { getMarketSessionStatus } from "@/app/(backend)/lib/market-hours";
 import {
   publishOrderFilledEventsForOrder,
   scheduleStockUpdated,
@@ -373,6 +374,34 @@ async function getPendingStockOrders({
   `;
 }
 
+async function filterOpenMarketPendingOrders<T extends { stockId: number }>(
+  pendingOrders: T[],
+) {
+  const stockIds = Array.from(new Set(pendingOrders.map((order) => order.stockId)));
+  const stocks = await prisma.stock.findMany({
+    select: {
+      countryCode: true,
+      id: true,
+    },
+    where: {
+      id: {
+        in: stockIds,
+      },
+    },
+  });
+  const openStockIds = new Set<number>();
+
+  for (const stock of stocks) {
+    const marketSession = await getMarketSessionStatus(stock.countryCode);
+
+    if (marketSession?.isOpen === true) {
+      openStockIds.add(stock.id);
+    }
+  }
+
+  return pendingOrders.filter((order) => openStockIds.has(order.stockId));
+}
+
 export async function createStockOrderForUser({
   allowExternalLiquidity = false,
   orderPriceType,
@@ -588,16 +617,18 @@ export async function matchPendingStockOrders({
     });
     lastMark = now;
   };
-  const pendingOrders = await getPendingStockOrders({
+  const pendingOrderCandidates = await getPendingStockOrders({
     limit,
     stockId,
   });
+  const pendingOrders = await filterOpenMarketPendingOrders(pendingOrderCandidates);
   let matchedCount = 0;
   let failedCount = 0;
 
   markDuration("load-pending-orders", {
+    marketOpenPendingOrderCount: pendingOrders.length,
     limit,
-    pendingOrderCount: pendingOrders.length,
+    pendingOrderCount: pendingOrderCandidates.length,
     stockId: stockId ?? null,
   });
 
