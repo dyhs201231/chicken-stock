@@ -2,7 +2,7 @@
 
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
-import type { EducationSummary } from "../../../apis/edu/api";
+import type { EducationProgressArticle } from "../../../apis/edu/api";
 import { educationQueryKeys } from "../../../apis/edu/queries";
 
 type ArticleProgressTrackerProps = {
@@ -33,37 +33,40 @@ function calculateArticleProgressRate(targetId: string) {
   return Math.min(100, Math.max(0, Math.floor(progressRate)));
 }
 
-function updateEducationSummariesArticleProgress(
-  summaries: EducationSummary[] | undefined,
+function updateEducationArticleProgress(
+  progress: EducationProgressArticle[] | undefined,
   articleId: string,
   progressRate: number,
 ) {
-  if (!summaries) {
-    return summaries;
-  }
-
   const targetArticleId = Number(articleId);
 
   if (!Number.isInteger(targetArticleId)) {
-    return summaries;
+    return progress;
   }
 
-  return summaries.map((summary) => ({
-    ...summary,
-    articles: summary.articles.map((article) => {
-      if (article.id !== targetArticleId) {
-        return article;
-      }
+  const currentProgress = progress ?? [];
+  const existingProgress = currentProgress.find(
+    (articleProgress) => articleProgress.articleId === targetArticleId,
+  );
+  const nextProgressRate = Math.max(
+    existingProgress?.progressRate ?? 0,
+    progressRate,
+  );
+  const nextArticleProgress = {
+    articleId: targetArticleId,
+    progressRate: nextProgressRate,
+    isCompleted: existingProgress?.isCompleted || nextProgressRate >= 90,
+  };
 
-      const nextProgressRate = Math.max(article.progressRate, progressRate);
+  if (!existingProgress) {
+    return [...currentProgress, nextArticleProgress];
+  }
 
-      return {
-        ...article,
-        progressRate: nextProgressRate,
-        isCompleted: article.isCompleted || nextProgressRate >= 90,
-      };
-    }),
-  }));
+  return currentProgress.map((articleProgress) =>
+    articleProgress.articleId === targetArticleId
+      ? nextArticleProgress
+      : articleProgress,
+  );
 }
 
 export default function ArticleProgressTracker({
@@ -85,14 +88,14 @@ export default function ArticleProgressTracker({
         progressRate,
         savedProgressRateRef.current,
       );
-      const summariesQueryKey = educationQueryKeys.summaries(userId);
+      const progressQueryKey = educationQueryKeys.progress(userId);
 
       savedProgressRateRef.current = nextProgressRate;
-      queryClient.setQueryData<EducationSummary[]>(
-        summariesQueryKey,
-        (summaries) =>
-          updateEducationSummariesArticleProgress(
-            summaries,
+      queryClient.setQueryData<EducationProgressArticle[]>(
+        progressQueryKey,
+        (progress) =>
+          updateEducationArticleProgress(
+            progress,
             articleId,
             nextProgressRate,
           ),
@@ -115,14 +118,14 @@ export default function ArticleProgressTracker({
             throw new Error("ARTICLE_PROGRESS_SAVE_FAILED");
           }
 
-          void queryClient.invalidateQueries({ queryKey: summariesQueryKey });
+          void queryClient.invalidateQueries({ queryKey: progressQueryKey });
         })
         .catch(() => {
           savedProgressRateRef.current = Math.min(
             savedProgressRateRef.current,
             nextProgressRate,
           );
-          void queryClient.invalidateQueries({ queryKey: summariesQueryKey });
+          void queryClient.invalidateQueries({ queryKey: progressQueryKey });
         });
     };
 

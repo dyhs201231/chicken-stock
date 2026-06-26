@@ -4,11 +4,8 @@ import { useCallback, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useStockOrderBookQuery } from "../../apis/stocks/queries";
-import ChartPanel from "./order/chart-panel";
 import StockLogo from "./stock-logo";
 import StockDetailPanelSkeleton from "./panel-skeleton";
-import OrderBookPanel from "./order/order-book-panel";
-import OrderPanel from "./order/order-panel";
 import { useStockRealtime } from "../../hooks/use-stock-realtime";
 import type {
   MainOrderTab,
@@ -46,6 +43,30 @@ const InfoPanel = dynamic(() => import("./analytics/info-panel"), {
   ssr: false,
 });
 
+const ChartPanel = dynamic(() => import("./order/chart-panel"), {
+  loading: () => (
+    <StockDetailPanelSkeleton
+      className="min-w-0"
+      label="차트를 불러오는 중입니다."
+    />
+  ),
+  ssr: false,
+});
+
+const OrderBookPanel = dynamic(() => import("./order/order-book-panel"), {
+  loading: () => (
+    <StockDetailPanelSkeleton label="호가를 불러오는 중입니다." />
+  ),
+  ssr: false,
+});
+
+const OrderPanel = dynamic(() => import("./order/order-panel"), {
+  loading: () => (
+    <StockDetailPanelSkeleton label="주문 정보를 불러오는 중입니다." />
+  ),
+  ssr: false,
+});
+
 const sideTabs: { label: string; value: StockDetailTab }[] = [
   { label: "차트 / 호가", value: "chart-orderbook" },
   { label: "내 주식 / 종목 정보", value: "portfolio-info" },
@@ -62,9 +83,11 @@ export default function StockDetail({ stock, activeTab }: StockDetailProps) {
     useState<NormalOrderTab>("buy");
   const [selectedLimitPrice, setSelectedLimitPrice] =
     useState<SelectedOrderBookLimitPrice | null>(null);
+  const isOrderTab = activeTab === "chart-orderbook";
   const { data: liveOrderBookSnapshot } = useStockOrderBookQuery(
     stock.id,
     stock.orderBookSnapshot,
+    { enabled: isOrderTab },
   );
 
   const liveStock = useMemo(() => {

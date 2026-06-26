@@ -59,7 +59,7 @@ export default function RelatedIndexList({
     (marketIndex) => marketIndex.category === "exchangeRate",
   );
 
-  if (!isHydrated) {
+  if (marketIndexes.length === 0) {
     return <RelatedIndexListFallback />;
   }
 

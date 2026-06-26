@@ -29,7 +29,7 @@ export default function AvatarButton() {
       <Popover.Trigger className="cursor-pointer">
         <Avatar
           type="header"
-          src={data.user.profileImageUrl || "/test-image.png"}
+          src={data.user.profileImageUrl || "/test-image.webp"}
           alt={data.user.name}
         />
       </Popover.Trigger>
@@ -39,7 +39,7 @@ export default function AvatarButton() {
           <div className="flex items-center gap-3 border-b border-(--cs-color-gray-500) py-2">
             <Avatar
               type="header"
-              src={data.user.profileImageUrl || "/test-image.png"}
+              src={data.user.profileImageUrl || "/test-image.webp"}
               alt={data.user.name}
             />
 

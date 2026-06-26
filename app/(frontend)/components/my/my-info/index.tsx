@@ -24,7 +24,7 @@ export default function MyInfo() {
       <div className="flex items-center gap-4">
         <Avatar
           type="mypage"
-          src={data.user.profileImageUrl || "/test-image.png"}
+          src={data.user.profileImageUrl || "/test-image.webp"}
           alt="프로필 이미지"
         />
 

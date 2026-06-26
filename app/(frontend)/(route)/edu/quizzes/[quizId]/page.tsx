@@ -1,22 +1,13 @@
 import Link from "next/link";
-import type { Metadata } from "next";
 import { IconChevronLeft } from "@tabler/icons-react";
-import { getEducationArticle } from "@/app/(frontend)/apis/edu/queries";
-import type { QuizResponse } from "@/app/(frontend)/apis/edu/quizzes/api";
+import { getArticleQuizzes } from "@/app/(backend)/lib/quizzes";
+import { prisma } from "@/app/(backend)/lib/prisma";
+import AuthRequiredRedirect from "@/app/(frontend)/components/auth-guard/auth-required-redirect";
 import { getCurrentUser } from "../../../../lib/auth-check";
-import {
-  getRequestCookieHeader,
-  getRequestOrigin,
-} from "../../../../lib/server/request";
 import { isPositiveIntegerString } from "../../../../utils/number";
 import QuizContainer from "@/app/(frontend)/components/edu/quizzes/quiz-container";
 import type { QuizContentData } from "@/app/(frontend)/components/edu/quizzes/quiz-content";
-import {
-  createCanonicalUrl,
-  createPageMetadata,
-  getArticleSeoData,
-  SITE_NAME,
-} from "../../seo";
+import { createCanonicalUrl, SITE_NAME } from "../../seo";
 
 type QuizPageProps = {
   params: Promise<{
@@ -27,11 +18,19 @@ type QuizPageProps = {
   }>;
 };
 
+type QuizArticleContextData = {
+  id: number;
+  title: string;
+  educationSummary: {
+    stage: number;
+  };
+};
+
 async function getQuizArticleContext(quizId: string, level?: string) {
   const parsedArticleId = Number(quizId);
   let articleId = parsedArticleId;
   let levelParam: string | null = null;
-  let article: Awaited<ReturnType<typeof getEducationArticle>> | null = null;
+  let article: QuizArticleContextData | null = null;
 
   if (Number.isNaN(parsedArticleId)) {
     articleId = 1;
@@ -42,11 +41,23 @@ async function getQuizArticleContext(quizId: string, level?: string) {
   }
 
   if (isPositiveIntegerString(quizId) && levelParam) {
-    article = await getEducationArticle(
-      quizId,
-      levelParam,
-      await getRequestOrigin(),
-    );
+    article = await prisma.article.findFirst({
+      where: {
+        id: articleId,
+        educationSummary: {
+          stage: Number(levelParam),
+        },
+      },
+      select: {
+        id: true,
+        title: true,
+        educationSummary: {
+          select: {
+            stage: true,
+          },
+        },
+      },
+    });
   }
 
   let articleHref: { pathname: string; query: { level: string } } | string =
@@ -80,83 +91,26 @@ function getQuizSeoDescription(articleTitle: string) {
   return `${articleTitle} 개념을 이해했는지 퀴즈로 확인하고, Chicken Stock에서 주식 투자 지식을 단계별로 학습해보세요.`;
 }
 
-export async function generateMetadata({
-  params,
-  searchParams,
-}: QuizPageProps): Promise<Metadata> {
-  const { quizId } = await params;
-  const { level } = await searchParams;
-  const seoData = await getArticleSeoData(quizId, level);
-  const articleTitle = seoData?.article.title ?? "주식 투자";
-  const title = getQuizSeoTitle(articleTitle, seoData?.level ?? level);
-  const description = getQuizSeoDescription(articleTitle);
-  const url = createCanonicalUrl(`/edu/quizzes/${quizId}`);
-
-  return createPageMetadata({
-    title,
-    description,
-    url,
-    robots: {
-      index: false,
-      follow: false,
-    },
-  });
-}
-
-async function getInitialQuizzes(articleId: number, userId?: string) {
-  if (articleId <= 0) {
-    return [];
-  }
-
-  try {
-    const url = new URL("/api/quizzes", await getRequestOrigin());
-    url.searchParams.set("articleId", String(articleId));
-
-    if (userId) {
-      url.searchParams.set("userId", userId);
-    }
-
-    const cookieHeader = userId ? await getRequestCookieHeader() : null;
-    const response = await fetch(url, {
-      cache: "no-store",
-      headers: cookieHeader
-        ? {
-            Cookie: cookieHeader,
-          }
-        : undefined,
-    });
-
-    if (!response.ok) {
-      return [];
-    }
-
-    const result = (await response.json()) as QuizResponse;
-
-    if (!result.ok) {
-      return [];
-    }
-
-    return result.data.quizzes;
-  } catch {
-    return [];
-  }
-}
-
 export default async function QuizPage({
   params,
   searchParams,
 }: QuizPageProps) {
   const { quizId } = await params;
   const { level } = await searchParams;
-  const currentUser = await getCurrentUser();
-  const currentUserId = currentUser ? String(currentUser.id) : undefined;
-  const { articleHref, articleId, label } = await getQuizArticleContext(
-    quizId,
-    level,
-  );
-  const initialQuizzes: QuizContentData[] = await getInitialQuizzes(
+  const [currentUser, articleContext] = await Promise.all([
+    getCurrentUser(),
+    getQuizArticleContext(quizId, level),
+  ]);
+
+  if (!currentUser) {
+    return <AuthRequiredRedirect />;
+  }
+
+  const currentUserId = String(currentUser.id);
+  const { articleHref, articleId, label } = articleContext;
+  const initialQuizzes: QuizContentData[] = await getArticleQuizzes(
     articleId,
-    currentUserId,
+    currentUser.id,
   );
   const quizTitle = getQuizSeoTitle(label.title, level);
   const quizDescription = getQuizSeoDescription(label.title);

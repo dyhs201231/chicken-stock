@@ -9,27 +9,18 @@ function createUrl(pathname: string) {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [articles, stocks] = await Promise.all([
-    prisma.article.findMany({
-      orderBy: [{ educationSummary: { stage: "asc" } }, { sortOrder: "asc" }],
-      select: {
-        id: true,
-        updatedAt: true,
-        educationSummary: {
-          select: {
-            stage: true,
-          },
+  const articles = await prisma.article.findMany({
+    orderBy: [{ educationSummary: { stage: "asc" } }, { sortOrder: "asc" }],
+    select: {
+      id: true,
+      updatedAt: true,
+      educationSummary: {
+        select: {
+          stage: true,
         },
       },
-    }),
-    prisma.stock.findMany({
-      orderBy: { ticker: "asc" },
-      select: {
-        ticker: true,
-        updatedAt: true,
-      },
-    }),
-  ]);
+    },
+  });
 
   return [
     {
@@ -49,12 +40,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: article.updatedAt,
       changeFrequency: "monthly" as const,
       priority: 0.7,
-    })),
-    ...stocks.map((stock) => ({
-      url: createUrl(`/stock/${stock.ticker}`),
-      lastModified: stock.updatedAt,
-      changeFrequency: "daily" as const,
-      priority: 0.8,
     })),
   ];
 }
