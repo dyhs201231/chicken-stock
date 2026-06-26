@@ -332,6 +332,7 @@ export function useMarketIndexChartPanel({
   return {
     axisTickLabels,
     chartContainerRef,
+    chartCandles,
     crosshairDateLabel,
     crosshairPriceLabel,
     currentPriceLabel,

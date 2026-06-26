@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { getCachedMarketIndexSummaries } from "../../(backend)/lib/market-indices";
 import EduProgress from "../components/main/edu-progress";
 import IndexList from "../components/main/index_list";
 import StockList from "../components/main/stock_list";
@@ -49,7 +50,9 @@ const websiteJsonLd = {
   description: HOME_DESCRIPTION,
 };
 
-export default function Home() {
+export default async function Home() {
+  const initialIndices = await getCachedMarketIndexSummaries();
+
   return (
     <main className="mx-10 py-8">
       <script
@@ -61,7 +64,7 @@ export default function Home() {
 
       <div className="flex items-center justify-center">
         <EduProgress />
-        <IndexList />
+        <IndexList initialIndices={initialIndices} />
       </div>
 
       <StockList />

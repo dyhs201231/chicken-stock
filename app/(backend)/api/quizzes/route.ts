@@ -8,6 +8,10 @@ import {
 import { Prisma } from "../../generated/prisma/client";
 import { TransactionType } from "../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
+import {
+  getArticleQuizzes,
+  selectQuizFields,
+} from "../../lib/quizzes";
 
 const QUIZ_CORRECT_REWARD_KRW = 10_000;
 const QUIZ_REWARD_COMPANY_NAME = "퀴즈 정답 보상";
@@ -40,34 +44,8 @@ function parsePositiveBigInt(value: string | null) {
   return parsedValue;
 }
 
-function selectQuizFields() {
-  return {
-    id: true,
-    educationLevelId: true,
-    articleId: true,
-    quizType: true,
-    question: true,
-    description: true,
-    optionText: true,
-  } as const;
-}
-
 function createQuizRewardTransactionId(userId: bigint, quizId: number) {
   return `quiz-reward-${userId.toString()}-${quizId}`;
-}
-
-function serializeQuizSubmission(submission: {
-  answeredAt: Date | null;
-  isCorrect: boolean;
-  isSkip: boolean;
-  selectedAnswer: string;
-}) {
-  return {
-    answeredAt: submission.answeredAt?.toISOString() ?? null,
-    isCorrect: submission.isCorrect,
-    isSkip: submission.isSkip,
-    selectedAnswer: submission.selectedAnswer,
-  };
 }
 
 function normalizeAnswerText(value: string) {
@@ -295,31 +273,7 @@ export async function GET(request: NextRequest) {
         return userValidationResponse;
       }
 
-      const quizzes = await prisma.quiz.findMany({
-        where: { articleId },
-        orderBy: { id: "asc" },
-        select: {
-          ...selectQuizFields(),
-          submissions: {
-            where: {
-              userId,
-            },
-            select: {
-              answeredAt: true,
-              isCorrect: true,
-              isSkip: true,
-              selectedAnswer: true,
-            },
-            take: 1,
-          },
-        },
-      });
-      const serializedQuizzes = quizzes.map(({ submissions, ...quiz }) => ({
-        ...quiz,
-        submission: submissions[0]
-          ? serializeQuizSubmission(submissions[0])
-          : null,
-      }));
+      const serializedQuizzes = await getArticleQuizzes(articleId, userId);
       const hasCorrectSubmission = serializedQuizzes.some(
         (quiz) => quiz.submission?.isCorrect === true,
       );
@@ -342,11 +296,7 @@ export async function GET(request: NextRequest) {
         );
       }
 
-      const quizzes = await prisma.quiz.findMany({
-        where: { articleId },
-        orderBy: { id: "asc" },
-        select: selectQuizFields(),
-      });
+      const quizzes = await getArticleQuizzes(articleId);
 
       return NextResponse.json({
         ok: true,

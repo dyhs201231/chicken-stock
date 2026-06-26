@@ -6,12 +6,12 @@ export default function AvatarSample() {
       <h1>Avatar Sample</h1>
 
       <div className="flex gap-5">
-        <Avatar src="/test-image.png" type="header" />
-        <Avatar src="/test-image.png" type="main" />
-        <Avatar src="/test-image.png" type="portfolio-mini-circle" />
-        <Avatar src="/test-image.png" type="portfolio-mini-square" />
-        <Avatar src="/test-image.png" type="stock-detail" />
-        <Avatar src="/test-image.png" type="mypage" />
+        <Avatar src="/test-image.webp" type="header" />
+        <Avatar src="/test-image.webp" type="main" />
+        <Avatar src="/test-image.webp" type="portfolio-mini-circle" />
+        <Avatar src="/test-image.webp" type="portfolio-mini-square" />
+        <Avatar src="/test-image.webp" type="stock-detail" />
+        <Avatar src="/test-image.webp" type="mypage" />
       </div>
     </div>
   );

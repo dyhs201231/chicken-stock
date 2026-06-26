@@ -16,6 +16,12 @@ export type EducationSummary = {
   articles: EducationSummaryArticle[];
 };
 
+export type EducationProgressArticle = {
+  articleId: number;
+  progressRate: number;
+  isCompleted: boolean;
+};
+
 export type EducationArticle = {
   id: number;
   educationSummaryId: number;
@@ -39,6 +45,16 @@ type EducationSummariesResponse =
       error: string;
     };
 
+type EducationProgressResponse =
+  | {
+      ok: true;
+      data: EducationProgressArticle[];
+    }
+  | {
+      ok: false;
+      error: string;
+    };
+
 type EducationArticleResponse =
   | {
       ok: true;
@@ -49,10 +65,23 @@ type EducationArticleResponse =
       error: string;
     };
 
-export async function fetchEducationSummaries(userId?: string | null) {
-  const { data } = await requests.get<EducationSummariesResponse>("/api/edu", {
-    params: userId ? { userId } : undefined,
-  });
+export async function fetchEducationSummaries() {
+  const { data } = await requests.get<EducationSummariesResponse>("/api/edu");
+
+  if (!data.ok) {
+    throw new Error(data.error);
+  }
+
+  return data.data;
+}
+
+export async function fetchEducationProgress(userId: string) {
+  const { data } = await requests.get<EducationProgressResponse>(
+    "/api/edu/progress",
+    {
+      params: { userId },
+    },
+  );
 
   if (!data.ok) {
     throw new Error(data.error);

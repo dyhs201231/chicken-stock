@@ -11,7 +11,7 @@ function clampProgressRate(progressRate: number) {
 
 function getCharacterImages() {
   return {
-    nest: "/images/main/nest.svg",
+    nest: "/images/main/nest.webp",
     egg: "/images/main/egg.svg",
   };
 }
@@ -24,7 +24,7 @@ export default function EduProgress() {
   const userLevel = isLoggedIn ? myInfo.user.currentLevel : null;
 
   const { data: educationSummaries = [], isLoading: isEducationLoading } =
-    useEducationSummariesQuery(userId);
+    useEducationSummariesQuery(userId, { enabled: isLoggedIn });
 
   const progressRate = useMemo(() => {
     const articles = educationSummaries.flatMap((summary) => summary.articles);
@@ -79,7 +79,6 @@ export default function EduProgress() {
               width={172}
               height={110}
               className="absolute bottom-0 left-1/2 w-44 -translate-x-1/2 md:w-56"
-              unoptimized
             />
 
             <Image

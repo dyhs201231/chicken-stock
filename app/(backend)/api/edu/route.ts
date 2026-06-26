@@ -157,24 +157,10 @@ export async function GET(request: NextRequest) {
     const { searchParams } = request.nextUrl;
     const articleId = parsePositiveInteger(searchParams.get("id"));
     const level = parsePositiveInteger(searchParams.get("level"));
-    const userId = parsePositiveBigInt(
-      searchParams.get("userId") ?? searchParams.get("user_id"),
-    );
     const educationSummaryId = parsePositiveInteger(
       searchParams.get("education_summary_id") ??
         searchParams.get("educationSummaryId"),
     );
-
-    if (userId) {
-      const userValidationResponse = await validateRequestedUser(
-        request,
-        userId,
-      );
-
-      if (userValidationResponse) {
-        return userValidationResponse;
-      }
-    }
 
     if (
       searchParams.has("id") ||
@@ -250,38 +236,25 @@ export async function GET(request: NextRequest) {
             id: true,
             title: true,
             sortOrder: true,
-            completions: {
-              where: userId ? { userId } : { userId: BigInt(0) },
-              select: {
-                progressRate: true,
-                isCompleted: true,
-              },
-            },
           },
         },
       },
     });
 
-    const educationSummariesWithArticleProgress = educationSummaries.map(
+    const educationSummariesWithArticleDefaults = educationSummaries.map(
       (summary) => ({
         ...summary,
-        articles: summary.articles.map((article) => {
-          const completion = article.completions[0];
-
-          return {
-            id: article.id,
-            title: article.title,
-            sortOrder: article.sortOrder,
-            progressRate: completion?.progressRate ?? 0,
-            isCompleted: completion?.isCompleted ?? false,
-          };
-        }),
+        articles: summary.articles.map((article) => ({
+          ...article,
+          progressRate: 0,
+          isCompleted: false,
+        })),
       }),
     );
 
     return NextResponse.json({
       ok: true,
-      data: educationSummariesWithArticleProgress,
+      data: educationSummariesWithArticleDefaults,
     });
   } catch (error) {
     const message =

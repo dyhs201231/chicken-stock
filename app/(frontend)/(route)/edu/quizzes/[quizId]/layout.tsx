@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import type { Metadata } from "next";
-import AuthGuard from "@/app/(frontend)/components/auth-guard";
 import { createCanonicalUrl, createPageMetadata, SITE_NAME } from "../../seo";
 
 type EduLayoutProps = {
@@ -53,7 +52,7 @@ export default async function EduLayout({ children, params }: EduLayoutProps) {
           __html: JSON.stringify(jsonLd),
         }}
       />
-      <AuthGuard>{children}</AuthGuard>
+      {children}
     </>
   );
 }

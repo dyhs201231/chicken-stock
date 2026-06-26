@@ -30,10 +30,11 @@ export default function IndexList({ initialIndices }: IndexListProps) {
   const { data } = useMarketIndicesQuery(initialIndices);
   const marketIndexes =
     isHydrated && data !== undefined ? data : (initialIndices ?? []);
+  const shouldShowFallback = marketIndexes.length === 0;
 
   return (
     <section className="w-auto bg-white pt-16 pr-8 pb-8 pl-8">
-      {!isHydrated || marketIndexes.length === 0 ? (
+      {shouldShowFallback ? (
         <IndexListFallback />
       ) : (
         <ul className="flex h-full flex-col justify-between gap-3.5">

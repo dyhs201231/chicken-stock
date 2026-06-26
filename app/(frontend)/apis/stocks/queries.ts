@@ -74,11 +74,14 @@ export function useStockAnalyticsQuery(stockId: number) {
 export function useStockOrderBookQuery(
   stockId: number,
   initialData?: StockOrderBookSnapshotData | null,
+  options?: { enabled?: boolean },
 ) {
+  const enabled = options?.enabled ?? true;
+
   return useQuery({
     queryKey: stockQueryKeys.orderBook(stockId),
     queryFn: () => fetchStockOrderBook(stockId),
-    enabled: Number.isInteger(stockId) && stockId > 0,
+    enabled: enabled && Number.isInteger(stockId) && stockId > 0,
     initialData,
     refetchInterval: STOCK_ORDER_BOOK_REFETCH_INTERVAL_MS,
     staleTime: 5_000,

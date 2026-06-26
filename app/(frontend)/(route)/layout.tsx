@@ -31,6 +31,7 @@ const atoz = localFont({
     },
   ],
   display: "swap",
+  preload: false,
   variable: "--font-atoz",
 });
 
