@@ -1,7 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { CandlestickSeries, createChart } from "lightweight-charts";
-import type { IRange, Time } from "lightweight-charts";
+import type {
+  IChartApi,
+  IPriceLine,
+  IRange,
+  ISeriesApi,
+  Time,
+} from "lightweight-charts";
 import { useStockCandlesQuery } from "../../../../apis/stocks/queries";
+import { getCandlesForRange } from "./chart-candles";
 import { createCrosshairMoveHandler } from "./chart-crosshair";
 import { getOhlcItems } from "./chart-format";
 import { convertCurrencyValue } from "../../../../utils/stock/stock-detail";
@@ -39,6 +46,10 @@ function getInitialDailyChartCandles({ stock }: StockOnlyProps) {
 
 export function useChartPanel({ stock }: StockOnlyProps) {
   const chartContainerRef = useRef<HTMLDivElement>(null);
+  const chartRef = useRef<IChartApi | null>(null);
+  const candleSeriesRef = useRef<ISeriesApi<"Candlestick", Time> | null>(null);
+  const currentPriceLineRef = useRef<IPriceLine | null>(null);
+  const scheduleOverlayLabelUpdateRef = useRef<() => void>(() => {});
 
   const [selectedRange, setSelectedRange] = useState<CandleRange>("daily");
   const [highLabelPosition, setHighLabelPosition] =
@@ -77,10 +88,15 @@ export function useChartPanel({ stock }: StockOnlyProps) {
     [stock],
   );
 
+  const initialChartCandles = useMemo(
+    () => getCandlesForRange(initialDailyChartCandles, selectedRange),
+    [initialDailyChartCandles, selectedRange],
+  );
+
   const { data: rawChartCandles = [] } = useStockCandlesQuery(
     stock.id,
     selectedInterval,
-    selectedInterval === "DAY" ? initialDailyChartCandles : undefined,
+    initialChartCandles,
   );
 
   const chartCandles = useMemo(() => {
@@ -170,19 +186,60 @@ export function useChartPanel({ stock }: StockOnlyProps) {
   useEffect(() => {
     const chartContainer = chartContainerRef.current;
 
-    if (!chartContainer || chartCandles.length === 0) {
+    if (!chartContainer) {
       return;
     }
 
     const chart = createChart(chartContainer, getChartOptions(chartContainer));
-
     const candleSeries = chart.addSeries(
       CandlestickSeries,
       getCandlestickSeriesOptions(stock.currencyCode),
     );
 
+    chartRef.current = chart;
+    candleSeriesRef.current = candleSeries;
+
+    const resizeObserver = new ResizeObserver(() => {
+      chart.applyOptions({
+        width: chartContainer.clientWidth,
+        height: chartContainer.clientHeight,
+      });
+      scheduleOverlayLabelUpdateRef.current();
+    });
+
+    resizeObserver.observe(chartContainer);
+
+    return () => {
+      resizeObserver.disconnect();
+      chart.remove();
+      chartRef.current = null;
+      candleSeriesRef.current = null;
+      currentPriceLineRef.current = null;
+      scheduleOverlayLabelUpdateRef.current = () => {};
+    };
+  }, [stock.currencyCode]);
+
+  useEffect(() => {
+    const chartContainer = chartContainerRef.current;
+    const chart = chartRef.current;
+    const candleSeries = candleSeriesRef.current;
+
+    if (
+      !chartContainer ||
+      !chart ||
+      !candleSeries ||
+      chartCandles.length === 0
+    ) {
+      return;
+    }
+
     candleSeries.setData(chartCandles);
-    candleSeries.createPriceLine(
+
+    if (currentPriceLineRef.current) {
+      candleSeries.removePriceLine(currentPriceLineRef.current);
+    }
+
+    currentPriceLineRef.current = candleSeries.createPriceLine(
       getCurrentPriceLineOptions(stock.currentPrice),
     );
 
@@ -218,6 +275,7 @@ export function useChartPanel({ stock }: StockOnlyProps) {
         }
       });
     };
+    scheduleOverlayLabelUpdateRef.current = scheduleOverlayLabelUpdate;
 
     const handleCrosshairMove = createCrosshairMoveHandler({
       candleSeries,
@@ -233,16 +291,6 @@ export function useChartPanel({ stock }: StockOnlyProps) {
 
     chart.timeScale().fitContent();
     scheduleOverlayLabelUpdate();
-
-    const resizeObserver = new ResizeObserver(() => {
-      chart.applyOptions({
-        width: chartContainer.clientWidth,
-        height: chartContainer.clientHeight,
-      });
-      scheduleOverlayLabelUpdate();
-    });
-
-    resizeObserver.observe(chartContainer);
 
     const handleVisibleTimeRangeChange = (range: IRange<Time> | null) => {
       updateHighLowLabels(range);
@@ -263,7 +311,6 @@ export function useChartPanel({ stock }: StockOnlyProps) {
     chart.subscribeCrosshairMove(handleCrosshairMove);
 
     return () => {
-      resizeObserver.disconnect();
       chart
         .timeScale()
         .unsubscribeVisibleTimeRangeChange(handleVisibleTimeRangeChange);
@@ -271,7 +318,7 @@ export function useChartPanel({ stock }: StockOnlyProps) {
         .timeScale()
         .unsubscribeVisibleLogicalRangeChange(handleVisibleLogicalRangeChange);
       chart.unsubscribeCrosshairMove(handleCrosshairMove);
-      chart.remove();
+      scheduleOverlayLabelUpdateRef.current = () => {};
     };
   }, [
     chartCandles,
