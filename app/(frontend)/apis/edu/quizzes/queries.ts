@@ -13,6 +13,8 @@ export const quizQueryKeys = {
   root: ["quizzes"] as const,
 };
 
+const ARTICLE_QUIZZES_STALE_TIME_MS = 5 * 60 * 1000;
+
 export function useArticleQuizzesQuery(
   articleId: number,
   options?: UseArticleQuizzesQueryOptions,
@@ -22,6 +24,7 @@ export function useArticleQuizzesQuery(
     queryFn: () => fetchQuizzesByArticleId(articleId, options?.userId),
     enabled: articleId > 0,
     initialData: options?.initialData,
+    staleTime: options?.initialData ? ARTICLE_QUIZZES_STALE_TIME_MS : 0,
   });
 }
 

@@ -2,13 +2,9 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
 import { IconChevronLeft } from "@tabler/icons-react";
-import { getEducationArticle } from "@/app/(frontend)/apis/edu/queries";
-import { getArticleQuizProgress } from "@/app/(frontend)/apis/edu/quizzes/queries";
+import { getCachedEducationArticle } from "@/app/(backend)/lib/education";
+import { getArticleQuizProgress } from "@/app/(backend)/lib/quizzes";
 import { getCurrentUser } from "../../../../lib/auth-check";
-import {
-  getRequestCookieHeader,
-  getRequestOrigin,
-} from "../../../../lib/server/request";
 import { parseArticleContent } from "../../../../utils/edu/article-content";
 import { isPositiveIntegerString } from "../../../../utils/number";
 import ArticleProgressTracker from "../../../../components/edu/article-progress-tracker";
@@ -144,11 +140,9 @@ export default async function ArticlePage({
   }
 
   const articleLevel = level ?? "";
-  const requestOrigin = await getRequestOrigin();
-  const article = await getEducationArticle(
-    articlesId,
-    articleLevel,
-    requestOrigin,
+  const article = await getCachedEducationArticle(
+    Number(articlesId),
+    Number(articleLevel),
   );
 
   if (!article) {
@@ -167,14 +161,10 @@ export default async function ArticlePage({
   let quizProgress: Awaited<ReturnType<typeof getArticleQuizProgress>> | null =
     null;
 
-  if (currentUserIdParam) {
-    const cookieHeader = await getRequestCookieHeader();
-
+  if (currentUser) {
     quizProgress = await getArticleQuizProgress(
-      articlesId,
-      currentUserIdParam,
-      requestOrigin,
-      cookieHeader,
+      Number(articlesId),
+      currentUser.id,
     );
   }
 

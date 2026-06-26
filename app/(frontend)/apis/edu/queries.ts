@@ -6,6 +6,7 @@ import {
   fetchEducationSummaries,
 } from "./api";
 import type { EducationProgressArticle, EducationSummary } from "./api";
+import { getEducationSummariesState } from "./education-summaries-state";
 
 export const educationQueryKeys = {
   summaries: () => ["educationSummaries"] as const,
@@ -17,6 +18,7 @@ const EDUCATION_SUMMARIES_STALE_TIME_MS = 5 * 60 * 1000;
 
 type UseEducationSummariesQueryOptions = {
   enabled?: boolean;
+  initialData?: EducationSummary[];
 };
 
 function mergeEducationProgress(
@@ -57,6 +59,7 @@ export function useEducationSummariesQuery(
     queryKey: educationQueryKeys.summaries(),
     queryFn: fetchEducationSummaries,
     enabled,
+    initialData: options?.initialData,
     staleTime: EDUCATION_SUMMARIES_STALE_TIME_MS,
   });
   const progressQuery = useQuery({
@@ -69,14 +72,20 @@ export function useEducationSummariesQuery(
     () => mergeEducationProgress(summariesQuery.data, progressQuery.data),
     [progressQuery.data, summariesQuery.data],
   );
+  const state = getEducationSummariesState({
+    hasSummaries: (summariesQuery.data?.length ?? 0) > 0,
+    isProgressLoading: progressQuery.isLoading,
+    isSummariesLoading: summariesQuery.isLoading,
+  });
 
   return {
     ...summariesQuery,
     data,
-    error: summariesQuery.error ?? progressQuery.error,
-    isError: summariesQuery.isError || progressQuery.isError,
-    isLoading: summariesQuery.isLoading || progressQuery.isLoading,
-    isPending: summariesQuery.isPending || progressQuery.isPending,
+    error: summariesQuery.error,
+    isError: summariesQuery.isError,
+    isLoading: state.isLoading,
+    isPending: state.isLoading,
+    isProgressLoading: state.isProgressLoading,
   };
 }
 

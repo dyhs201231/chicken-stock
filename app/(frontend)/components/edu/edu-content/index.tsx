@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useGetMyInfo } from "../../../apis/auth/queries";
 import { useEducationSummariesQuery } from "../../../apis/edu/queries";
+import type { EducationSummary } from "../../../apis/edu/api";
 import EducationCard from "../education-card";
 
 const educationCardStyles = [
@@ -25,7 +26,13 @@ const educationCardStyles = [
   },
 ] as const;
 
-export default function EduContent() {
+type EduContentProps = {
+  initialEducationSummaries?: EducationSummary[];
+};
+
+export default function EduContent({
+  initialEducationSummaries,
+}: EduContentProps) {
   const searchParams = useSearchParams();
   const openLevel = searchParams.get("openLevel");
   const { data: myInfo, isLoading: isMyInfoLoading } = useGetMyInfo();
@@ -35,7 +42,9 @@ export default function EduContent() {
     data: educationSummaries = [],
     isError,
     isLoading: isEducationLoading,
-  } = useEducationSummariesQuery(userId);
+  } = useEducationSummariesQuery(userId, {
+    initialData: initialEducationSummaries,
+  });
 
   const educationCards = useMemo(
     () =>
