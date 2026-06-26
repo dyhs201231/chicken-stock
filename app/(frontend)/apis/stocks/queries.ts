@@ -51,13 +51,13 @@ export function useStockSearchQuery(query: string, enabled = true) {
 export function useStockCandlesQuery(
   stockId: number,
   interval: StockCandleInterval,
-  initialData?: ChartCandleData[],
+  placeholderData?: ChartCandleData[],
 ) {
   return useQuery({
     queryKey: stockQueryKeys.candles(stockId, interval),
     queryFn: () => fetchStockCandles(stockId, interval),
     enabled: Number.isInteger(stockId) && stockId > 0,
-    initialData,
+    placeholderData,
     refetchInterval: STOCK_CANDLES_REFETCH_INTERVAL_MS,
   });
 }

@@ -2,7 +2,10 @@ import type {
   QuizContentData,
   QuizSubmissionData,
 } from "@/app/(frontend)/components/edu/quizzes/quiz-content";
+import { unstable_cache } from "next/cache";
 import { prisma } from "./prisma";
+
+const QUIZ_CONTENT_REVALIDATE_SECONDS = 60 * 10;
 
 export function selectQuizFields() {
   return {
@@ -30,6 +33,24 @@ export function serializeQuizSubmission(submission: {
   };
 }
 
+export const getCachedArticleQuizzes = unstable_cache(
+  async (articleId: number): Promise<QuizContentData[]> => {
+    if (articleId <= 0) {
+      return [];
+    }
+
+    return prisma.quiz.findMany({
+      where: { articleId },
+      orderBy: { id: "asc" },
+      select: selectQuizFields(),
+    });
+  },
+  ["article-quizzes"],
+  {
+    revalidate: QUIZ_CONTENT_REVALIDATE_SECONDS,
+  },
+);
+
 export async function getArticleQuizzes(
   articleId: number,
   userId?: bigint,
@@ -39,37 +60,47 @@ export async function getArticleQuizzes(
   }
 
   if (!userId) {
-    return prisma.quiz.findMany({
-      where: { articleId },
-      orderBy: { id: "asc" },
-      select: selectQuizFields(),
-    });
+    return getCachedArticleQuizzes(articleId);
   }
 
-  const quizzes = await prisma.quiz.findMany({
-    where: { articleId },
-    orderBy: { id: "asc" },
-    select: {
-      ...selectQuizFields(),
-      submissions: {
-        where: {
-          userId,
+  const [quizzes, submissions] = await Promise.all([
+    getCachedArticleQuizzes(articleId),
+    prisma.userQuizSubmission.findMany({
+      where: {
+        userId,
+        quiz: {
+          articleId,
         },
-        select: {
-          answeredAt: true,
-          isCorrect: true,
-          isSkip: true,
-          selectedAnswer: true,
-        },
-        take: 1,
       },
-    },
-  });
+      select: {
+        answeredAt: true,
+        isCorrect: true,
+        isSkip: true,
+        quizId: true,
+        selectedAnswer: true,
+      },
+    }),
+  ]);
+  const submissionByQuizId = new Map(
+    submissions.map((submission) => [submission.quizId, submission]),
+  );
 
-  return quizzes.map(({ submissions, ...quiz }) => ({
-    ...quiz,
-    submission: submissions[0]
-      ? serializeQuizSubmission(submissions[0])
-      : null,
-  })) satisfies QuizContentData[];
+  return quizzes.map((quiz) => {
+    const submission = submissionByQuizId.get(quiz.id);
+
+    return {
+      ...quiz,
+      submission: submission ? serializeQuizSubmission(submission) : null,
+    };
+  }) satisfies QuizContentData[];
+}
+
+export async function getArticleQuizProgress(articleId: number, userId: bigint) {
+  const quizzes = await getArticleQuizzes(articleId, userId);
+  const isCorrect = quizzes.some((quiz) => quiz.submission?.isCorrect === true);
+
+  return {
+    isCorrect,
+    quizzes,
+  };
 }

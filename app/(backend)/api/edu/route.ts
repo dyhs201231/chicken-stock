@@ -5,7 +5,15 @@ import {
   hashAuthToken,
   verifyAuthToken,
 } from "../../lib/auth";
+import {
+  getCachedEducationArticle,
+  getCachedEducationSummaries,
+} from "../../lib/education";
 import { prisma } from "../../lib/prisma";
+
+const EDUCATION_PUBLIC_CACHE_HEADERS = {
+  "Cache-Control": "public, s-maxage=600, stale-while-revalidate=86400",
+};
 
 type ArticleCompletionRequestBody = {
   user_id?: unknown;
@@ -178,34 +186,28 @@ export async function GET(request: NextRequest) {
         );
       }
 
-      const articleLevel = level ?? 0;
-
-      const article = await prisma.article.findFirst({
-        where: {
-          id: articleId,
-          ...(educationSummaryId
-            ? { educationSummaryId }
-            : {
-                educationSummary: {
-                  stage: articleLevel,
-                },
-              }),
-        },
-        select: {
-          id: true,
-          educationSummaryId: true,
-          title: true,
-          content: true,
-          imageUrl: true,
-          sortOrder: true,
-          educationSummary: {
-            select: {
-              stage: true,
-              title: true,
+      const article = educationSummaryId
+        ? await prisma.article.findFirst({
+            where: {
+              id: articleId,
+              educationSummaryId,
             },
-          },
-        },
-      });
+            select: {
+              id: true,
+              educationSummaryId: true,
+              title: true,
+              content: true,
+              imageUrl: true,
+              sortOrder: true,
+              educationSummary: {
+                select: {
+                  stage: true,
+                  title: true,
+                },
+              },
+            },
+          })
+        : await getCachedEducationArticle(articleId, level ?? 0);
 
       if (!article) {
         return NextResponse.json(
@@ -217,45 +219,28 @@ export async function GET(request: NextRequest) {
         );
       }
 
-      return NextResponse.json({
-        ok: true,
-        data: article,
-      });
+      return NextResponse.json(
+        {
+          ok: true,
+          data: article,
+        },
+        {
+          headers: EDUCATION_PUBLIC_CACHE_HEADERS,
+        },
+      );
     }
 
-    const educationSummaries = await prisma.educationSummary.findMany({
-      orderBy: { stage: "asc" },
-      select: {
-        id: true,
-        title: true,
-        stage: true,
-        summary: true,
-        articles: {
-          orderBy: { sortOrder: "asc" },
-          select: {
-            id: true,
-            title: true,
-            sortOrder: true,
-          },
-        },
+    const educationSummaries = await getCachedEducationSummaries();
+
+    return NextResponse.json(
+      {
+        ok: true,
+        data: educationSummaries,
       },
-    });
-
-    const educationSummariesWithArticleDefaults = educationSummaries.map(
-      (summary) => ({
-        ...summary,
-        articles: summary.articles.map((article) => ({
-          ...article,
-          progressRate: 0,
-          isCompleted: false,
-        })),
-      }),
+      {
+        headers: EDUCATION_PUBLIC_CACHE_HEADERS,
+      },
     );
-
-    return NextResponse.json({
-      ok: true,
-      data: educationSummariesWithArticleDefaults,
-    });
   } catch (error) {
     const message =
       process.env.NODE_ENV === "production"

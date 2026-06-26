@@ -9,12 +9,16 @@ import { Prisma } from "../../generated/prisma/client";
 import { TransactionType } from "../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
 import {
+  getArticleQuizProgress,
   getArticleQuizzes,
   selectQuizFields,
 } from "../../lib/quizzes";
 
 const QUIZ_CORRECT_REWARD_KRW = 10_000;
 const QUIZ_REWARD_COMPANY_NAME = "퀴즈 정답 보상";
+const QUIZ_PUBLIC_CACHE_HEADERS = {
+  "Cache-Control": "public, s-maxage=600, stale-while-revalidate=86400",
+};
 
 function parsePositiveInteger(value: string | null) {
   if (!value) {
@@ -273,17 +277,14 @@ export async function GET(request: NextRequest) {
         return userValidationResponse;
       }
 
-      const serializedQuizzes = await getArticleQuizzes(articleId, userId);
-      const hasCorrectSubmission = serializedQuizzes.some(
-        (quiz) => quiz.submission?.isCorrect === true,
-      );
+      const quizProgress = await getArticleQuizProgress(articleId, userId);
 
       return NextResponse.json({
         ok: true,
         data: {
           source: "ARTICLE_PROGRESS",
-          isCorrect: hasCorrectSubmission,
-          quizzes: serializedQuizzes,
+          isCorrect: quizProgress.isCorrect,
+          quizzes: quizProgress.quizzes,
         },
       });
     }
@@ -298,13 +299,18 @@ export async function GET(request: NextRequest) {
 
       const quizzes = await getArticleQuizzes(articleId);
 
-      return NextResponse.json({
-        ok: true,
-        data: {
-          source: "ARTICLE",
-          quizzes,
+      return NextResponse.json(
+        {
+          ok: true,
+          data: {
+            source: "ARTICLE",
+            quizzes,
+          },
         },
-      });
+        {
+          headers: QUIZ_PUBLIC_CACHE_HEADERS,
+        },
+      );
     }
 
     if (searchParams.has("userId") || searchParams.has("user_id")) {

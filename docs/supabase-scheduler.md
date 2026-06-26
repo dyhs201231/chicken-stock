@@ -17,6 +17,7 @@ The scheduler only wakes the API routes. The application still enforces the ADK 
 - Rule-based execution is filtered by KR/US market-session status.
 - Scheduler-triggered trade runs prefilter stocks to currently open KR/US markets and cap the stock candidate count.
 - Pending order matching runs independently every 10 minutes.
+- Daily candle maintenance fills missing `LISTED` stock candles for completed KR/US market days.
 
 ## Setup
 
@@ -31,6 +32,7 @@ The scheduler only wakes the API routes. The application still enforces the ADK 
 
 - `chicken-stock-run-agent-trade`: every 10 minutes, max 5 executable intents and 30 open-market stocks per run
 - `chicken-stock-match-pending`: every 10 minutes, default 10 pending orders per run
+- `chicken-stock-ensure-daily-candles`: every 30 minutes, backfills missing `LISTED` daily candles for the last 7 completed market days
 
 To inspect jobs:
 
@@ -46,4 +48,5 @@ To remove jobs:
 ```sql
 select cron.unschedule('chicken-stock-run-agent-trade');
 select cron.unschedule('chicken-stock-match-pending');
+select cron.unschedule('chicken-stock-ensure-daily-candles');
 ```

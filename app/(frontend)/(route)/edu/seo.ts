@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { getEducationArticle } from "../../apis/edu/queries";
-import { getRequestOrigin } from "../../lib/server/request";
+import { getCachedEducationArticle } from "@/app/(backend)/lib/education";
 import { parseArticleContent } from "../../utils/edu/article-content";
 import { isPositiveIntegerString } from "../../utils/number";
 
@@ -101,11 +100,10 @@ export async function getArticleSeoData(articleId: string, level?: string) {
     return null;
   }
 
-  const articleLevel = level;
-  const article = await getEducationArticle(
-    articleId,
+  const articleLevel = Number(level);
+  const article = await getCachedEducationArticle(
+    Number(articleId),
     articleLevel,
-    await getRequestOrigin(),
   );
 
   if (!article) {
@@ -114,6 +112,6 @@ export async function getArticleSeoData(articleId: string, level?: string) {
 
   return {
     article,
-    level: articleLevel,
+    level,
   };
 }

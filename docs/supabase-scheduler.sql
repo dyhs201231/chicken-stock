@@ -27,6 +27,13 @@ exception
   when others then null;
 end $$;
 
+do $$
+begin
+  perform cron.unschedule('chicken-stock-ensure-daily-candles');
+exception
+  when others then null;
+end $$;
+
 select cron.schedule(
   'chicken-stock-run-agent-trade',
   '*/10 * * * *',
@@ -37,6 +44,30 @@ select cron.schedule(
       from vault.decrypted_secrets
       where name = 'chicken_stock_app_url'
     ) || '/api/internal/agents/run-trade?source=scheduler&limit=5&stockLimit=30',
+    headers := jsonb_build_object(
+      'Content-Type', 'application/json',
+      'Authorization', 'Bearer ' || (
+        select decrypted_secret
+        from vault.decrypted_secrets
+        where name = 'chicken_stock_cron_secret'
+      )
+    ),
+    body := jsonb_build_object('scheduler', 'supabase-pg-cron'),
+    timeout_milliseconds := 120000
+  );
+  $$
+);
+
+select cron.schedule(
+  'chicken-stock-ensure-daily-candles',
+  '*/30 * * * *',
+  $$
+  select net.http_post(
+    url := (
+      select decrypted_secret
+      from vault.decrypted_secrets
+      where name = 'chicken_stock_app_url'
+    ) || '/api/internal/agents/ensure-daily-candles?source=scheduler&lookbackDays=7',
     headers := jsonb_build_object(
       'Content-Type', 'application/json',
       'Authorization', 'Bearer ' || (

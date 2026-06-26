@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { getCachedEducationSummaries } from "@/app/(backend)/lib/education";
 import EduContent from "../../components/edu/edu-content";
 import EduPageFallback from "../../components/edu/edu-page-fallback";
 import { createCanonicalUrl, createPageMetadata, SITE_NAME } from "./seo";
@@ -29,7 +30,9 @@ const jsonLd = {
   },
 };
 
-export default function Edu() {
+export default async function Edu() {
+  const educationSummaries = await getCachedEducationSummaries();
+
   return (
     <>
       <script
@@ -39,7 +42,7 @@ export default function Edu() {
         }}
       />
       <Suspense fallback={<EduPageFallback />}>
-        <EduContent />
+        <EduContent initialEducationSummaries={educationSummaries} />
       </Suspense>
     </>
   );

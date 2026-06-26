@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { IconChevronLeft } from "@tabler/icons-react";
+import { getCachedEducationArticle } from "@/app/(backend)/lib/education";
 import { getArticleQuizzes } from "@/app/(backend)/lib/quizzes";
-import { prisma } from "@/app/(backend)/lib/prisma";
 import AuthRequiredRedirect from "@/app/(frontend)/components/auth-guard/auth-required-redirect";
 import { getCurrentUser } from "../../../../lib/auth-check";
 import { isPositiveIntegerString } from "../../../../utils/number";
@@ -41,23 +41,7 @@ async function getQuizArticleContext(quizId: string, level?: string) {
   }
 
   if (isPositiveIntegerString(quizId) && levelParam) {
-    article = await prisma.article.findFirst({
-      where: {
-        id: articleId,
-        educationSummary: {
-          stage: Number(levelParam),
-        },
-      },
-      select: {
-        id: true,
-        title: true,
-        educationSummary: {
-          select: {
-            stage: true,
-          },
-        },
-      },
-    });
+    article = await getCachedEducationArticle(articleId, Number(levelParam));
   }
 
   let articleHref: { pathname: string; query: { level: string } } | string =

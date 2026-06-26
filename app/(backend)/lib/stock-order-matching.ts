@@ -6,6 +6,7 @@ import {
   TradeOrderType,
   TransactionType,
 } from "@/app/(backend)/generated/prisma/enums";
+import { getMarketDateTimestamp } from "./stock-daily-candles";
 
 export type StockOrderPriceType = "LIMIT" | "MARKET";
 
@@ -71,12 +72,6 @@ const AssetType = {
 } as const;
 
 const DAILY_CANDLE_INTERVAL_CODE = "1D";
-const KST_DATE_FORMATTER = new Intl.DateTimeFormat("en-CA", {
-  day: "2-digit",
-  month: "2-digit",
-  timeZone: "Asia/Seoul",
-  year: "numeric",
-});
 
 export class StockOrderMatchingError extends Error {
   constructor(
@@ -161,13 +156,11 @@ function getTradeExecutionId() {
   return randomUUID();
 }
 
-function getDailyCandleTimestamp(executedAt: Date) {
-  const parts = KST_DATE_FORMATTER.formatToParts(executedAt);
-  const year = Number(parts.find((part) => part.type === "year")?.value);
-  const month = Number(parts.find((part) => part.type === "month")?.value);
-  const day = Number(parts.find((part) => part.type === "day")?.value);
-
-  return BigInt(Date.UTC(year, month - 1, day));
+function getDailyCandleTimestamp(executedAt: Date, countryCode: string) {
+  return getMarketDateTimestamp(
+    executedAt,
+    countryCode === "US" ? "US" : "KR",
+  );
 }
 
 function minDecimal(left: Prisma.Decimal, right: Prisma.Decimal) {
@@ -270,14 +263,16 @@ async function updateDailyCandleAfterExecution(
     executionPrice,
     quantity,
     ticker,
+    countryCode,
   }: {
+    countryCode: string;
     executedAt: Date;
     executionPrice: Prisma.Decimal;
     quantity: number;
     ticker: string;
   },
 ): Promise<boolean> {
-  const timestamp = getDailyCandleTimestamp(executedAt);
+  const timestamp = getDailyCandleTimestamp(executedAt, countryCode);
   const candleId = {
     ticker_intervalCode_timestamp: {
       intervalCode: DAILY_CANDLE_INTERVAL_CODE,
@@ -374,6 +369,7 @@ async function recordTradeExecution(
   const fillAmount = getFillAmount(price, quantity);
   const changeAmount = price.sub(currentStock.previousClose).toDecimalPlaces(2);
   const isNewDailyCandle = await updateDailyCandleAfterExecution(tx, {
+    countryCode: stock.countryCode,
     executedAt,
     executionPrice: price,
     quantity,
