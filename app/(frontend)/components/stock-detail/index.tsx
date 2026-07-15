@@ -7,17 +7,18 @@ import { useStockOrderBookQuery } from "../../apis/stocks/queries";
 import StockLogo from "./stock-logo";
 import StockDetailPanelSkeleton from "./panel-skeleton";
 import { useStockRealtime } from "../../hooks/use-stock-realtime";
-import type {
-  MainOrderTab,
-  NormalOrderTab,
-  SelectedOrderBookLimitPrice,
+import OrderPanel, {
+  type MainOrderTab,
+  type NormalOrderTab,
+  type SelectedOrderBookLimitPrice,
 } from "./order/order-panel";
-import { SegmentedControl, Tab } from "../ui";
+import OrderBookPanel from "./order/order-book-panel";
 import type {
   StockCurrencyCode,
   StockDetailTab,
   StockOnlyProps,
 } from "../../types/stock/stock-detail";
+import { SegmentedControl, Tab } from "../ui";
 import {
   convertCurrencyValue,
   convertStockCurrency,
@@ -49,20 +50,6 @@ const ChartPanel = dynamic(() => import("./order/chart-panel"), {
       className="min-w-0"
       label="차트를 불러오는 중입니다."
     />
-  ),
-  ssr: false,
-});
-
-const OrderBookPanel = dynamic(() => import("./order/order-book-panel"), {
-  loading: () => (
-    <StockDetailPanelSkeleton label="호가를 불러오는 중입니다." />
-  ),
-  ssr: false,
-});
-
-const OrderPanel = dynamic(() => import("./order/order-panel"), {
-  loading: () => (
-    <StockDetailPanelSkeleton label="주문 정보를 불러오는 중입니다." />
   ),
   ssr: false,
 });
