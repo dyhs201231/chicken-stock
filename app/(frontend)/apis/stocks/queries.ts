@@ -31,6 +31,11 @@ const STOCK_CANDLES_REFETCH_INTERVAL_MS = 10_000;
 const STOCK_ORDER_BOOK_REFETCH_INTERVAL_MS = 5_000;
 const STOCK_ORDERS_REFETCH_INTERVAL_MS = 10_000;
 
+type StockCandlesQueryOptions = {
+  initialData?: ChartCandleData[];
+  placeholderData?: ChartCandleData[];
+};
+
 export function useStocksInfiniteQuery(
   market: string,
   ranking: string,
@@ -65,14 +70,16 @@ export function useStockSearchQuery(query: string, enabled = true) {
 export function useStockCandlesQuery(
   stockId: number,
   interval: StockCandleInterval,
-  placeholderData?: ChartCandleData[],
+  options?: StockCandlesQueryOptions,
 ) {
   return useQuery({
     queryKey: stockQueryKeys.candles(stockId, interval),
     queryFn: () => fetchStockCandles(stockId, interval),
     enabled: Number.isInteger(stockId) && stockId > 0,
-    placeholderData,
+    initialData: options?.initialData,
+    placeholderData: options?.placeholderData,
     refetchInterval: STOCK_CANDLES_REFETCH_INTERVAL_MS,
+    staleTime: STOCK_CANDLES_REFETCH_INTERVAL_MS,
   });
 }
 
