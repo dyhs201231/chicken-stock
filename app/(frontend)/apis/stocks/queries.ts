@@ -41,6 +41,10 @@ type StockOrderBookQueryOptions = {
   refetchInterval?: number | false;
 };
 
+type StockOrdersQueryOptions = {
+  enabled?: boolean;
+};
+
 export function useStocksInfiniteQuery(
   market: string,
   ranking: string,
@@ -119,11 +123,16 @@ export function useStockOrderBookQuery(
   });
 }
 
-export function useStockOrdersQuery(stockId: number) {
+export function useStockOrdersQuery(
+  stockId: number,
+  options?: StockOrdersQueryOptions,
+) {
+  const enabled = options?.enabled ?? true;
+
   return useQuery({
     queryKey: stockQueryKeys.orders(stockId),
     queryFn: () => fetchStockOrders(stockId),
-    enabled: Number.isInteger(stockId) && stockId > 0,
+    enabled: enabled && Number.isInteger(stockId) && stockId > 0,
     refetchInterval: STOCK_ORDERS_REFETCH_INTERVAL_MS,
   });
 }
