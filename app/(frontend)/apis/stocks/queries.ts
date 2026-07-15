@@ -116,7 +116,7 @@ export function useStockOrderBookQuery(
     queryKey: stockQueryKeys.orderBook(stockId),
     queryFn: () => fetchStockOrderBook(stockId),
     enabled: enabled && Number.isInteger(stockId) && stockId > 0,
-    initialData,
+    initialData: initialData ?? undefined,
     refetchInterval:
       options?.refetchInterval ?? STOCK_ORDER_BOOK_REFETCH_INTERVAL_MS,
     staleTime: 5_000,
