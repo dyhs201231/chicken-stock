@@ -46,6 +46,7 @@ export default function OrderPanel({
   const { data: orderBookSnapshot } = useStockOrderBookQuery(
     stock.id,
     stock.orderBookSnapshot,
+    { refetchInterval: false },
   );
 
   const renderPanelContent = () => {

@@ -36,6 +36,11 @@ type StockCandlesQueryOptions = {
   placeholderData?: ChartCandleData[];
 };
 
+type StockOrderBookQueryOptions = {
+  enabled?: boolean;
+  refetchInterval?: number | false;
+};
+
 export function useStocksInfiniteQuery(
   market: string,
   ranking: string,
@@ -99,7 +104,7 @@ export function useStockAnalyticsQuery(
 export function useStockOrderBookQuery(
   stockId: number,
   initialData?: StockOrderBookSnapshotData | null,
-  options?: { enabled?: boolean },
+  options?: StockOrderBookQueryOptions,
 ) {
   const enabled = options?.enabled ?? true;
 
@@ -108,7 +113,8 @@ export function useStockOrderBookQuery(
     queryFn: () => fetchStockOrderBook(stockId),
     enabled: enabled && Number.isInteger(stockId) && stockId > 0,
     initialData,
-    refetchInterval: STOCK_ORDER_BOOK_REFETCH_INTERVAL_MS,
+    refetchInterval:
+      options?.refetchInterval ?? STOCK_ORDER_BOOK_REFETCH_INTERVAL_MS,
     staleTime: 5_000,
   });
 }

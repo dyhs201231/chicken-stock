@@ -61,7 +61,7 @@ const sideTabs: { label: string; value: StockDetailTab }[] = [
 
 export default function StockDetail({ stock, activeTab }: StockDetailProps) {
   const router = useRouter();
-  useStockRealtime(stock.id);
+  const isStockRealtimeConnected = useStockRealtime(stock.id);
   const [selectedCurrencyCode, setSelectedCurrencyCode] =
     useState<StockCurrencyCode>(stock.currencyCode);
   const [orderPanelMainTab, setOrderPanelMainTab] =
@@ -75,7 +75,10 @@ export default function StockDetail({ stock, activeTab }: StockDetailProps) {
   const { data: liveOrderBookSnapshot } = useStockOrderBookQuery(
     stock.id,
     stock.orderBookSnapshot,
-    { enabled: isOrderTab },
+    {
+      enabled: isOrderTab,
+      refetchInterval: isStockRealtimeConnected ? false : undefined,
+    },
   );
 
   const liveStock = useMemo(() => {
