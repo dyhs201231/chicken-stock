@@ -43,7 +43,7 @@ export default function CurrencyExchangeModal() {
 
       <Modal.Overlay>
         <Modal.Content className="col min-h-[565px] w-full max-w-[650px] justify-between">
-          {isPending && (
+          {(isPending || isFetching) && (
             <p className="m-auto text-center text-xl">최신 환율 확인 중...</p>
           )}
           {isError && (
@@ -51,13 +51,19 @@ export default function CurrencyExchangeModal() {
               <p className="text-xl">
                 최신 환율을 확인할 수 없어 지금은 환전할 수 없습니다.
               </p>
-              <button className="cursor-pointer underline" onClick={() => refetch()}>
+              <button
+                className="cursor-pointer underline"
+                onClick={() => refetch()}
+              >
                 다시 시도
               </button>
             </div>
           )}
           {exchangeViewState.canContinue && step === "form" && (
-            <ExchangeForm exchangeRate={exchangeViewState.rate} setStep={setStep} />
+            <ExchangeForm
+              exchangeRate={exchangeViewState.rate}
+              setStep={setStep}
+            />
           )}
           {exchangeViewState.canContinue && step === "check" && (
             <ExchangeCheck

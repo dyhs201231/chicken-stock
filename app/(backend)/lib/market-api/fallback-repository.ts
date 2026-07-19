@@ -51,7 +51,9 @@ function getSnapshotTimestamp(observedAt: Date) {
 }
 
 function getDatabaseId(indexId: string) {
-  const index = MARKET_INDEX_CONFIGS.findIndex((config) => config.id === indexId);
+  const index = MARKET_INDEX_CONFIGS.findIndex(
+    (config) => config.id === indexId,
+  );
 
   if (index < 0) {
     throw new MarketApiError(
@@ -86,11 +88,7 @@ function isFiniteCandle(candle: MarketIndexCandleData) {
   );
 }
 
-export function isFallbackFresh(
-  updatedAt: Date,
-  ttlMs: number,
-  now: Date,
-) {
+export function isFallbackFresh(updatedAt: Date, ttlMs: number, now: Date) {
   const ageMs = now.getTime() - updatedAt.getTime();
 
   return (
@@ -185,11 +183,36 @@ export function createMarketFallbackRepository(
         }))
         .filter(isFiniteCandle)
         .sort((left, right) => left.time.localeCompare(right.time));
-      const quoteCurrentValue = snapshot
-        ? toNumber(snapshot.price)
-        : marketIndex
-          ? toNumber(marketIndex.currentValue)
+      const marketIndexQuote = marketIndex
+        ? {
+            currentValue: toNumber(marketIndex.currentValue),
+            previousClose: toNumber(marketIndex.previousClose),
+          }
+        : null;
+      const matchingSnapshot =
+        marketIndex &&
+        snapshot &&
+        snapshot.observedAt.getTime() === marketIndex.updatedAt.getTime() &&
+        snapshot.provider === marketIndex.provider &&
+        toNumber(snapshot.price) === marketIndexQuote?.currentValue
+          ? snapshot
           : null;
+      const quoteVolume = matchingSnapshot?.volume
+        ? toNumber(matchingSnapshot.volume)
+        : (candles.at(-1)?.volume ?? 0);
+      const quoteIsValid =
+        marketIndexQuote !== null &&
+        Number.isFinite(marketIndexQuote.currentValue) &&
+        marketIndexQuote.currentValue > 0 &&
+        Number.isFinite(marketIndexQuote.previousClose) &&
+        marketIndexQuote.previousClose > 0 &&
+        Number.isFinite(quoteVolume) &&
+        quoteVolume >= 0 &&
+        Number.isFinite(marketIndex?.updatedAt.getTime()) &&
+        Boolean(marketIndex?.provider);
+      const changeAmount = marketIndexQuote
+        ? marketIndexQuote.currentValue - marketIndexQuote.previousClose
+        : 0;
 
       return {
         chart:
@@ -201,17 +224,18 @@ export function createMarketFallbackRepository(
               }
             : null,
         quote:
-          marketIndex && quoteCurrentValue !== null
+          marketIndex && marketIndexQuote && quoteIsValid
             ? {
-                changeAmount: toNumber(marketIndex.changeAmount),
-                changeRate: toNumber(marketIndex.changeRate),
-                currentValue: quoteCurrentValue,
-                previousClose: toNumber(marketIndex.previousClose),
-                provider: snapshot?.provider ?? marketIndex.provider,
-                updatedAt: snapshot?.observedAt ?? marketIndex.updatedAt,
-                volume: snapshot?.volume
-                  ? toNumber(snapshot.volume)
-                  : candles.at(-1)?.volume ?? 0,
+                changeAmount,
+                changeRate: getChangeRate(
+                  marketIndexQuote.currentValue,
+                  marketIndexQuote.previousClose,
+                ),
+                currentValue: marketIndexQuote.currentValue,
+                previousClose: marketIndexQuote.previousClose,
+                provider: marketIndex.provider,
+                updatedAt: marketIndex.updatedAt,
+                volume: quoteVolume,
               }
             : null,
       };
@@ -244,9 +268,7 @@ export function createMarketFallbackRepository(
             changeRate,
             countryCode: collection.config.countryCode,
             currencyCode:
-              collection.config.currencyCode === "USD"
-                ? "USD"
-                : "KRW",
+              collection.config.currencyCode === "USD" ? "USD" : "KRW",
             currentValue: latestCandle.close,
             id: databaseId,
             indexType: collection.config.indexType,

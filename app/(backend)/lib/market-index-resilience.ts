@@ -30,6 +30,25 @@ type MarketIndexServiceDependencies = {
   repository: MarketFallbackRepository;
 };
 
+const DEFAULT_MARKET_INDEX_REVALIDATE_SECONDS = 60 * 60;
+
+export function getMarketIndexCacheRevalidateSeconds(
+  indexId: string,
+  { exchangeFallbackTtlMs }: { exchangeFallbackTtlMs: number },
+) {
+  if (indexId !== "usd-krw") {
+    return DEFAULT_MARKET_INDEX_REVALIDATE_SECONDS;
+  }
+
+  return Math.max(
+    1,
+    Math.min(
+      DEFAULT_MARKET_INDEX_REVALIDATE_SECONDS,
+      Math.floor(exchangeFallbackTtlMs / 1_000),
+    ),
+  );
+}
+
 function getTrend(changeAmount: number): MarketIndexTrend {
   if (changeAmount > 0) {
     return "up";
@@ -147,9 +166,7 @@ export function enforceMarketIndexFallbackTtl(
   },
 ): MarketIndexViewData {
   const quoteTtlMs =
-    view.category === "exchangeRate"
-      ? exchangeFallbackTtlMs
-      : fallbackTtlMs;
+    view.category === "exchangeRate" ? exchangeFallbackTtlMs : fallbackTtlMs;
 
   return {
     ...view,
@@ -194,7 +211,9 @@ export function createMarketIndexService({
   now = () => new Date(),
   repository,
 }: MarketIndexServiceDependencies) {
-  async function getView(config: MarketIndexConfig): Promise<MarketIndexViewData> {
+  async function getView(
+    config: MarketIndexConfig,
+  ): Promise<MarketIndexViewData> {
     const fresh = await getFreshCollection(
       config,
       collectTwelveData,

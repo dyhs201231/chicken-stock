@@ -8,6 +8,7 @@ import {
 import {
   createMarketIndexService,
   enforceMarketIndexFallbackTtl,
+  getMarketIndexCacheRevalidateSeconds,
 } from "./market-index-resilience";
 import { getMarketApiConfig } from "./market-api/config";
 import { MarketApiError } from "./market-api/errors";
@@ -28,7 +29,12 @@ import type {
 } from "../../(frontend)/types/market-index";
 
 const MARKET_INDEX_REVALIDATE_SECONDS = 60 * 60;
-const USD_KRW_EXCHANGE_RATE_REVALIDATE_SECONDS = 60 * 10;
+const marketApiConfig = getMarketApiConfig();
+const USD_KRW_EXCHANGE_RATE_REVALIDATE_SECONDS =
+  getMarketIndexCacheRevalidateSeconds("usd-krw", marketApiConfig);
+const NON_EXCHANGE_MARKET_INDEX_CONFIGS = MARKET_INDEX_CONFIGS.filter(
+  ({ id }) => id !== "usd-krw",
+);
 
 const repository = createMarketFallbackRepository(prisma);
 
@@ -45,7 +51,10 @@ function createService(configs = MARKET_INDEX_CONFIGS) {
   });
 }
 
-function getDetailValues(candles: MarketIndexCandleData[], currentValue: number) {
+function getDetailValues(
+  candles: MarketIndexCandleData[],
+  currentValue: number,
+) {
   const latest = candles.at(-1);
   const high52w = Math.max(...candles.map(({ high }) => high));
   const low52w = Math.min(...candles.map(({ low }) => low));
@@ -59,7 +68,9 @@ function getDetailValues(candles: MarketIndexCandleData[], currentValue: number)
   };
 }
 
-function toLegacyDetail(view: MarketIndexViewData): MarketIndexDetailData | null {
+function toLegacyDetail(
+  view: MarketIndexViewData,
+): MarketIndexDetailData | null {
   if (view.quote.status === "error" || view.chart.status === "error") {
     return null;
   }
@@ -114,21 +125,50 @@ export async function getFreshMarketIndexViews() {
   return createService().getViews();
 }
 
-const getStoredCachedMarketIndexViews = unstable_cache(
-  getFreshMarketIndexViews,
-  ["market-index-views-v4"],
+async function getFreshNonExchangeMarketIndexViews() {
+  return createService(NON_EXCHANGE_MARKET_INDEX_CONFIGS).getViews();
+}
+
+async function getFreshUsdKrwMarketIndexView() {
+  return getFreshMarketIndexView("usd-krw");
+}
+
+const getStoredCachedNonExchangeMarketIndexViews = unstable_cache(
+  getFreshNonExchangeMarketIndexViews,
+  ["non-exchange-market-index-views-v1"],
   { revalidate: MARKET_INDEX_REVALIDATE_SECONDS },
+);
+
+const getStoredCachedUsdKrwMarketIndexView = unstable_cache(
+  getFreshUsdKrwMarketIndexView,
+  ["usd-krw-market-index-view-v1"],
+  { revalidate: USD_KRW_EXCHANGE_RATE_REVALIDATE_SECONDS },
 );
 
 export async function getCachedMarketIndexViews() {
   const config = getMarketApiConfig();
-
-  return (await getStoredCachedMarketIndexViews()).map((view) =>
-    enforceMarketIndexFallbackTtl(view, {
-      exchangeFallbackTtlMs: config.exchangeFallbackTtlMs,
-      fallbackTtlMs: config.fallbackTtlMs,
-    }),
+  const [nonExchangeViews, exchangeView] = await Promise.all([
+    getStoredCachedNonExchangeMarketIndexViews(),
+    getStoredCachedUsdKrwMarketIndexView(),
+  ]);
+  const viewsById = new Map(
+    [...nonExchangeViews, ...(exchangeView ? [exchangeView] : [])].map(
+      (view) => [view.id, view],
+    ),
   );
+
+  return MARKET_INDEX_CONFIGS.flatMap(({ id }) => {
+    const view = viewsById.get(id);
+
+    return view
+      ? [
+          enforceMarketIndexFallbackTtl(view, {
+            exchangeFallbackTtlMs: config.exchangeFallbackTtlMs,
+            fallbackTtlMs: config.fallbackTtlMs,
+          }),
+        ]
+      : [];
+  });
 }
 
 export async function getFreshMarketIndexView(indexId: string) {
@@ -223,11 +263,13 @@ export async function getMarketIndexCandles(
 export async function getUsdKrwExchangeRateResult() {
   const view = await getCachedMarketIndexView("usd-krw");
 
-  return view?.quote ?? {
-    status: "error" as const,
-    errorCode: "MARKET_API_UNAVAILABLE",
-    message: "환율 정보를 불러오지 못했습니다.",
-  };
+  return (
+    view?.quote ?? {
+      status: "error" as const,
+      errorCode: "MARKET_API_UNAVAILABLE",
+      message: "환율 정보를 불러오지 못했습니다.",
+    }
+  );
 }
 
 export async function getFreshUsdKrwExchangeRateResult() {
@@ -253,10 +295,7 @@ export async function getUsdKrwExchangeRate() {
   const result = await getCachedUsdKrwExchangeRateResult();
 
   if (result.status === "error") {
-    throw new MarketApiError(
-      "MARKET_API_NETWORK",
-      result.message,
-    );
+    throw new MarketApiError("MARKET_API_NETWORK", result.message);
   }
 
   return result.data.currentValue;
