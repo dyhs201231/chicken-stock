@@ -1,7 +1,9 @@
 import type {
   MarketIndexCategory,
+  MarketIndexDetailData,
   MarketIndexSummaryData,
   MarketIndexTrend,
+  MarketIndexViewData,
 } from "../types/market-index";
 import { USD_KRW_EXCHANGE_RATE } from "./currency";
 
@@ -81,6 +83,59 @@ export function getMarketIndexCountryLabel(countryCode: string) {
   }
 
   return countryCode;
+}
+
+export function toMarketIndexChartData(
+  marketIndex: MarketIndexViewData,
+): MarketIndexDetailData | null {
+  if (marketIndex.chart.status === "error") {
+    return null;
+  }
+
+  const candles = marketIndex.chart.data;
+  const latest = candles.at(-1);
+
+  if (!latest) {
+    return null;
+  }
+
+  const previous = candles.at(-2);
+  const previousClose = previous?.close ?? latest.open;
+  const currentValue = latest.close;
+  const changeAmount = currentValue - previousClose;
+  const changeRate =
+    previousClose > 0 ? (changeAmount / previousClose) * 100 : 0;
+  const chartQuote = {
+    changeAmount,
+    changeRate,
+    currentValue,
+    previousClose,
+    trend: changeAmount > 0 ? "up" as const : changeAmount < 0 ? "down" as const : "flat" as const,
+    volume: latest.volume,
+  };
+  const quote =
+    marketIndex.quote.status === "error"
+      ? chartQuote
+      : marketIndex.quote.data;
+
+  return {
+    ...marketIndex,
+    candles,
+    changeAmount: quote.changeAmount,
+    changeRate: quote.changeRate,
+    currentValue: quote.currentValue,
+    dayHigh: latest.high,
+    dayLow: latest.low,
+    high52w: Math.max(...candles.map(({ high }) => high)),
+    isRealtime: marketIndex.chart.status === "success",
+    low52w: Math.min(...candles.map(({ low }) => low)),
+    openValue: latest.open,
+    previousClose: quote.previousClose,
+    provider: marketIndex.chart.provider,
+    trend: quote.trend,
+    updatedAt: marketIndex.chart.updatedAt,
+    volume: quote.volume,
+  };
 }
 
 export function getUsdKrwExchangeRateFromIndices(

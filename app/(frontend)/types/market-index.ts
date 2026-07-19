@@ -3,6 +3,26 @@ export type MarketIndexTrend = "up" | "down" | "flat";
 export type MarketIndexCurrencyCode = "KRW" | "USD";
 export type MarketIndexCandleInterval = "DAY" | "WEEK" | "MONTH";
 
+export type MarketDataResult<T> =
+  | {
+      status: "success";
+      data: T;
+      provider: string;
+      updatedAt: string;
+    }
+  | {
+      status: "fallback";
+      data: T;
+      provider: string;
+      reason: string;
+      updatedAt: string;
+    }
+  | {
+      status: "error";
+      errorCode: string;
+      message: string;
+    };
+
 export type MarketIndexCandleData = {
   time: string;
   open: number;
@@ -38,4 +58,25 @@ export type MarketIndexDetailData = MarketIndexSummaryData & {
   high52w: number;
   low52w: number;
   volume: number;
+};
+
+export type MarketIndexQuoteData = {
+  changeAmount: number;
+  changeRate: number;
+  currentValue: number;
+  previousClose: number;
+  trend: MarketIndexTrend;
+  volume: number;
+};
+
+export type MarketIndexViewData = {
+  category: MarketIndexCategory;
+  chart: MarketDataResult<MarketIndexCandleData[]>;
+  countryCode: string;
+  currencyCode: MarketIndexCurrencyCode;
+  id: string;
+  indexType: string;
+  name: string;
+  quote: MarketDataResult<MarketIndexQuoteData>;
+  ticker: string;
 };

@@ -15,6 +15,7 @@ export type CreatePortfolioRequest = {
 };
 
 export type ExchangePortfolioRequest = {
+  quoteToken: string;
   type: ExchangeType;
   value: number;
 };
@@ -69,10 +70,29 @@ export type Portfolio = {
   createdAt: string;
   domesticStockAmount: number;
   foreignStockAmount: number;
+  exchangeRate:
+    | {
+        data: number;
+        provider: string;
+        status: "success";
+        updatedAt: string;
+      }
+    | {
+        data: number;
+        provider: string;
+        reason: string;
+        status: "fallback";
+        updatedAt: string;
+      }
+    | {
+        errorCode: string;
+        message: string;
+        status: "error";
+      };
   id: string;
   items: PortfolioItem[];
   krwBalance: number;
-  totalAvailableOrderAmount: number;
+  totalAvailableOrderAmount: number | null;
   totalBalance: number;
   totalInvestmentAmount: number;
   transactions: PortfolioTransaction[];

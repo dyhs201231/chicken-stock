@@ -1,17 +1,27 @@
 import { useUsdKrwExchangeRateQuery } from "@/app/(frontend)/apis/market-indices/queries";
 import { Modal } from "@/app/(frontend)/components/ui";
 import { usePortfolioStore } from "@/app/(frontend)/stores/portfolio";
-import { USD_KRW_EXCHANGE_RATE } from "@/app/(frontend)/utils/currency";
 import { useState } from "react";
 import ExchangeForm from "./exchange-form";
 import ExchangeCheck from "./exchange-check";
+import { getExchangeViewState } from "./exchange-state";
 
 export default function CurrencyExchangeModal() {
   const { exchangeData, setExchangeData } = usePortfolioStore();
   const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState("form");
-  const { data: exchangeRateData } = useUsdKrwExchangeRateQuery(isOpen);
-  const exchangeRate = exchangeRateData?.currentValue ?? USD_KRW_EXCHANGE_RATE;
+  const {
+    data: exchangeRateQuote,
+    isError,
+    isFetching,
+    isPending,
+    refetch,
+  } = useUsdKrwExchangeRateQuery(isOpen);
+  const exchangeViewState = getExchangeViewState({
+    data: exchangeRateQuote,
+    isError,
+    isLoading: isPending || isFetching,
+  });
 
   const handleOpenChange = (nextOpen: boolean) => {
     setIsOpen(nextOpen);
@@ -33,14 +43,38 @@ export default function CurrencyExchangeModal() {
 
       <Modal.Overlay>
         <Modal.Content className="col min-h-[565px] w-full max-w-[650px] justify-between">
-          {step === "form" && (
-            <ExchangeForm exchangeRate={exchangeRate} setStep={setStep} />
+          {(isPending || isFetching) && (
+            <p className="m-auto text-center text-xl">최신 환율 확인 중...</p>
           )}
-          {step === "check" && (
+          {!isFetching && isError && (
+            <div className="col center m-auto gap-4 text-center">
+              <p className="text-xl">
+                최신 환율을 확인할 수 없어 지금은 환전할 수 없습니다.
+              </p>
+              <button
+                className="cursor-pointer underline"
+                onClick={() => refetch()}
+              >
+                다시 시도
+              </button>
+            </div>
+          )}
+          {exchangeViewState.canContinue && step === "form" && (
+            <ExchangeForm
+              exchangeRate={exchangeViewState.rate}
+              setStep={setStep}
+            />
+          )}
+          {exchangeViewState.canContinue && step === "check" && (
             <ExchangeCheck
-              exchangeRate={exchangeRate}
+              exchangeRate={exchangeViewState.rate}
+              quoteToken={exchangeViewState.token}
               setStep={setStep}
               onExchangeSuccess={() => handleOpenChange(false)}
+              onQuoteExpired={() => {
+                setStep("form");
+                void refetch();
+              }}
             />
           )}
         </Modal.Content>

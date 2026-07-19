@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import {
-  getCachedMarketIndexDetail,
-  getCachedMarketIndexSummaries,
+  getCachedMarketIndexView,
+  getCachedMarketIndexViews,
 } from "@/app/(backend)/lib/market-indices";
 import MarketIndexDetail from "../../../components/market-index-detail";
 
@@ -18,8 +18,8 @@ export default async function IndexDetailPage({
 }: IndexDetailPageProps) {
   const { indexId } = await params;
   const [marketIndex, marketIndexes] = await Promise.all([
-    getCachedMarketIndexDetail(indexId),
-    getCachedMarketIndexSummaries(),
+    getCachedMarketIndexView(indexId),
+    getCachedMarketIndexViews(),
   ]);
 
   if (!marketIndex) {

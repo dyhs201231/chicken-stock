@@ -3,14 +3,19 @@ import { Button } from "@/app/(frontend)/components/ui";
 import { usePortfolioStore } from "@/app/(frontend)/stores/portfolio";
 import React from "react";
 import { toast } from "sonner";
+import { isAxiosError } from "axios";
 
 export default function ExchangeCheck({
   exchangeRate,
   onExchangeSuccess,
+  onQuoteExpired,
+  quoteToken,
   setStep,
 }: {
   exchangeRate: number;
   onExchangeSuccess: () => void;
+  onQuoteExpired: () => void;
+  quoteToken: string;
   setStep: React.Dispatch<React.SetStateAction<string>>;
 }) {
   const { exchangeData, setExchangeData } = usePortfolioStore();
@@ -30,8 +35,18 @@ export default function ExchangeCheck({
   const targetText = `${targetAmount}${targetUnit}`;
 
   const handleExchange = () => {
-    exchangePortfolio(exchangeData, {
-      onError: () => {
+    exchangePortfolio({ ...exchangeData, quoteToken }, {
+      onError: (error) => {
+        if (
+          isAxiosError<{ code?: string }>(error) &&
+          (error.response?.data.code === "EXCHANGE_RATE_QUOTE_EXPIRED" ||
+            error.response?.data.code === "EXCHANGE_RATE_QUOTE_INVALID")
+        ) {
+          toast.error("환율이 갱신되었습니다. 금액을 다시 확인해주세요.");
+          onQuoteExpired();
+          return;
+        }
+
         toast.error("환전에 실패했습니다. 잔액을 확인해주세요.");
       },
       onSuccess: () => {

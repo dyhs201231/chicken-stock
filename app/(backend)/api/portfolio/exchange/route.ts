@@ -4,10 +4,9 @@ import {
   ACCESS_TOKEN_COOKIE_NAME,
   verifyAuthToken,
 } from "@/app/(backend)/lib/auth";
-import {
-  getTotalAvailableOrderAmountKrw,
-} from "@/app/(backend)/lib/portfolio-balance";
-import { getUsdKrwExchangeRate } from "@/app/(backend)/lib/market-indices";
+import { getTotalAvailableOrderAmountKrw } from "@/app/(backend)/lib/portfolio-balance";
+import { ExchangeRateQuoteError } from "@/app/(backend)/lib/exchange-rate-quote";
+import { runWithVerifiedExchangeRateQuote } from "@/app/(backend)/lib/portfolio-exchange-boundary";
 import { prisma } from "@/app/(backend)/lib/prisma";
 import { lockPortfolioRows } from "@/app/(backend)/lib/stock-order-matching";
 import { Prisma } from "@/app/(backend)/generated/prisma/client";
@@ -146,7 +145,12 @@ async function getExchangePayload(request: NextRequest) {
     return null;
   }
 
-  if (!isRecord(body) || !isExchangeType(body.type)) {
+  if (
+    !isRecord(body) ||
+    !isExchangeType(body.type) ||
+    typeof body.quoteToken !== "string" ||
+    body.quoteToken.length === 0
+  ) {
     return null;
   }
 
@@ -157,6 +161,7 @@ async function getExchangePayload(request: NextRequest) {
   }
 
   return {
+    quoteToken: body.quoteToken,
     type: body.type,
     value,
   };
@@ -188,8 +193,7 @@ function getExchangeCompanyName(type: ExchangeType) {
 
 function getPendingBuyOrderAmount(orders: PendingBuyOrderAmount[]) {
   return orders.reduce(
-    (sum, order) =>
-      sum.add(order.pricePerShare.mul(order.remainingQuantity)),
+    (sum, order) => sum.add(order.pricePerShare.mul(order.remainingQuantity)),
     new Prisma.Decimal(0),
   );
 }
@@ -227,147 +231,165 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const usdKrwExchangeRate = await getUsdKrwExchangeRate();
-  const exchangedValue = getExchangedValue(
-    payload.type,
-    payload.value,
-    usdKrwExchangeRate,
-  );
-
   try {
-    const portfolio = await runSerializablePortfolioTransaction(async (tx) => {
-      const currentPortfolio = await tx.portfolio.findUnique({
-        select: {
-          id: true,
-        },
-        where: {
-          userId,
-        },
-      });
+    const {
+      rate: usdKrwExchangeRate,
+      value: { exchangedValue, portfolio },
+    } = await runWithVerifiedExchangeRateQuote({
+      quoteToken: payload.quoteToken,
+      runTransaction: async (usdKrwExchangeRate) => {
+        const exchangedValue = getExchangedValue(
+          payload.type,
+          payload.value,
+          usdKrwExchangeRate,
+        );
+        const portfolio = await runSerializablePortfolioTransaction(
+          async (tx) => {
+            const currentPortfolio = await tx.portfolio.findUnique({
+              select: {
+                id: true,
+              },
+              where: {
+                userId,
+              },
+            });
 
-      if (!currentPortfolio) {
-        throw new PortfolioExchangeError("계좌가 없습니다.", 404);
-      }
+            if (!currentPortfolio) {
+              throw new PortfolioExchangeError("계좌가 없습니다.", 404);
+            }
 
-      await lockPortfolioRows(tx, [currentPortfolio.id]);
+            await lockPortfolioRows(tx, [currentPortfolio.id]);
 
-      const lockedPortfolio = await tx.portfolio.findUnique({
-        select: {
-          krwBalance: true,
-          usdBalance: true,
-        },
-        where: {
-          id: currentPortfolio.id,
-        },
-      });
+            const lockedPortfolio = await tx.portfolio.findUnique({
+              select: {
+                krwBalance: true,
+                usdBalance: true,
+              },
+              where: {
+                id: currentPortfolio.id,
+              },
+            });
 
-      if (!lockedPortfolio) {
-        throw new PortfolioExchangeError("계좌가 없습니다.", 404);
-      }
+            if (!lockedPortfolio) {
+              throw new PortfolioExchangeError("계좌가 없습니다.", 404);
+            }
 
-      const sourceCurrencyCode = getExchangeSourceCurrencyCode(payload.type);
-      const pendingBuyOrders = await tx.tradeOrder.findMany({
-        select: {
-          pricePerShare: true,
-          remainingQuantity: true,
-        },
-        where: {
-          currencyCode: sourceCurrencyCode,
-          portfolioId: currentPortfolio.id,
-          remainingQuantity: {
-            gt: 0,
+            const sourceCurrencyCode = getExchangeSourceCurrencyCode(
+              payload.type,
+            );
+            const pendingBuyOrders = await tx.tradeOrder.findMany({
+              select: {
+                pricePerShare: true,
+                remainingQuantity: true,
+              },
+              where: {
+                currencyCode: sourceCurrencyCode,
+                portfolioId: currentPortfolio.id,
+                remainingQuantity: {
+                  gt: 0,
+                },
+                status: TradeOrderStatus.PENDING,
+                type: TradeOrderType.BUY,
+              },
+            });
+            const availableExchangeAmount = getExchangeSourceBalance(
+              lockedPortfolio,
+              payload.type,
+            )
+              .sub(getPendingBuyOrderAmount(pendingBuyOrders))
+              .toDecimalPlaces(2);
+
+            if (payload.value.gt(availableExchangeAmount)) {
+              throw new PortfolioExchangeError(
+                "환전 가능 금액이 부족합니다.",
+                400,
+              );
+            }
+
+            const updateResult = await tx.portfolio.updateMany({
+              data:
+                payload.type === "krwToUsd"
+                  ? {
+                      krwBalance: {
+                        decrement: payload.value,
+                      },
+                      usdBalance: {
+                        increment: exchangedValue,
+                      },
+                    }
+                  : {
+                      krwBalance: {
+                        increment: exchangedValue,
+                      },
+                      usdBalance: {
+                        decrement: payload.value,
+                      },
+                    },
+              where:
+                payload.type === "krwToUsd"
+                  ? {
+                      id: currentPortfolio.id,
+                      krwBalance: {
+                        gte: payload.value,
+                      },
+                    }
+                  : {
+                      id: currentPortfolio.id,
+                      usdBalance: {
+                        gte: payload.value,
+                      },
+                    },
+            });
+
+            if (updateResult.count === 0) {
+              throw new PortfolioExchangeError(
+                "환전 가능 금액이 부족합니다.",
+                400,
+              );
+            }
+
+            const executedAt = new Date();
+
+            await tx.portfolioTransaction.create({
+              data: {
+                companyName: getExchangeCompanyName(payload.type),
+                exchangeRate: new Prisma.Decimal(usdKrwExchangeRate),
+                exchangeType: payload.type,
+                executedAt,
+                fee: new Prisma.Decimal(0),
+                id: createPortfolioTransactionId(),
+                paidAmount: payload.value,
+                portfolioId: currentPortfolio.id,
+                receivedAmount: exchangedValue,
+                totalAmount: payload.value,
+                totalQuantity: 0,
+                transactionType: TransactionType.EXCHANGE,
+                withdrawalAt: executedAt,
+              },
+            });
+
+            const updatedPortfolio = await tx.portfolio.findUnique({
+              select: {
+                id: true,
+                krwBalance: true,
+                totalBalance: true,
+                usdBalance: true,
+              },
+              where: {
+                id: currentPortfolio.id,
+              },
+            });
+
+            if (!updatedPortfolio) {
+              throw new PortfolioExchangeError("계좌가 없습니다.", 404);
+            }
+
+            return updatedPortfolio;
           },
-          status: TradeOrderStatus.PENDING,
-          type: TradeOrderType.BUY,
-        },
-      });
-      const availableExchangeAmount = getExchangeSourceBalance(
-        lockedPortfolio,
-        payload.type,
-      )
-        .sub(getPendingBuyOrderAmount(pendingBuyOrders))
-        .toDecimalPlaces(2);
+        );
 
-      if (payload.value.gt(availableExchangeAmount)) {
-        throw new PortfolioExchangeError("환전 가능 금액이 부족합니다.", 400);
-      }
-
-      const updateResult = await tx.portfolio.updateMany({
-        data:
-          payload.type === "krwToUsd"
-            ? {
-                krwBalance: {
-                  decrement: payload.value,
-                },
-                usdBalance: {
-                  increment: exchangedValue,
-                },
-              }
-            : {
-                krwBalance: {
-                  increment: exchangedValue,
-                },
-                usdBalance: {
-                  decrement: payload.value,
-                },
-              },
-        where:
-          payload.type === "krwToUsd"
-            ? {
-                id: currentPortfolio.id,
-                krwBalance: {
-                  gte: payload.value,
-                },
-              }
-            : {
-                id: currentPortfolio.id,
-                usdBalance: {
-                  gte: payload.value,
-                },
-              },
-      });
-
-      if (updateResult.count === 0) {
-        throw new PortfolioExchangeError("환전 가능 금액이 부족합니다.", 400);
-      }
-
-      const executedAt = new Date();
-
-      await tx.portfolioTransaction.create({
-        data: {
-          companyName: getExchangeCompanyName(payload.type),
-          exchangeRate: new Prisma.Decimal(usdKrwExchangeRate),
-          exchangeType: payload.type,
-          executedAt,
-          fee: new Prisma.Decimal(0),
-          id: createPortfolioTransactionId(),
-          paidAmount: payload.value,
-          portfolioId: currentPortfolio.id,
-          receivedAmount: exchangedValue,
-          totalAmount: payload.value,
-          totalQuantity: 0,
-          transactionType: TransactionType.EXCHANGE,
-          withdrawalAt: executedAt,
-        },
-      });
-
-      const updatedPortfolio = await tx.portfolio.findUnique({
-        select: {
-          id: true,
-          krwBalance: true,
-          totalBalance: true,
-          usdBalance: true,
-        },
-        where: {
-          id: currentPortfolio.id,
-        },
-      });
-
-      if (!updatedPortfolio) {
-        throw new PortfolioExchangeError("계좌가 없습니다.", 404);
-      }
-
-      return updatedPortfolio;
+        return { exchangedValue, portfolio };
+      },
     });
 
     return NextResponse.json({
@@ -391,6 +413,19 @@ export async function POST(request: NextRequest) {
       type: payload.type,
     });
   } catch (error) {
+    if (error instanceof ExchangeRateQuoteError) {
+      return NextResponse.json(
+        {
+          code: error.code,
+          message:
+            error.code === "EXCHANGE_RATE_QUOTE_EXPIRED"
+              ? "환율이 변경될 수 있어 최신 환율을 다시 확인해주세요."
+              : "유효한 환율 견적이 필요합니다.",
+        },
+        { status: 409 },
+      );
+    }
+
     if (error instanceof PortfolioExchangeError) {
       return NextResponse.json(
         { message: error.message },

@@ -1,19 +1,19 @@
 import { unstable_cache } from "next/cache";
-import { CurrencyCode } from "../generated/prisma/enums";
-import { prisma } from "./prisma";
 import {
-  collectTwelveDataMarketIndexBatch,
   collectTwelveDataMarketIndexCandles,
-  collectYahooMarketIndexBatch,
   collectYahooMarketIndexCandles,
-  FALLBACK_CANDLE_COUNT,
   getMarketIndexConfig,
-  getMarketIndexConfigByTicker,
   MARKET_INDEX_CONFIGS,
-  type CollectedMarketIndexCandles,
-  type MarketIndexConfig,
 } from "./market-data-collector";
-import { saveCollectedMarketIndexSnapshots } from "./market-price-snapshots";
+import {
+  createMarketIndexService,
+  enforceMarketIndexFallbackTtl,
+  getMarketIndexCacheRevalidateSeconds,
+} from "./market-index-resilience";
+import { getMarketApiConfig } from "./market-api/config";
+import { MarketApiError } from "./market-api/errors";
+import { createMarketFallbackRepository } from "./market-api/fallback-repository";
+import { prisma } from "./prisma";
 import {
   getCandlesByInterval,
   parseCandleInterval,
@@ -21,550 +21,284 @@ import {
   type StockCandleResponse,
 } from "./stock-candles";
 import type {
+  MarketDataResult,
   MarketIndexCandleData,
   MarketIndexDetailData,
-  MarketIndexCurrencyCode,
   MarketIndexSummaryData,
-  MarketIndexTrend,
+  MarketIndexViewData,
 } from "../../(frontend)/types/market-index";
 
-type DecimalLike = {
-  toNumber: () => number;
-};
-
 const MARKET_INDEX_REVALIDATE_SECONDS = 60 * 60;
-const USD_KRW_EXCHANGE_RATE_REVALIDATE_SECONDS = 60 * 10;
-
-function toNumber(value: DecimalLike) {
-  return value.toNumber();
-}
-
-function roundMarketValue(value: number) {
-  return Number(value.toFixed(2));
-}
-
-function getTrend(changeAmount: number): MarketIndexTrend {
-  if (changeAmount > 0) {
-    return "up";
-  }
-
-  if (changeAmount < 0) {
-    return "down";
-  }
-
-  return "flat";
-}
-
-function getChangeRate(currentValue: number, previousClose: number) {
-  if (!Number.isFinite(previousClose) || previousClose === 0) {
-    return 0;
-  }
-
-  return ((currentValue - previousClose) / previousClose) * 100;
-}
-
-function toMarketIndexDetailFromCandles(
-  config: MarketIndexConfig,
-  candles: MarketIndexCandleData[],
-  provider: string,
-): MarketIndexDetailData | null {
-  const latestCandle = candles.at(-1);
-  const previousCandle = candles.at(-2);
-
-  if (!latestCandle) {
-    return null;
-  }
-
-  const currentValue = latestCandle.close;
-  const previousClose = previousCandle?.close ?? latestCandle.open;
-  const changeAmount = roundMarketValue(currentValue - previousClose);
-
-  return {
-    id: config.id,
-    ticker: config.ticker,
-    name: config.name,
-    category: config.category,
-    indexType: config.indexType,
-    countryCode: config.countryCode,
-    currencyCode: config.currencyCode,
-    currentValue,
-    previousClose,
-    changeAmount,
-    changeRate: roundMarketValue(getChangeRate(currentValue, previousClose)),
-    trend: getTrend(changeAmount),
-    isRealtime: false,
-    provider,
-    updatedAt: new Date().toISOString(),
-    candles,
-    ...getDetailValuesFromCandles(candles, currentValue),
-  };
-}
-
-function toMarketIndexDetailFromCollection(
-  collection: CollectedMarketIndexCandles,
-) {
-  return toMarketIndexDetailFromCandles(
-    collection.config,
-    collection.candles,
-    collection.provider,
-  );
-}
-
-async function saveCollectedMarketIndexSnapshotsSafely(
-  collections: CollectedMarketIndexCandles[],
-) {
-  try {
-    await saveCollectedMarketIndexSnapshots(collections);
-  } catch (error) {
-    console.error("Saving market price snapshots failed", {
-      error,
-      tickers: collections.map((collection) => collection.config.ticker),
-    });
-  }
-}
-
-async function fetchTwelveDataMarketIndexDetails(): Promise<
-  MarketIndexDetailData[]
-> {
-  const collections = await collectTwelveDataMarketIndexBatch();
-  await saveCollectedMarketIndexSnapshotsSafely(collections);
-
-  return collections
-    .map(toMarketIndexDetailFromCollection)
-    .filter((detail): detail is MarketIndexDetailData => detail !== null);
-}
-
-async function fetchYahooMarketIndexDetails(): Promise<
-  MarketIndexDetailData[]
-> {
-  const collections = await collectYahooMarketIndexBatch();
-  await saveCollectedMarketIndexSnapshotsSafely(collections);
-
-  return collections
-    .map(toMarketIndexDetailFromCollection)
-    .filter((detail): detail is MarketIndexDetailData => detail !== null);
-}
-
-const getCachedTwelveDataMarketIndexDetails = unstable_cache(
-  fetchTwelveDataMarketIndexDetails,
-  ["twelve-data-market-index-details-v1"],
-  {
-    revalidate: MARKET_INDEX_REVALIDATE_SECONDS,
-  },
+const marketApiConfig = getMarketApiConfig();
+const USD_KRW_EXCHANGE_RATE_REVALIDATE_SECONDS =
+  getMarketIndexCacheRevalidateSeconds("usd-krw", marketApiConfig);
+const NON_EXCHANGE_MARKET_INDEX_CONFIGS = MARKET_INDEX_CONFIGS.filter(
+  ({ id }) => id !== "usd-krw",
 );
 
-const getCachedYahooMarketIndexDetails = unstable_cache(
-  fetchYahooMarketIndexDetails,
-  ["yahoo-market-index-details-v1"],
-  {
-    revalidate: MARKET_INDEX_REVALIDATE_SECONDS,
-  },
-);
+const repository = createMarketFallbackRepository(prisma);
 
-function getBusinessDateKeys(count: number) {
-  const date = new Date();
-  date.setUTCHours(0, 0, 0, 0);
+function createService(configs = MARKET_INDEX_CONFIGS) {
+  const config = getMarketApiConfig();
 
-  const dateKeys: string[] = [];
-
-  while (dateKeys.length < count) {
-    const day = date.getUTCDay();
-
-    if (day !== 0 && day !== 6) {
-      dateKeys.push(date.toISOString().slice(0, 10));
-    }
-
-    date.setUTCDate(date.getUTCDate() - 1);
-  }
-
-  return dateKeys.reverse();
-}
-
-function createFallbackCandles(config: MarketIndexConfig) {
-  const dateKeys = getBusinessDateKeys(FALLBACK_CANDLE_COUNT);
-  const startValue = config.low52w + (config.high52w - config.low52w) * 0.28;
-  const valueRange = config.high52w - config.low52w;
-
-  return dateKeys.map<MarketIndexCandleData>((time, index) => {
-    const progress = index / Math.max(dateKeys.length - 1, 1);
-    const trendValue =
-      startValue + (config.currentValue - startValue) * progress;
-    const wave =
-      Math.sin(index * 0.22 + config.waveSeed) * valueRange * 0.025 +
-      Math.cos(index * 0.09 + config.waveSeed) * valueRange * 0.015;
-    const close =
-      index === dateKeys.length - 1
-        ? config.currentValue
-        : index === dateKeys.length - 2
-          ? config.previousClose
-          : roundMarketValue(trendValue + wave);
-    const previousClose =
-      index === 0
-        ? close
-        : roundMarketValue(trendValue + Math.sin((index - 1) * 0.2) * 8);
-    const open =
-      index === dateKeys.length - 1
-        ? config.openValue
-        : roundMarketValue((previousClose + close) / 2);
-    const spread = Math.max(Math.abs(close - open), valueRange * 0.006);
-    const high =
-      index === dateKeys.length - 1
-        ? config.dayHigh
-        : roundMarketValue(Math.max(open, close) + spread * 0.55);
-    const low =
-      index === dateKeys.length - 1
-        ? config.dayLow
-        : roundMarketValue(Math.min(open, close) - spread * 0.55);
-    const volume =
-      config.volume > 0
-        ? Math.round(config.volume * (0.72 + (index % 9) * 0.045))
-        : 0;
-
-    return {
-      time,
-      open,
-      high,
-      low,
-      close,
-      volume,
-    };
+  return createMarketIndexService({
+    collectTwelveData: collectTwelveDataMarketIndexCandles,
+    collectYahoo: collectYahooMarketIndexCandles,
+    configs,
+    exchangeFallbackTtlMs: config.exchangeFallbackTtlMs,
+    fallbackTtlMs: config.fallbackTtlMs,
+    repository,
   });
 }
 
-function getCurrencyCode(value: CurrencyCode): MarketIndexCurrencyCode {
-  return value === CurrencyCode.USD ? "USD" : "KRW";
-}
-
-function getCandlesFromDb(
-  candles: {
-    timestamp: bigint;
-    openValue: DecimalLike;
-    highValue: DecimalLike;
-    lowValue: DecimalLike;
-    closeValue: DecimalLike;
-    volume: DecimalLike | null;
-  }[],
-) {
-  return candles
-    .map<MarketIndexCandleData>((candle) => ({
-      time: new Date(Number(candle.timestamp)).toISOString().slice(0, 10),
-      open: toNumber(candle.openValue),
-      high: toNumber(candle.highValue),
-      low: toNumber(candle.lowValue),
-      close: toNumber(candle.closeValue),
-      volume: candle.volume ? toNumber(candle.volume) : 0,
-    }))
-    .filter((candle) =>
-      [candle.open, candle.high, candle.low, candle.close, candle.volume].every(
-        Number.isFinite,
-      ),
-    )
-    .sort((a, b) => a.time.localeCompare(b.time));
-}
-
-function getDetailValuesFromCandles(
+function getDetailValues(
   candles: MarketIndexCandleData[],
   currentValue: number,
 ) {
-  const latestCandle = candles.at(-1);
-  const high52w = Math.max(...candles.map((candle) => candle.high));
-  const low52w = Math.min(...candles.map((candle) => candle.low));
+  const latest = candles.at(-1);
+  const high52w = Math.max(...candles.map(({ high }) => high));
+  const low52w = Math.min(...candles.map(({ low }) => low));
 
   return {
-    openValue: latestCandle?.open ?? currentValue,
-    dayHigh: latestCandle?.high ?? currentValue,
-    dayLow: latestCandle?.low ?? currentValue,
+    dayHigh: latest?.high ?? currentValue,
+    dayLow: latest?.low ?? currentValue,
     high52w: Number.isFinite(high52w) ? high52w : currentValue,
     low52w: Number.isFinite(low52w) ? low52w : currentValue,
-    volume: latestCandle?.volume ?? 0,
+    openValue: latest?.open ?? currentValue,
+  };
+}
+
+function toLegacyDetail(
+  view: MarketIndexViewData,
+): MarketIndexDetailData | null {
+  if (view.quote.status === "error" || view.chart.status === "error") {
+    return null;
+  }
+
+  const quote = view.quote.data;
+  const candles = view.chart.data;
+
+  return {
+    ...view,
+    candles,
+    changeAmount: quote.changeAmount,
+    changeRate: quote.changeRate,
+    currentValue: quote.currentValue,
+    isRealtime: view.quote.status === "success",
+    previousClose: quote.previousClose,
+    provider: view.quote.provider,
+    trend: quote.trend,
+    updatedAt: view.quote.updatedAt,
+    volume: quote.volume,
+    ...getDetailValues(candles, quote.currentValue),
+  };
+}
+
+function toSummary(detail: MarketIndexDetailData): MarketIndexSummaryData {
+  return {
+    candles: detail.candles.slice(-24),
+    category: detail.category,
+    changeAmount: detail.changeAmount,
+    changeRate: detail.changeRate,
+    countryCode: detail.countryCode,
+    currencyCode: detail.currencyCode,
+    currentValue: detail.currentValue,
+    id: detail.id,
+    indexType: detail.indexType,
+    isRealtime: detail.isRealtime,
+    name: detail.name,
+    previousClose: detail.previousClose,
+    provider: detail.provider,
+    ticker: detail.ticker,
+    trend: detail.trend,
+    updatedAt: detail.updatedAt,
   };
 }
 
 function toStockCandleResponse(
   candles: MarketIndexCandleData[],
 ): StockCandleResponse[] {
-  return candles.map((candle) => ({
-    time: candle.time,
-    open: candle.open,
-    high: candle.high,
-    low: candle.low,
-    close: candle.close,
-    volume: candle.volume,
-  }));
+  return candles.map((candle) => ({ ...candle }));
 }
 
-function getFallbackDetail(config: MarketIndexConfig): MarketIndexDetailData {
-  const changeAmount = roundMarketValue(
-    config.currentValue - config.previousClose,
-  );
-  const candles = createFallbackCandles(config);
+export async function getFreshMarketIndexViews() {
+  return createService().getViews();
+}
 
-  return {
-    id: config.id,
-    ticker: config.ticker,
-    name: config.name,
-    category: config.category,
-    indexType: config.indexType,
-    countryCode: config.countryCode,
-    currencyCode: config.currencyCode,
-    currentValue: config.currentValue,
-    previousClose: config.previousClose,
-    changeAmount,
-    changeRate: roundMarketValue(
-      getChangeRate(config.currentValue, config.previousClose),
+async function getFreshNonExchangeMarketIndexViews() {
+  return createService(NON_EXCHANGE_MARKET_INDEX_CONFIGS).getViews();
+}
+
+async function getFreshUsdKrwMarketIndexView() {
+  return getFreshMarketIndexView("usd-krw");
+}
+
+const getStoredCachedNonExchangeMarketIndexViews = unstable_cache(
+  getFreshNonExchangeMarketIndexViews,
+  ["non-exchange-market-index-views-v1"],
+  { revalidate: MARKET_INDEX_REVALIDATE_SECONDS },
+);
+
+const getStoredCachedUsdKrwMarketIndexView = unstable_cache(
+  getFreshUsdKrwMarketIndexView,
+  ["usd-krw-market-index-view-v1"],
+  { revalidate: USD_KRW_EXCHANGE_RATE_REVALIDATE_SECONDS },
+);
+
+export async function getCachedMarketIndexViews() {
+  const config = getMarketApiConfig();
+  const [nonExchangeViews, exchangeView] = await Promise.all([
+    getStoredCachedNonExchangeMarketIndexViews(),
+    getStoredCachedUsdKrwMarketIndexView(),
+  ]);
+  const viewsById = new Map(
+    [...nonExchangeViews, ...(exchangeView ? [exchangeView] : [])].map(
+      (view) => [view.id, view],
     ),
-    trend: getTrend(changeAmount),
-    isRealtime: config.isRealtime,
-    provider: config.provider,
-    updatedAt: new Date().toISOString(),
-    candles,
-    openValue: config.openValue,
-    dayHigh: config.dayHigh,
-    dayLow: config.dayLow,
-    high52w: config.high52w,
-    low52w: config.low52w,
-    volume: config.volume,
-  };
-}
+  );
 
-function toSummary(detail: MarketIndexDetailData): MarketIndexSummaryData {
-  return {
-    id: detail.id,
-    ticker: detail.ticker,
-    name: detail.name,
-    category: detail.category,
-    indexType: detail.indexType,
-    countryCode: detail.countryCode,
-    currencyCode: detail.currencyCode,
-    currentValue: detail.currentValue,
-    previousClose: detail.previousClose,
-    changeAmount: detail.changeAmount,
-    changeRate: detail.changeRate,
-    trend: detail.trend,
-    isRealtime: detail.isRealtime,
-    provider: detail.provider,
-    updatedAt: detail.updatedAt,
-    candles: detail.candles.slice(-24),
-  };
-}
+  return MARKET_INDEX_CONFIGS.flatMap(({ id }) => {
+    const view = viewsById.get(id);
 
-async function getMarketIndexDetailsFromDb() {
-  const tickers = MARKET_INDEX_CONFIGS.map((config) => config.ticker);
-  const marketIndexes = await prisma.marketIndex.findMany({
-    include: {
-      candles: {
-        orderBy: {
-          timestamp: "desc",
-        },
-        take: FALLBACK_CANDLE_COUNT,
-        where: {
-          intervalCode: "1D",
-        },
-      },
-    },
-    where: {
-      ticker: {
-        in: tickers,
-      },
-    },
-  });
-
-  return marketIndexes.map<MarketIndexDetailData>((marketIndex) => {
-    const config = getMarketIndexConfigByTicker(marketIndex.ticker);
-    const currentValue = toNumber(marketIndex.currentValue);
-    const previousClose = toNumber(marketIndex.previousClose);
-    const changeAmount = toNumber(marketIndex.changeAmount);
-    const candles = getCandlesFromDb(marketIndex.candles.reverse());
-    const detailValues =
-      candles.length > 0
-        ? getDetailValuesFromCandles(candles, currentValue)
-        : config
-          ? {
-              openValue: config.openValue,
-              dayHigh: config.dayHigh,
-              dayLow: config.dayLow,
-              high52w: config.high52w,
-              low52w: config.low52w,
-              volume: config.volume,
-            }
-          : {
-              openValue: currentValue,
-              dayHigh: currentValue,
-              dayLow: currentValue,
-              high52w: currentValue,
-              low52w: currentValue,
-              volume: 0,
-            };
-
-    return {
-      id: config?.id ?? marketIndex.ticker.toLowerCase(),
-      ticker: marketIndex.ticker,
-      name: marketIndex.name,
-      category: config?.category ?? "stockIndex",
-      indexType: marketIndex.indexType,
-      countryCode: marketIndex.countryCode,
-      currencyCode: getCurrencyCode(marketIndex.currencyCode),
-      currentValue,
-      previousClose,
-      changeAmount,
-      changeRate: toNumber(marketIndex.changeRate),
-      trend: getTrend(changeAmount),
-      isRealtime: marketIndex.isRealtime,
-      provider: marketIndex.provider,
-      updatedAt: marketIndex.updatedAt.toISOString(),
-      candles:
-        candles.length > 0
-          ? candles
-          : config
-            ? createFallbackCandles(config)
-            : [],
-      ...detailValues,
-    };
+    return view
+      ? [
+          enforceMarketIndexFallbackTtl(view, {
+            exchangeFallbackTtlMs: config.exchangeFallbackTtlMs,
+            fallbackTtlMs: config.fallbackTtlMs,
+          }),
+        ]
+      : [];
   });
 }
 
-async function mergeMarketIndexDetails(
-  externalDetails: MarketIndexDetailData[],
-) {
-  const dbDetails = await getMarketIndexDetailsFromDb();
-  const externalDetailsById = new Map(
-    externalDetails.map((detail) => [detail.id, detail]),
-  );
-  const detailsByTicker = new Map(
-    dbDetails.map((detail) => [detail.ticker, detail]),
-  );
+export async function getFreshMarketIndexView(indexId: string) {
+  const config = getMarketIndexConfig(indexId);
 
-  return MARKET_INDEX_CONFIGS.map(
-    (config) =>
-      externalDetailsById.get(config.id) ??
-      detailsByTicker.get(config.ticker) ??
-      getFallbackDetail(config),
-  );
+  return config ? createService([config]).getView(config.id) : null;
 }
 
-async function getMarketIndexDetails() {
-  const [twelveDataDetails, yahooDetails] = await Promise.all([
-    getCachedTwelveDataMarketIndexDetails(),
-    getCachedYahooMarketIndexDetails(),
-  ]);
+export async function getCachedMarketIndexView(indexId: string) {
+  const config = getMarketIndexConfig(indexId);
 
-  return mergeMarketIndexDetails([...yahooDetails, ...twelveDataDetails]);
-}
+  if (!config) {
+    return null;
+  }
 
-export async function getFreshMarketIndexDetails() {
-  const [twelveDataDetails, yahooDetails] = await Promise.all([
-    fetchTwelveDataMarketIndexDetails(),
-    fetchYahooMarketIndexDetails(),
-  ]);
-
-  return mergeMarketIndexDetails([...yahooDetails, ...twelveDataDetails]);
+  return (
+    (await getCachedMarketIndexViews()).find(({ id }) => id === config.id) ??
+    null
+  );
 }
 
 export async function getMarketIndexSummaries() {
-  return (await getMarketIndexDetails()).map(toSummary);
+  return (await getCachedMarketIndexViews())
+    .map(toLegacyDetail)
+    .filter((detail): detail is MarketIndexDetailData => detail !== null)
+    .map(toSummary);
 }
+
+export const getCachedMarketIndexSummaries = getMarketIndexSummaries;
 
 export async function getFreshMarketIndexSummaries() {
-  return (await getFreshMarketIndexDetails()).map(toSummary);
+  return (await getFreshMarketIndexViews())
+    .map(toLegacyDetail)
+    .filter((detail): detail is MarketIndexDetailData => detail !== null)
+    .map(toSummary);
 }
 
-export const getCachedMarketIndexSummaries = unstable_cache(
-  getMarketIndexSummaries,
-  ["market-index-summaries-v3"],
-  {
-    revalidate: MARKET_INDEX_REVALIDATE_SECONDS,
-  },
-);
+export async function getCachedMarketIndexDetail(indexId: string) {
+  const view = await getCachedMarketIndexView(indexId);
 
-export async function getMarketIndexDetail(indexId: string) {
-  const config = getMarketIndexConfig(indexId);
-
-  if (!config) {
-    return null;
-  }
-
-  const details = await getMarketIndexDetails();
-
-  return details.find((detail) => detail.id === config.id) ?? null;
+  return view ? toLegacyDetail(view) : null;
 }
 
 export async function getFreshMarketIndexDetail(indexId: string) {
-  const config = getMarketIndexConfig(indexId);
+  const view = await getFreshMarketIndexView(indexId);
 
-  if (!config) {
+  return view ? toLegacyDetail(view) : null;
+}
+
+export async function getFreshUsdKrwMarketIndexDetail() {
+  return getFreshMarketIndexDetail("usd-krw");
+}
+
+export const getCachedUsdKrwMarketIndexDetail = unstable_cache(
+  getFreshUsdKrwMarketIndexDetail,
+  ["usd-krw-market-index-detail-v2"],
+  { revalidate: USD_KRW_EXCHANGE_RATE_REVALIDATE_SECONDS },
+);
+
+export async function getMarketIndexCandleResult(
+  indexId: string,
+  interval: CandleInterval,
+): Promise<MarketDataResult<StockCandleResponse[]> | null> {
+  const view = await getCachedMarketIndexView(indexId);
+
+  if (!view) {
     return null;
   }
 
-  const details = await getFreshMarketIndexDetails();
+  if (view.chart.status === "error") {
+    return view.chart;
+  }
 
-  return details.find((detail) => detail.id === config.id) ?? null;
+  return {
+    ...view.chart,
+    data: getCandlesByInterval(
+      toStockCandleResponse(view.chart.data),
+      interval,
+    ),
+  };
 }
-
-export const getCachedMarketIndexDetail = unstable_cache(
-  getMarketIndexDetail,
-  ["market-index-detail-v3"],
-  {
-    revalidate: MARKET_INDEX_REVALIDATE_SECONDS,
-  },
-);
 
 export async function getMarketIndexCandles(
   indexId: string,
   interval: CandleInterval,
 ) {
-  const detail = await getCachedMarketIndexDetail(indexId);
+  const result = await getMarketIndexCandleResult(indexId, interval);
 
-  if (!detail) {
-    return null;
-  }
-
-  return getCandlesByInterval(toStockCandleResponse(detail.candles), interval);
+  return result && result.status !== "error" ? result.data : null;
 }
 
-export async function getFreshUsdKrwMarketIndexDetail() {
-  const config = getMarketIndexConfig("usd-krw");
-
-  if (!config) {
-    return getFallbackDetail(MARKET_INDEX_CONFIGS[4]);
-  }
-
-  const twelveDataCollection = await collectTwelveDataMarketIndexCandles(config);
-  await saveCollectedMarketIndexSnapshotsSafely(
-    twelveDataCollection ? [twelveDataCollection] : [],
-  );
-  const twelveDataDetail = twelveDataCollection
-    ? toMarketIndexDetailFromCollection(twelveDataCollection)
-    : null;
-
-  if (twelveDataDetail) {
-    return twelveDataDetail;
-  }
-
-  const yahooCollection = await collectYahooMarketIndexCandles(config);
-  await saveCollectedMarketIndexSnapshotsSafely(
-    yahooCollection ? [yahooCollection] : [],
-  );
-  const yahooDetail = yahooCollection
-    ? toMarketIndexDetailFromCollection(yahooCollection)
-    : null;
+export async function getUsdKrwExchangeRateResult() {
+  const view = await getCachedMarketIndexView("usd-krw");
 
   return (
-    yahooDetail ??
-    (await getCachedMarketIndexDetail("usd-krw")) ??
-    getFallbackDetail(config)
+    view?.quote ?? {
+      status: "error" as const,
+      errorCode: "MARKET_API_UNAVAILABLE",
+      message: "환율 정보를 불러오지 못했습니다.",
+    }
   );
 }
 
-export const getCachedUsdKrwMarketIndexDetail = unstable_cache(
-  getFreshUsdKrwMarketIndexDetail,
-  ["usd-krw-exchange-rate-v1"],
-  {
-    revalidate: USD_KRW_EXCHANGE_RATE_REVALIDATE_SECONDS,
-  },
-);
+export async function getFreshUsdKrwExchangeRateResult() {
+  const view = await getFreshMarketIndexView("usd-krw");
+
+  if (!view || view.quote.status !== "success") {
+    return {
+      status: "error" as const,
+      errorCode:
+        view?.quote.status === "error"
+          ? view.quote.errorCode
+          : "MARKET_API_FRESH_RATE_UNAVAILABLE",
+      message: "최신 환율 정보를 불러오지 못했습니다.",
+    };
+  }
+
+  return view.quote;
+}
+
+export const getCachedUsdKrwExchangeRateResult = getUsdKrwExchangeRateResult;
 
 export async function getUsdKrwExchangeRate() {
-  return (await getCachedUsdKrwMarketIndexDetail()).currentValue;
+  const result = await getCachedUsdKrwExchangeRateResult();
+
+  if (result.status === "error") {
+    throw new MarketApiError("MARKET_API_NETWORK", result.message);
+  }
+
+  return result.data.currentValue;
 }
 
 export { parseCandleInterval };

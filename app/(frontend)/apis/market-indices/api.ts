@@ -1,16 +1,18 @@
 import { requests } from "../request";
 import type {
-  MarketIndexCandleData,
   MarketIndexCandleInterval,
-  MarketIndexSummaryData,
-  MarketIndexDetailData,
+  MarketIndexViewData,
 } from "../../types/market-index";
+import {
+  toMarketIndexCandleResult,
+  type MarketIndexCandlePayload,
+} from "./chart-state";
 
 type MarketIndicesResponse =
   | {
       ok: true;
       data: {
-        indices: MarketIndexSummaryData[];
+        results: MarketIndexViewData[];
       };
     }
   | {
@@ -21,21 +23,25 @@ type MarketIndicesResponse =
 type MarketIndexCandlesResponse =
   | {
       ok: true;
-      data: {
-        interval: MarketIndexCandleInterval;
-        candles: MarketIndexCandleData[];
-      };
+      data: MarketIndexCandlePayload;
     }
   | {
       ok: false;
       error: string;
     };
 
+export type ExchangeRateQuote = {
+  expiresAt: string;
+  observedAt: string;
+  rate: number;
+  token: string;
+};
+
 type ExchangeRateResponse =
   | {
       ok: true;
       data: {
-        exchangeRate: MarketIndexDetailData;
+        exchangeRate: ExchangeRateQuote;
       };
     }
   | {
@@ -50,7 +56,7 @@ export async function fetchMarketIndices() {
     throw new Error(data.error);
   }
 
-  return data.data.indices;
+  return data.data.results;
 }
 
 export async function fetchMarketIndexCandles(
@@ -70,7 +76,7 @@ export async function fetchMarketIndexCandles(
     throw new Error(data.error);
   }
 
-  return data.data.candles;
+  return toMarketIndexCandleResult(data.data);
 }
 
 export async function fetchUsdKrwExchangeRate() {

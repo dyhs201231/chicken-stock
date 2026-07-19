@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { getCachedMarketIndexSummaries } from "../../(backend)/lib/market-indices";
+import { getCachedMarketIndexViews } from "../../(backend)/lib/market-indices";
 import {
   DEFAULT_STOCKS_PAGE,
   STOCKS_PAGE_SIZE,
@@ -57,7 +57,7 @@ const websiteJsonLd = {
 
 export default async function Home() {
   const [initialIndices, initialStocksPage] = await Promise.all([
-    getCachedMarketIndexSummaries(),
+    getCachedMarketIndexViews(),
     getCachedStocksPage({
       limit: STOCKS_PAGE_SIZE,
       market: "all",
