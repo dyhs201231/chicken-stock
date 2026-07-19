@@ -221,13 +221,11 @@ export default function StockDetail({ stock, activeTab }: StockDetailProps) {
               className="h-7 text-sm"
               value={selectedCurrencyCode.toLowerCase()}
               style="invertedPanel"
-              onValueChange={(value) => {
-                if (value === "usd") {
-                  setSelectedCurrencyCode("USD");
-                } else if (value === "krw") {
-                  setSelectedCurrencyCode("KRW");
-                }
-              }}
+              onValueChange={(value) =>
+                setSelectedCurrencyCode(
+                  value.toUpperCase() as StockCurrencyCode,
+                )
+              }
             >
               <SegmentedControl.Item className="h-6 min-w-8 px-2" value="usd">
                 달러
