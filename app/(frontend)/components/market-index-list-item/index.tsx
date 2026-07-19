@@ -1,8 +1,9 @@
 import Link from "next/link";
 import type {
   MarketIndexCandleData,
-  MarketIndexSummaryData,
+  MarketIndexViewData,
 } from "../../types/market-index";
+import MarketDataStatus from "../market-data-status";
 import {
   formatMarketIndexChange,
   formatMarketIndexPercent,
@@ -15,7 +16,7 @@ type MarketIndexListItemSize = "default" | "compact";
 
 type MarketIndexListItemProps = {
   isActive?: boolean;
-  marketIndex: MarketIndexSummaryData;
+  marketIndex: MarketIndexViewData;
   size?: MarketIndexListItemSize;
 };
 
@@ -50,17 +51,21 @@ function getSparklinePoints(candles: MarketIndexCandleData[]) {
 }
 
 function MarketIndexSparkline({
+  candles,
   marketIndex,
   size,
 }: {
-  marketIndex: MarketIndexSummaryData;
+  candles: MarketIndexCandleData[];
+  marketIndex: MarketIndexViewData;
   size: MarketIndexListItemSize;
 }) {
-  const chartPoints = getSparklinePoints(marketIndex.candles);
+  const chartPoints = getSparklinePoints(candles);
   const chartAreaPoints = chartPoints
     ? `${chartPoints} ${SPARKLINE_WIDTH},${SPARKLINE_HEIGHT} 0,${SPARKLINE_HEIGHT}`
     : "";
-  const strokeColor = getMarketIndexTrendStrokeColor(marketIndex.trend);
+  const trend =
+    marketIndex.quote.status === "error" ? "flat" : marketIndex.quote.data.trend;
+  const strokeColor = getMarketIndexTrendStrokeColor(trend);
 
   return (
     <div
@@ -101,7 +106,12 @@ export default function MarketIndexListItem({
   marketIndex,
   size = "default",
 }: MarketIndexListItemProps) {
-  const trendTextColor = getMarketIndexTrendTextColor(marketIndex.trend);
+  const quote = marketIndex.quote;
+  const candles =
+    marketIndex.chart.status === "error" ? [] : marketIndex.chart.data;
+  const trendTextColor = getMarketIndexTrendTextColor(
+    quote.status === "error" ? "flat" : quote.data.trend,
+  );
   const titleClassName =
     size === "compact"
       ? "truncate text-xs leading-4 tracking-normal text-zinc-950"
@@ -119,18 +129,38 @@ export default function MarketIndexListItem({
         size === "compact" ? "gap-2 px-2 py-1.5" : "gap-3 px-1 py-1"
       } ${isActive ? "bg-zinc-100" : "hover:bg-zinc-50"}`}
     >
-      <MarketIndexSparkline marketIndex={marketIndex} size={size} />
+      <MarketIndexSparkline
+        candles={candles}
+        marketIndex={marketIndex}
+        size={size}
+      />
 
       <div className="min-w-0 flex-1">
         <h3 className={titleClassName}>{marketIndex.name}</h3>
 
-        <p className={valueClassName}>
-          {formatMarketIndexValue(marketIndex.currentValue)}
-          <span className={`ml-2 ${trendTextColor}`}>
-            {formatMarketIndexChange(marketIndex.changeAmount)}(
-            {formatMarketIndexPercent(marketIndex.changeRate)})
-          </span>
-        </p>
+        {quote.status === "error" ? (
+          <p className={`${valueClassName} text-zinc-500`}>
+            정보를 불러오지 못했습니다.
+          </p>
+        ) : (
+          <>
+            <p className={valueClassName}>
+              {formatMarketIndexValue(quote.data.currentValue)}
+              <span className={`ml-2 ${trendTextColor}`}>
+                {formatMarketIndexChange(quote.data.changeAmount)}(
+                {formatMarketIndexPercent(quote.data.changeRate)})
+              </span>
+            </p>
+            {size === "default" && quote.status === "fallback" && (
+              <MarketDataStatus result={quote} />
+            )}
+            {size === "default" &&
+              quote.status === "success" &&
+              marketIndex.chart.status !== "success" && (
+                <MarketDataStatus result={marketIndex.chart} />
+              )}
+          </>
+        )}
       </div>
     </Link>
   );

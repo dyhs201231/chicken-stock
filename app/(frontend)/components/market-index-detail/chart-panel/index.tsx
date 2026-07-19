@@ -1,6 +1,11 @@
 "use client";
 
-import type { MarketIndexDetailData } from "../../../types/market-index";
+import type {
+  MarketDataResult,
+  MarketIndexCandleData,
+  MarketIndexDetailData,
+} from "../../../types/market-index";
+import MarketDataStatus from "../../market-data-status";
 import { ChartOverlayLabels } from "../../stock-detail/order/chart-panel/chart-overlay-labels";
 import { RangeToolbar } from "../../stock-detail/order/chart-panel/range-toolbar";
 import type { ChartCandleData } from "../../stock-detail/order/chart-panel/types";
@@ -8,6 +13,7 @@ import { MarketIndexOhlcSummary } from "./ohlc-summary";
 import { useMarketIndexChartPanel } from "./use-market-index-chart-panel";
 
 type MarketIndexChartPanelProps = {
+  initialChartResult: MarketDataResult<MarketIndexCandleData[]>;
   marketIndex: MarketIndexDetailData;
 };
 
@@ -143,12 +149,14 @@ function StaticMarketIndexChartPreview({
 }
 
 export default function MarketIndexChartPanel({
+  initialChartResult,
   marketIndex,
 }: MarketIndexChartPanelProps) {
   const {
     axisTickLabels,
     chartContainerRef,
     chartCandles,
+    chartResult,
     crosshairDateLabel,
     crosshairPriceLabel,
     currentPriceLabel,
@@ -160,10 +168,19 @@ export default function MarketIndexChartPanel({
     ohlcItems,
     priceAxisTickLabels,
     selectedRange,
-  } = useMarketIndexChartPanel({ marketIndex });
+  } = useMarketIndexChartPanel({ initialChartResult, marketIndex });
+
+  if (chartResult.status === "error") {
+    return (
+      <section className="flex h-130 min-w-0 items-center justify-center rounded-3xl bg-white px-7 py-6 shadow-[0_10px_18px_rgba(0,0,0,0.22)]">
+        <MarketDataStatus result={chartResult} />
+      </section>
+    );
+  }
 
   return (
     <section className="flex h-130 min-w-0 flex-col rounded-3xl bg-white px-7 py-6 shadow-[0_10px_18px_rgba(0,0,0,0.22)]">
+      <MarketDataStatus result={chartResult} />
       <RangeToolbar
         selectedRange={selectedRange}
         onRangeChange={handleRangeChange}

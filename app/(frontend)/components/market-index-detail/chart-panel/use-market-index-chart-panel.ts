@@ -4,10 +4,13 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { CandlestickSeries, createChart } from "lightweight-charts";
 import type { IRange, Time } from "lightweight-charts";
 import { useMarketIndexCandlesQuery } from "../../../apis/market-indices/queries";
+import { resolveMarketIndexChartResult } from "../../../apis/market-indices/chart-state";
 import { useIsHydrated } from "../../../hooks/use-is-hydrated";
 import type {
   MarketIndexCandleInterval,
+  MarketIndexCandleData,
   MarketIndexDetailData,
+  MarketDataResult,
 } from "../../../types/market-index";
 import {
   getCandlestickSeriesOptions,
@@ -29,6 +32,7 @@ import { createMarketIndexCrosshairMoveHandler } from "./market-index-chart-cros
 import { createMarketIndexChartOverlayUpdaters } from "./market-index-chart-overlay-updaters";
 
 type UseMarketIndexChartPanelParams = {
+  initialChartResult: MarketDataResult<MarketIndexCandleData[]>;
   marketIndex: MarketIndexDetailData;
 };
 
@@ -120,6 +124,7 @@ function getSelectedInterval(
 }
 
 export function useMarketIndexChartPanel({
+  initialChartResult,
   marketIndex,
 }: UseMarketIndexChartPanelParams) {
   const isHydrated = useIsHydrated();
@@ -153,16 +158,30 @@ export function useMarketIndexChartPanel({
     () => getInitialChartCandles(marketIndex, selectedInterval),
     [marketIndex, selectedInterval],
   );
-  const { data } = useMarketIndexCandlesQuery(
+  const initialQueryResult = useMemo(
+    () =>
+      initialChartResult.status === "error"
+        ? initialChartResult
+        : { ...initialChartResult, data: initialChartCandles },
+    [initialChartCandles, initialChartResult],
+  );
+  const { data, isError } = useMarketIndexCandlesQuery(
     marketIndex.id,
     selectedInterval,
-    initialChartCandles,
-    {
-      hydrateInitialData: marketIndex.provider !== "local-fallback",
-    },
+    initialQueryResult,
   );
-  const chartCandles =
-    isHydrated && data !== undefined ? data : initialChartCandles;
+  const chartResult = useMemo(
+    () =>
+      resolveMarketIndexChartResult(
+        isHydrated ? data : initialQueryResult,
+        isError,
+      ),
+    [data, initialQueryResult, isError, isHydrated],
+  );
+  const chartCandles = useMemo(
+    () => (chartResult.status === "error" ? [] : chartResult.data),
+    [chartResult],
+  );
   const latestCandle = chartCandles.at(-1);
   const displayCandle = hoveredCandle ?? latestCandle;
   const displayCandleBasePrice = useMemo(() => {
@@ -321,6 +340,7 @@ export function useMarketIndexChartPanel({
     };
   }, [
     chartCandles,
+    chartResult,
     isHydrated,
     marketIndex,
     marketIndex.currencyCode,
@@ -333,6 +353,7 @@ export function useMarketIndexChartPanel({
     axisTickLabels,
     chartContainerRef,
     chartCandles,
+    chartResult,
     crosshairDateLabel,
     crosshairPriceLabel,
     currentPriceLabel,

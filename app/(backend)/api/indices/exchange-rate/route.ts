@@ -1,16 +1,50 @@
-import { NextResponse } from "next/server";
-import { getCachedUsdKrwMarketIndexDetail } from "../../../lib/market-indices";
+import { NextRequest, NextResponse } from "next/server";
+import { createExchangeRateQuote } from "../../../lib/exchange-rate-quote";
+import {
+  getCachedUsdKrwExchangeRateResult,
+  getFreshUsdKrwExchangeRateResult,
+} from "../../../lib/market-indices";
 
-export async function GET() {
+export const dynamic = "force-dynamic";
+
+export async function GET(request: NextRequest) {
   try {
-    const exchangeRate = await getCachedUsdKrwMarketIndexDetail();
+    if (request.nextUrl.searchParams.get("purpose") === "display") {
+      const exchangeRate = await getCachedUsdKrwExchangeRateResult();
 
-    return NextResponse.json({
-      ok: true,
-      data: {
-        exchangeRate,
-      },
+      return NextResponse.json(
+        { ok: true, data: { exchangeRate } },
+        { headers: { "Cache-Control": "no-store" } },
+      );
+    }
+
+    const result = await getFreshUsdKrwExchangeRateResult();
+
+    if (result.status !== "success") {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: result.errorCode,
+          message: "최신 환율을 확인할 수 없어 환전을 진행할 수 없습니다.",
+        },
+        { status: 503 },
+      );
+    }
+
+    const exchangeRate = createExchangeRateQuote({
+      observedAt: new Date(result.updatedAt),
+      rate: result.data.currentValue,
     });
+
+    return NextResponse.json(
+      {
+        ok: true,
+        data: {
+          exchangeRate,
+        },
+      },
+      { headers: { "Cache-Control": "no-store" } },
+    );
   } catch (error) {
     const message =
       process.env.NODE_ENV === "production"

@@ -1,4 +1,5 @@
-import type { MarketIndexDetailData } from "../../../types/market-index";
+import type { MarketIndexViewData } from "../../../types/market-index";
+import MarketDataStatus from "../../market-data-status";
 import {
   formatMarketIndexChange,
   formatMarketIndexPercent,
@@ -9,7 +10,7 @@ import {
 } from "../../../utils/market-index";
 
 type MarketIndexHeaderProps = {
-  marketIndex: MarketIndexDetailData;
+  marketIndex: MarketIndexViewData;
 };
 
 type StatItemProps = {
@@ -29,53 +30,68 @@ function StatItem({ label, value }: StatItemProps) {
 export default function MarketIndexHeader({
   marketIndex,
 }: MarketIndexHeaderProps) {
-  const trendTextColor = getMarketIndexTrendTextColor(marketIndex.trend);
-  const realtimeText = marketIndex.isRealtime ? "실시간" : "지연";
+  const quote = marketIndex.quote;
+  const candles = marketIndex.chart.status === "error" ? [] : marketIndex.chart.data;
+  const latest = candles.at(-1);
+  const high52w = candles.length > 0 ? Math.max(...candles.map(({ high }) => high)) : null;
+  const low52w = candles.length > 0 ? Math.min(...candles.map(({ low }) => low)) : null;
+  const trendTextColor = getMarketIndexTrendTextColor(
+    quote.status === "error" ? "flat" : quote.data.trend,
+  );
+  const realtimeText = quote.status === "success" ? "최신" : "최근 저장";
   const countryText = getMarketIndexCountryLabel(marketIndex.countryCode);
 
   return (
     <header className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
       <div className="min-w-0">
         <h1 className="text-2xl leading-8 tracking-normal text-zinc-950">
-          {marketIndex.name} {formatMarketIndexValue(marketIndex.currentValue)}
+          {marketIndex.name}{" "}
+          {quote.status === "error"
+            ? "정보를 불러오지 못했습니다."
+            : formatMarketIndexValue(quote.data.currentValue)}
         </h1>
 
-        <p className="mt-3 text-base leading-5 text-zinc-950">
+        {quote.status !== "error" && <p className="mt-3 text-base leading-5 text-zinc-950">
           전일 대비{" "}
           <span className={trendTextColor}>
-            {formatMarketIndexChange(marketIndex.changeAmount)}(
-            {formatMarketIndexPercent(marketIndex.changeRate)})
+            {formatMarketIndexChange(quote.data.changeAmount)}(
+            {formatMarketIndexPercent(quote.data.changeRate)})
           </span>
           <span className="ml-3 text-zinc-500">
             {realtimeText} | {countryText}
           </span>
-        </p>
+        </p>}
+        <MarketDataStatus result={quote} />
       </div>
 
       <dl className="grid grid-cols-3 gap-x-8 gap-y-5 md:grid-cols-6">
         <StatItem
           label="거래량"
-          value={formatMarketIndexVolume(marketIndex.volume)}
+          value={
+            quote.status === "error"
+              ? "-"
+              : formatMarketIndexVolume(quote.data.volume)
+          }
         />
         <StatItem
           label="시작"
-          value={formatMarketIndexValue(marketIndex.openValue)}
+          value={latest ? formatMarketIndexValue(latest.open) : "-"}
         />
         <StatItem
           label="1일 최고"
-          value={formatMarketIndexValue(marketIndex.dayHigh)}
+          value={latest ? formatMarketIndexValue(latest.high) : "-"}
         />
         <StatItem
           label="1일 최저"
-          value={formatMarketIndexValue(marketIndex.dayLow)}
+          value={latest ? formatMarketIndexValue(latest.low) : "-"}
         />
         <StatItem
           label="52주 최고"
-          value={formatMarketIndexValue(marketIndex.high52w)}
+          value={high52w === null ? "-" : formatMarketIndexValue(high52w)}
         />
         <StatItem
           label="52주 최저"
-          value={formatMarketIndexValue(marketIndex.low52w)}
+          value={low52w === null ? "-" : formatMarketIndexValue(low52w)}
         />
       </dl>
     </header>

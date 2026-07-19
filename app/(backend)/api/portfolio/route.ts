@@ -4,7 +4,8 @@ import {
   ACCESS_TOKEN_COOKIE_NAME,
   verifyAuthToken,
 } from "@/app/(backend)/lib/auth";
-import { getUsdKrwExchangeRate } from "@/app/(backend)/lib/market-indices";
+import { getCachedUsdKrwExchangeRateResult } from "@/app/(backend)/lib/market-indices";
+import { resolvePortfolioExchangeRate } from "@/app/(backend)/lib/portfolio-market-isolation";
 import { prisma } from "@/app/(backend)/lib/prisma";
 import { getTotalAvailableOrderAmountKrw } from "@/app/(backend)/lib/portfolio-balance";
 import { Prisma } from "@/app/(backend)/generated/prisma/client";
@@ -228,12 +229,21 @@ export async function GET(request: NextRequest) {
   }
 
   const investmentAmounts = getPortfolioInvestmentAmounts(portfolio.items);
-  const usdKrwExchangeRate = await getUsdKrwExchangeRate();
+  const exchangeRateResult = await getCachedUsdKrwExchangeRateResult().catch(
+    () => ({
+      status: "error" as const,
+      errorCode: "MARKET_API_UNAVAILABLE",
+      message: "환율 정보를 불러오지 못했습니다.",
+    }),
+  );
+  const { exchangeRate, rate: usdKrwExchangeRate } =
+    resolvePortfolioExchangeRate(exchangeRateResult);
 
   return NextResponse.json({
     accountNumber: portfolio.accountNumber,
     createdAt: serializeDate(portfolio.createdAt),
     domesticStockAmount: investmentAmounts.domesticStockAmount,
+    exchangeRate,
     foreignStockAmount: investmentAmounts.foreignStockAmount,
     id: portfolio.id.toString(),
     items: portfolio.items.map((item) => ({
@@ -254,13 +264,16 @@ export async function GET(request: NextRequest) {
       updatedAt: serializeDate(item.updatedAt),
     })),
     krwBalance: serializeDecimalNumber(portfolio.krwBalance),
-    totalAvailableOrderAmount: serializeDecimalNumber(
-      getTotalAvailableOrderAmountKrw(
-        portfolio.krwBalance,
-        portfolio.usdBalance,
-        usdKrwExchangeRate,
-      ),
-    ),
+    totalAvailableOrderAmount:
+      usdKrwExchangeRate === null
+        ? null
+        : serializeDecimalNumber(
+            getTotalAvailableOrderAmountKrw(
+              portfolio.krwBalance,
+              portfolio.usdBalance,
+              usdKrwExchangeRate,
+            ),
+          ),
     totalBalance: serializeDecimalNumber(portfolio.totalBalance),
     totalInvestmentAmount: investmentAmounts.totalInvestmentAmount,
     transactions: portfolio.transactions.map((transaction) => ({

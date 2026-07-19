@@ -2,11 +2,11 @@
 
 import { useMarketIndicesQuery } from "../../../apis/market-indices/queries";
 import { useIsHydrated } from "../../../hooks/use-is-hydrated";
-import type { MarketIndexSummaryData } from "../../../types/market-index";
+import type { MarketIndexViewData } from "../../../types/market-index";
 import MarketIndex from "./market_index";
 
 type IndexListProps = {
-  initialIndices?: MarketIndexSummaryData[];
+  initialIndices?: MarketIndexViewData[];
 };
 
 function IndexListFallback() {

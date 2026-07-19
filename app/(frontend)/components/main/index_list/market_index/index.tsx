@@ -1,8 +1,8 @@
 import MarketIndexListItem from "../../../market-index-list-item";
-import type { MarketIndexSummaryData } from "../../../../types/market-index";
+import type { MarketIndexViewData } from "../../../../types/market-index";
 
 type MarketIndexProps = {
-  marketIndex: MarketIndexSummaryData;
+  marketIndex: MarketIndexViewData;
 };
 
 export default function MarketIndex({ marketIndex }: MarketIndexProps) {

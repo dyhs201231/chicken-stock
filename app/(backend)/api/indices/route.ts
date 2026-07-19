@@ -1,16 +1,20 @@
 import { NextResponse } from "next/server";
-import { getCachedMarketIndexSummaries } from "../../lib/market-indices";
+import {
+  getCachedMarketIndexSummaries,
+  getCachedMarketIndexViews,
+} from "../../lib/market-indices";
+import { toMarketIndexListRouteResponse } from "./market-index-route-state";
 
 export async function GET() {
   try {
-    const indices = await getCachedMarketIndexSummaries();
+    const [indices, results] = await Promise.all([
+      getCachedMarketIndexSummaries(),
+      getCachedMarketIndexViews(),
+    ]);
 
-    return NextResponse.json({
-      ok: true,
-      data: {
-        indices,
-      },
-    });
+    const response = toMarketIndexListRouteResponse(indices, results);
+
+    return NextResponse.json(response.body, { status: response.status });
   } catch (error) {
     const message =
       process.env.NODE_ENV === "production"

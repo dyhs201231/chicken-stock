@@ -3,6 +3,13 @@ import type {
   MarketIndexCategory,
   MarketIndexCurrencyCode,
 } from "../../(frontend)/types/market-index";
+import { getMarketApiConfig } from "./market-api/config.ts";
+import { createFaultAwareFetch } from "./market-api/fault-adapter.ts";
+import { requestMarketJson } from "./market-api/request.ts";
+import {
+  parseTwelveDataCandles,
+  parseYahooChartCandles,
+} from "./market-api/schemas.ts";
 
 export type MarketIndexConfig = {
   id: string;
@@ -33,7 +40,15 @@ export type MarketDataProvider = "twelvedata" | "yahoo";
 export type CollectedMarketIndexCandles = {
   config: MarketIndexConfig;
   candles: MarketIndexCandleData[];
+  observedAt: string;
   provider: MarketDataProvider;
+};
+
+type CollectorDependencies = {
+  env?: Record<string, string | undefined>;
+  fetchImpl?: typeof fetch;
+  now?: () => Date;
+  requestJson?: (url: string | URL, headers?: HeadersInit) => Promise<unknown>;
 };
 
 export const FALLBACK_CANDLE_COUNT = 260;
@@ -167,67 +182,6 @@ const MARKET_INDEX_LOOKUP = new Map(
   ]),
 );
 
-type TwelveDataTimeSeriesValue = {
-  close?: string;
-  datetime?: string;
-  high?: string;
-  low?: string;
-  open?: string;
-  volume?: string;
-};
-
-type TwelveDataTimeSeriesSuccess = {
-  meta?: {
-    symbol?: string;
-  };
-  status?: "ok";
-  values?: TwelveDataTimeSeriesValue[];
-};
-
-type TwelveDataTimeSeriesError = {
-  code?: number;
-  message?: string;
-  status?: "error";
-};
-
-type TwelveDataTimeSeriesResponse =
-  | TwelveDataTimeSeriesSuccess
-  | TwelveDataTimeSeriesError;
-type TwelveDataBatchTimeSeriesResponse = Record<
-  string,
-  TwelveDataTimeSeriesResponse
->;
-
-type YahooChartQuote = {
-  close?: Array<number | null>;
-  high?: Array<number | null>;
-  low?: Array<number | null>;
-  open?: Array<number | null>;
-  volume?: Array<number | null>;
-};
-
-type YahooChartResult = {
-  indicators?: {
-    quote?: YahooChartQuote[];
-  };
-  meta?: {
-    chartPreviousClose?: number;
-    currency?: string;
-    regularMarketPrice?: number;
-  };
-  timestamp?: number[];
-};
-
-type YahooChartResponse = {
-  chart?: {
-    error?: {
-      code?: string;
-      description?: string;
-    } | null;
-    result?: YahooChartResult[];
-  };
-};
-
 export function getMarketIndexConfig(indexId: string) {
   return MARKET_INDEX_LOOKUP.get(indexId.toLowerCase()) ?? null;
 }
@@ -254,62 +208,6 @@ function getYahooSymbol(config: MarketIndexConfig) {
   return config.yahooSymbol ?? null;
 }
 
-function parseFiniteNumber(value: string | number | undefined) {
-  const numberValue = Number(value);
-
-  return Number.isFinite(numberValue) ? numberValue : null;
-}
-
-function parseTwelveDataCandle(value: TwelveDataTimeSeriesValue) {
-  const open = parseFiniteNumber(value.open);
-  const high = parseFiniteNumber(value.high);
-  const low = parseFiniteNumber(value.low);
-  const close = parseFiniteNumber(value.close);
-
-  if (
-    !value.datetime ||
-    open === null ||
-    high === null ||
-    low === null ||
-    close === null
-  ) {
-    return null;
-  }
-
-  return {
-    time: value.datetime.slice(0, 10),
-    open,
-    high,
-    low,
-    close,
-    volume: parseFiniteNumber(value.volume) ?? 0,
-  } satisfies MarketIndexCandleData;
-}
-
-function parseYahooChartCandle(
-  timestamp: number,
-  quote: YahooChartQuote,
-  index: number,
-) {
-  const open = parseFiniteNumber(quote.open?.[index] ?? undefined);
-  const high = parseFiniteNumber(quote.high?.[index] ?? undefined);
-  const low = parseFiniteNumber(quote.low?.[index] ?? undefined);
-  const close = parseFiniteNumber(quote.close?.[index] ?? undefined);
-
-  if (open === null || high === null || low === null || close === null) {
-    return null;
-  }
-
-  return {
-    time: new Date(timestamp * 1000).toISOString().slice(0, 10),
-    open,
-    high,
-    low,
-    close,
-    volume: parseFiniteNumber(quote.volume?.[index] ?? undefined) ?? 0,
-  } satisfies MarketIndexCandleData;
-}
-
 function toTwelveDataTimeSeriesUrl(config: MarketIndexConfig) {
   const apiKey = getTwelveDataApiKey();
 
@@ -319,23 +217,6 @@ function toTwelveDataTimeSeriesUrl(config: MarketIndexConfig) {
 
   const url = new URL(`${TWELVE_DATA_API_BASE_URL}/time_series`);
   url.searchParams.set("symbol", getTwelveDataSymbol(config));
-  url.searchParams.set("interval", "1day");
-  url.searchParams.set("outputsize", String(FALLBACK_CANDLE_COUNT));
-  url.searchParams.set("order", "ASC");
-  url.searchParams.set("apikey", apiKey);
-
-  return url;
-}
-
-function toTwelveDataBatchTimeSeriesUrl(configs: MarketIndexConfig[]) {
-  const apiKey = getTwelveDataApiKey();
-
-  if (!apiKey) {
-    return null;
-  }
-
-  const url = new URL(`${TWELVE_DATA_API_BASE_URL}/time_series`);
-  url.searchParams.set("symbol", configs.map(getTwelveDataSymbol).join(","));
   url.searchParams.set("interval", "1day");
   url.searchParams.set("outputsize", String(FALLBACK_CANDLE_COUNT));
   url.searchParams.set("order", "ASC");
@@ -360,47 +241,29 @@ function toYahooChartUrl(config: MarketIndexConfig) {
   return url;
 }
 
-function getCandlesFromTwelveDataResponse(data: TwelveDataTimeSeriesResponse) {
-  if (
-    data.status !== "ok" ||
-    !("values" in data) ||
-    !Array.isArray(data.values)
-  ) {
-    return null;
+function getRequestJson(dependencies: CollectorDependencies) {
+  if (dependencies.requestJson) {
+    return dependencies.requestJson;
   }
 
-  const candles = data.values
-    .map(parseTwelveDataCandle)
-    .filter((candle): candle is MarketIndexCandleData => candle !== null)
-    .sort((a, b) => a.time.localeCompare(b.time));
+  const env = dependencies.env ?? process.env;
+  const config = getMarketApiConfig(env);
+  const fetchImpl = createFaultAwareFetch({
+    env,
+    fetchImpl: dependencies.fetchImpl,
+  });
 
-  return candles.length > 0 ? candles : null;
-}
-
-function getCandlesFromYahooChartResponse(data: YahooChartResponse) {
-  const result = data.chart?.result?.[0];
-  const timestamps = result?.timestamp;
-  const quote = result?.indicators?.quote?.[0];
-
-  if (
-    data.chart?.error ||
-    !timestamps ||
-    !quote ||
-    !Array.isArray(timestamps)
-  ) {
-    return null;
-  }
-
-  const candles = timestamps
-    .map((timestamp, index) => parseYahooChartCandle(timestamp, quote, index))
-    .filter((candle): candle is MarketIndexCandleData => candle !== null)
-    .sort((a, b) => a.time.localeCompare(b.time));
-
-  return candles.length > 0 ? candles.slice(-FALLBACK_CANDLE_COUNT) : null;
+  return (url: string | URL, headers?: HeadersInit) =>
+    requestMarketJson(url, {
+      ...config,
+      fetchImpl,
+      headers,
+    });
 }
 
 export async function collectTwelveDataMarketIndexCandles(
   config: MarketIndexConfig,
+  dependencies: CollectorDependencies = {},
 ): Promise<CollectedMarketIndexCandles | null> {
   const url = toTwelveDataTimeSeriesUrl(config);
 
@@ -408,22 +271,17 @@ export async function collectTwelveDataMarketIndexCandles(
     return null;
   }
 
-  try {
-    const response = await fetch(url, {
-      cache: "no-store",
-    });
-    const data = (await response.json()) as TwelveDataTimeSeriesResponse;
+  const now = dependencies.now?.() ?? new Date();
+  const symbol = getTwelveDataSymbol(config);
+  const data = await getRequestJson(dependencies)(url);
+  const candles = parseTwelveDataCandles(data, config, now, symbol);
 
-    if (!response.ok) {
-      return null;
-    }
-
-    const candles = getCandlesFromTwelveDataResponse(data);
-
-    return candles ? { config, candles, provider: "twelvedata" } : null;
-  } catch {
-    return null;
-  }
+  return {
+    config,
+    candles,
+    observedAt: now.toISOString(),
+    provider: "twelvedata",
+  };
 }
 
 export async function collectTwelveDataMarketIndexBatch(): Promise<
@@ -432,43 +290,20 @@ export async function collectTwelveDataMarketIndexBatch(): Promise<
   const twelveDataConfigs = MARKET_INDEX_CONFIGS.filter(
     (config) => config.category === "exchangeRate",
   );
-  const url = toTwelveDataBatchTimeSeriesUrl(twelveDataConfigs);
+  const settled = await Promise.allSettled(
+    twelveDataConfigs.map((config) =>
+      collectTwelveDataMarketIndexCandles(config),
+    ),
+  );
 
-  if (!url) {
-    return [];
-  }
-
-  try {
-    const response = await fetch(url, {
-      cache: "no-store",
-    });
-    const data = (await response.json()) as TwelveDataBatchTimeSeriesResponse;
-
-    if (!response.ok || !data || typeof data !== "object") {
-      return [];
-    }
-
-    return twelveDataConfigs
-      .map((config) => {
-        const symbol = getTwelveDataSymbol(config);
-        const symbolData = data[symbol];
-        const candles = symbolData
-          ? getCandlesFromTwelveDataResponse(symbolData)
-          : null;
-
-        return candles ? { config, candles, provider: "twelvedata" } : null;
-      })
-      .filter(
-        (collection): collection is CollectedMarketIndexCandles =>
-          collection !== null,
-      );
-  } catch {
-    return [];
-  }
+  return settled.flatMap((result) =>
+    result.status === "fulfilled" && result.value ? [result.value] : [],
+  );
 }
 
 export async function collectYahooMarketIndexCandles(
   config: MarketIndexConfig,
+  dependencies: CollectorDependencies = {},
 ): Promise<CollectedMarketIndexCandles | null> {
   const url = toYahooChartUrl(config);
 
@@ -476,37 +311,30 @@ export async function collectYahooMarketIndexCandles(
     return null;
   }
 
-  try {
-    const response = await fetch(url, {
-      cache: "no-store",
-      headers: {
-        "User-Agent": "Mozilla/5.0",
-      },
-    });
-    const data = (await response.json()) as YahooChartResponse;
+  const now = dependencies.now?.() ?? new Date();
+  const data = await getRequestJson(dependencies)(url, {
+    "User-Agent": "Mozilla/5.0",
+  });
+  const candles = parseYahooChartCandles(data, config, now);
 
-    if (!response.ok) {
-      return null;
-    }
-
-    const candles = getCandlesFromYahooChartResponse(data);
-
-    return candles ? { config, candles, provider: "yahoo" } : null;
-  } catch {
-    return null;
-  }
+  return {
+    config,
+    candles,
+    observedAt: now.toISOString(),
+    provider: "yahoo",
+  };
 }
 
 export async function collectYahooMarketIndexBatch(): Promise<
   CollectedMarketIndexCandles[]
 > {
-  const details = await Promise.all(
+  const details = await Promise.allSettled(
     MARKET_INDEX_CONFIGS.filter((config) => Boolean(config.yahooSymbol)).map(
-      collectYahooMarketIndexCandles,
+      (config) => collectYahooMarketIndexCandles(config),
     ),
   );
 
-  return details.filter(
-    (detail): detail is CollectedMarketIndexCandles => detail !== null,
+  return details.flatMap((result) =>
+    result.status === "fulfilled" && result.value ? [result.value] : [],
   );
 }

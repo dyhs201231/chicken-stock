@@ -17,16 +17,20 @@ export default function AccountData({ initialPortfolio }: AccountDataProps) {
     return null;
   }
 
+  const totalAccountAmount =
+    data.totalAvailableOrderAmount === null
+      ? null
+      : data.totalAvailableOrderAmount + data.totalInvestmentAmount;
+
   return (
     <div className="col gap-8 pt-10">
       <div className="w-fit border px-3 py-2 text-xl">{data.accountNumber}</div>
 
       <div className="row items-center justify-between">
         <p className="typography-semibold-40">
-          {(
-            data.totalAvailableOrderAmount + data.totalInvestmentAmount
-          ).toLocaleString()}
-          원
+          {totalAccountAmount === null
+            ? "환율 확인 불가"
+            : `${totalAccountAmount.toLocaleString()}원`}
         </p>
 
         <div className="row gap-5">
