@@ -23,6 +23,14 @@ function hasStockAnalyticsData(stock: StockOnlyProps["stock"]) {
   );
 }
 
+function isInfoSection(section: string): section is InfoSection {
+  return (
+    section === "financial" ||
+    section === "earnings" ||
+    section === "valuation"
+  );
+}
+
 export default function InfoPanel({ stock }: StockOnlyProps) {
   const initialAnalyticsData: StockAnalyticsData | undefined =
     hasStockAnalyticsData(stock)
@@ -47,11 +55,14 @@ export default function InfoPanel({ stock }: StockOnlyProps) {
   });
 
   const handleSectionChange = useCallback((section: string) => {
-    const nextSection = section as InfoSection;
-    const scrollContainer = scrollContainerRef.current;
-    const sectionElement = sectionRefs.current[nextSection];
+    if (!isInfoSection(section)) {
+      return;
+    }
 
-    setActiveSection(nextSection);
+    const scrollContainer = scrollContainerRef.current;
+    const sectionElement = sectionRefs.current[section];
+
+    setActiveSection(section);
 
     if (!scrollContainer || !sectionElement) {
       return;

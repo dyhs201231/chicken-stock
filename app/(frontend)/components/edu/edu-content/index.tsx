@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo } from "react";
-import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useGetMyInfo } from "../../../apis/auth/queries";
 import { useEducationSummariesQuery } from "../../../apis/edu/queries";
@@ -74,61 +73,38 @@ export default function EduContent({
   const shouldShowCards = !isLoading && !isError && hasEducationCards;
 
   return (
-    <main className="relative min-h-[calc(100dvh-74px)] overflow-hidden px-5">
-      <Image
-        src="/images/edu/edu-background.webp"
-        alt=""
-        aria-hidden="true"
-        fill
-        className="object-cover object-center"
-        priority
-        sizes="100vw"
-      />
+    <>
+      {isLoading && (
+        <p className="mt-3 rounded-lg bg-white/90 px-5 py-4 text-center text-base font-medium text-zinc-700 shadow-sm">
+          학습 데이터를 불러오고 있어요.
+        </p>
+      )}
 
-      <section className="relative z-10 mx-auto flex min-h-[calc(100dvh-74px)] w-full max-w-7xl flex-col items-center gap-8 pt-16 pb-12 md:block md:min-h-237.5 md:pt-32">
-        <div className="mx-auto max-w-5xl text-center text-black">
-          <h1 className="text-5xl leading-tight font-bold tracking-normal md:text-8xl">
-            레벨별로 학습해보세요!
-          </h1>
-          <p className="mt-4 text-2xl leading-tight font-medium tracking-normal md:text-4xl">
-            학습하고 퀴즈 맞혀 크레딧을 얻어보세요
-          </p>
-        </div>
+      {isError && (
+        <p className="mt-3 rounded-lg bg-white/90 px-5 py-4 text-center text-base font-medium text-zinc-700 shadow-sm">
+          학습 데이터를 불러오지 못했어요. 잠시 후 다시 시도해주세요.
+        </p>
+      )}
 
-        <div className="mt-12 flex w-full flex-col items-center gap-8 md:mt-0">
-          {isLoading && (
-            <p className="mt-3 rounded-lg bg-white/90 px-5 py-4 text-center text-base font-medium text-zinc-700 shadow-sm">
-              학습 데이터를 불러오고 있어요.
-            </p>
-          )}
+      {shouldShowCards &&
+        educationCards.map((card, index) => (
+          <EducationCard
+            key={`${card.level}-${openLevel === card.level ? "open" : "idle"}`}
+            level={card.level}
+            title={card.title}
+            image={card.image}
+            data={card.data}
+            className={card.className}
+            autoOpenList={openLevel === card.level}
+            priority={index === 0}
+          />
+        ))}
 
-          {isError && (
-            <p className="mt-3 rounded-lg bg-white/90 px-5 py-4 text-center text-base font-medium text-zinc-700 shadow-sm">
-              학습 데이터를 불러오지 못했어요. 잠시 후 다시 시도해주세요.
-            </p>
-          )}
-
-          {shouldShowCards &&
-            educationCards.map((card, index) => (
-              <EducationCard
-                key={`${card.level}-${openLevel === card.level ? "open" : "idle"}`}
-                level={card.level}
-                title={card.title}
-                image={card.image}
-                data={card.data}
-                className={card.className}
-                autoOpenList={openLevel === card.level}
-                priority={index === 0}
-              />
-            ))}
-
-          {isEmpty && (
-            <p className="mt-3 rounded-lg bg-white/90 px-5 py-4 text-center text-base font-medium text-zinc-700 shadow-sm">
-              아직 준비된 학습 데이터가 없어요.
-            </p>
-          )}
-        </div>
-      </section>
-    </main>
+      {isEmpty && (
+        <p className="mt-3 rounded-lg bg-white/90 px-5 py-4 text-center text-base font-medium text-zinc-700 shadow-sm">
+          아직 준비된 학습 데이터가 없어요.
+        </p>
+      )}
+    </>
   );
 }
