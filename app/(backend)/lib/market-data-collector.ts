@@ -155,7 +155,7 @@ export const MARKET_INDEX_CONFIGS: MarketIndexConfig[] = [
     name: "달러 환율",
     category: "exchangeRate",
     indexType: "FX_RATE",
-    countryCode: "KR",
+    countryCode: "US",
     currencyCode: "KRW",
     currentValue: 1478.55,
     previousClose: 1467.3,
