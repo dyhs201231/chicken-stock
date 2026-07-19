@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { getCachedEducationSummaries } from "@/app/(backend)/lib/education";
 import EduContent from "../../components/edu/edu-content";
 import EduPageFallback from "../../components/edu/edu-page-fallback";
+import EduPageShell from "../../components/edu/edu-page-shell";
 import { createCanonicalUrl, createPageMetadata, SITE_NAME } from "./seo";
 
 const title = "주식 투자 학습 | Chicken Stock";
@@ -41,9 +42,11 @@ export default async function Edu() {
           __html: JSON.stringify(jsonLd),
         }}
       />
-      <Suspense fallback={<EduPageFallback />}>
-        <EduContent initialEducationSummaries={educationSummaries} />
-      </Suspense>
+      <EduPageShell>
+        <Suspense fallback={<EduPageFallback />}>
+          <EduContent initialEducationSummaries={educationSummaries} />
+        </Suspense>
+      </EduPageShell>
     </>
   );
 }
