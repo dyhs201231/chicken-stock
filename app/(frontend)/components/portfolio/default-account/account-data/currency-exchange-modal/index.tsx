@@ -46,7 +46,7 @@ export default function CurrencyExchangeModal() {
           {(isPending || isFetching) && (
             <p className="m-auto text-center text-xl">최신 환율 확인 중...</p>
           )}
-          {isError && (
+          {!isFetching && isError && (
             <div className="col center m-auto gap-4 text-center">
               <p className="text-xl">
                 최신 환율을 확인할 수 없어 지금은 환전할 수 없습니다.
