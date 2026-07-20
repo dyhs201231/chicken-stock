@@ -121,7 +121,7 @@ Run each endpoint five times with a 20-second limit:
 ```bash
 for path in '/stock/67/order' '/api/stocks/67/candles?interval=DAY' '/api/stocks/67/order-book'; do
   for run in 1 2 3 4 5; do
-    curl --max-time 20 -sS -o /dev/null -w "production path=$path run=$run status=%{http_code} ttfb=%{time_starttransfer} total=%{time_total} size=%{size_download}\n" "https://chicken-stock-app.vercel.app$path"
+    curl --max-time 20 -sS -o /dev/null -w "production path=$path run=$run status=%{http_code} ttfb=%{time_starttransfer} total=%{time_total} size=%{size_download}\n" "https://chicken-stock.com$path"
   done
 done
 ```
@@ -129,9 +129,9 @@ done
 Then inspect cache and region headers once per endpoint:
 
 ```bash
-curl --max-time 20 -sS -D - -o /dev/null 'https://chicken-stock-app.vercel.app/stock/67/order'
-curl --max-time 20 -sS -D - -o /dev/null 'https://chicken-stock-app.vercel.app/api/stocks/67/candles?interval=DAY'
-curl --max-time 20 -sS -D - -o /dev/null 'https://chicken-stock-app.vercel.app/api/stocks/67/order-book'
+curl --max-time 20 -sS -D - -o /dev/null 'https://chicken-stock.com/stock/67/order'
+curl --max-time 20 -sS -D - -o /dev/null 'https://chicken-stock.com/api/stocks/67/candles?interval=DAY'
+curl --max-time 20 -sS -D - -o /dev/null 'https://chicken-stock.com/api/stocks/67/order-book'
 ```
 
 Expected: all three return `200`; serverless MISS responses identify `iad1` as the function execution region.
@@ -249,7 +249,7 @@ Run without `--prod` and persist only the emitted Preview URL in `/private/tmp`:
 vercel deploy --yes | tail -n 1 | tee /private/tmp/chicken-stock-preview-url
 ```
 
-Expected: a Preview URL is returned and `chicken-stock-app.vercel.app` remains assigned to the existing Production deployment.
+Expected: a Preview URL is returned and `chicken-stock.com` remains assigned to the existing Production deployment.
 
 - [ ] **Step 2: Inspect the Preview deployment**
 
@@ -312,7 +312,7 @@ Run:
 
 ```bash
 PREVIEW_URL="$(tr -d '\n' < /private/tmp/chicken-stock-preview-url)"
-PREVIEW_URL="$PREVIEW_URL" node -e "const urls=['https://chicken-stock-app.vercel.app',process.env.PREVIEW_URL]; Promise.all(urls.flatMap(base=>['/api/stocks/67/candles?interval=DAY','/api/stocks/67/order-book'].map(async path=>{const response=await fetch(base+path); const body=await response.json(); return {base,path,status:response.status,ok:body.ok,dataKeys:Object.keys(body.data||{}).sort()};}))).then(rows=>console.log(JSON.stringify(rows,null,2)))"
+PREVIEW_URL="$PREVIEW_URL" node -e "const urls=['https://chicken-stock.com',process.env.PREVIEW_URL]; Promise.all(urls.flatMap(base=>['/api/stocks/67/candles?interval=DAY','/api/stocks/67/order-book'].map(async path=>{const response=await fetch(base+path); const body=await response.json(); return {base,path,status:response.status,ok:body.ok,dataKeys:Object.keys(body.data||{}).sort()};}))).then(rows=>console.log(JSON.stringify(rows,null,2)))"
 ```
 
 For protected Preview deployments, fetch the same bodies with `vercel curl` and compare `status`, `ok`, and the sorted keys under `data` manually without persisting response data.
@@ -325,7 +325,7 @@ Run one GET against each environment:
 
 ```bash
 PREVIEW_URL="$(tr -d '\n' < /private/tmp/chicken-stock-preview-url)"
-curl --max-time 20 -sS -o /dev/null -w 'production-orders status=%{http_code}\n' 'https://chicken-stock-app.vercel.app/api/stocks/67/orders'
+curl --max-time 20 -sS -o /dev/null -w 'production-orders status=%{http_code}\n' 'https://chicken-stock.com/api/stocks/67/orders'
 curl --max-time 20 -sS -o /dev/null -w 'preview-orders status=%{http_code}\n' "$PREVIEW_URL/api/stocks/67/orders"
 ```
 

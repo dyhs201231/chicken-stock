@@ -3,7 +3,7 @@
 -- Prerequisites:
 -- 1. Enable the pg_cron and pg_net extensions in Supabase.
 -- 2. Store these secrets in Supabase Vault:
---    - chicken_stock_app_url: https://chicken-stock-app.vercel.app
+--    - chicken_stock_app_url: https://chicken-stock.com
 --    - chicken_stock_cron_secret: same value as Vercel CRON_SECRET or AGENT_INTERNAL_TOKEN
 --
 -- This script is safe to re-run. Existing jobs with the same names are removed
@@ -12,6 +12,31 @@
 create extension if not exists pg_cron with schema extensions;
 create extension if not exists pg_net;
 create extension if not exists supabase_vault with schema vault;
+
+-- Keep the scheduler target aligned with the production custom domain. This is
+-- intentionally managed here because existing Vault values are not changed by
+-- a Vercel deployment.
+do $$
+declare
+  app_url_secret_id uuid;
+begin
+  select id
+  into app_url_secret_id
+  from vault.secrets
+  where name = 'chicken_stock_app_url';
+
+  if app_url_secret_id is null then
+    perform vault.create_secret(
+      'https://chicken-stock.com',
+      'chicken_stock_app_url'
+    );
+  else
+    perform vault.update_secret(
+      app_url_secret_id,
+      'https://chicken-stock.com'
+    );
+  end if;
+end $$;
 
 do $$
 begin

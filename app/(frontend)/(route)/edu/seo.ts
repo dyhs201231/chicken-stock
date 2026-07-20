@@ -3,7 +3,7 @@ import { getCachedEducationArticle } from "@/app/(backend)/lib/education";
 import { parseArticleContent } from "../../utils/edu/article-content";
 import { isPositiveIntegerString } from "../../utils/number";
 
-export const SITE_URL = "https://chicken-stock-app.vercel.app";
+export const SITE_URL = "https://chicken-stock.com";
 export const SITE_NAME = "Chicken Stock";
 export const OG_IMAGE_PATH = "/og-image?v=20260616-logo";
 

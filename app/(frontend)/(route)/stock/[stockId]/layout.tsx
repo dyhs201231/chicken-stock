@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getCachedStockPageShellData } from "./page-data";
 
-const SITE_URL = "https://chicken-stock-app.vercel.app";
+const SITE_URL = "https://chicken-stock.com";
 const SITE_NAME = "Chicken Stock";
 const OG_IMAGE_PATH = "/og-image?v=20260616-logo";
 

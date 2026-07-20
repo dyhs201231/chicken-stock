@@ -10,7 +10,7 @@ import EduProgress from "../components/main/edu-progress";
 import IndexList from "../components/main/index_list";
 import StockList from "../components/main/stock_list";
 
-const SITE_URL = "https://chicken-stock-app.vercel.app/";
+const SITE_URL = "https://chicken-stock.com/";
 const SITE_NAME = "Chicken Stock";
 const HOME_TITLE = "Chicken Stock - 가상 주식 투자 학습 플랫폼";
 const HOME_DESCRIPTION =

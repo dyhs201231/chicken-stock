@@ -23,10 +23,14 @@ The scheduler only wakes the API routes. The application still enforces the ADK 
 
 1. In Vercel, set `CRON_SECRET` or `AGENT_INTERNAL_TOKEN`.
 2. In Supabase, enable the `pg_cron` and `pg_net` extensions.
-3. In Supabase Vault, create:
-   - `chicken_stock_app_url`: `https://chicken-stock-app.vercel.app`
+3. In Supabase Vault, create or update:
+   - `chicken_stock_app_url`: `https://chicken-stock.com`
    - `chicken_stock_cron_secret`: the same value as Vercel `CRON_SECRET` or `AGENT_INTERNAL_TOKEN`
 4. Run `docs/supabase-scheduler.sql` in the Supabase SQL editor.
+
+The SQL script creates `chicken_stock_app_url` when it is missing and updates an
+existing value to the production custom domain. The cron secret is never changed
+by the script.
 
 ## Schedules
 
