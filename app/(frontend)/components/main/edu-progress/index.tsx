@@ -86,6 +86,7 @@ export default function EduProgress() {
               alt={userLevel ? `Level ${userLevel} 학습 캐릭터` : "학습 캐릭터"}
               width={119}
               height={145}
+              loading="eager"
               className="absolute bottom-12 left-1/2 w-28 -translate-x-1/2 md:bottom-16 md:w-40"
               unoptimized
             />
