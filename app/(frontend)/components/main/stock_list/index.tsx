@@ -57,9 +57,12 @@ export default function StockList({ initialStocksPage }: StockListProps) {
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   return (
-    <section className="w-full bg-white py-8 text-zinc-950">
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
-        <h2 className="text-2xl font-semibold tracking-normal">실시간 차트</h2>
+    <section className="cs-surface-card mt-6 w-full overflow-hidden text-(--cs-text-strong) md:mt-8">
+      <div className="flex flex-wrap items-end justify-between gap-5 border-b border-(--cs-border-subtle) px-5 py-6 md:px-7">
+        <div>
+          <p className="cs-section-label mb-1">03 · Discover</p>
+          <h2 className="cs-section-title">실시간 차트</h2>
+        </div>
 
         <StockListControls
           selectedMarket={selectedMarket}
@@ -71,11 +74,13 @@ export default function StockList({ initialStocksPage }: StockListProps) {
         />
       </div>
 
-      <StockListTable
-        isLoading={isLoading}
-        selectedRanking={selectedRanking}
-        stocks={stocks}
-      />
+      <div className="overflow-x-auto px-5 pt-5 md:px-7">
+        <StockListTable
+          isLoading={isLoading}
+          selectedRanking={selectedRanking}
+          stocks={stocks}
+        />
+      </div>
 
       <div ref={loadMoreRef} className="h-10" aria-hidden="true" />
 

@@ -13,7 +13,7 @@ type QuizInteractionProps = {
 type SubmissionResult = {
   answer: string;
   explanation: string;
-  isCorrect?: boolean;
+  status: "correct" | "incorrect" | "error";
   isRewardPaid?: boolean;
   rewardAmountKrw?: number;
 };
@@ -145,7 +145,7 @@ export default function QuizInteraction({
             explanation: result.isCorrect
               ? result.explanation
               : "아쉬워요! 다시 한 번 생각해 볼까요?",
-            isCorrect: result.isCorrect,
+            status: result.isCorrect ? "correct" : "incorrect",
             isRewardPaid: result.isRewardPaid,
             rewardAmountKrw: result.rewardAmountKrw,
           });
@@ -161,6 +161,7 @@ export default function QuizInteraction({
           setSubmissionResult({
             answer: "제출 실패",
             explanation,
+            status: "error",
           });
           setIsResultModalOpen(true);
         },
@@ -170,7 +171,7 @@ export default function QuizInteraction({
 
   return (
     <>
-      <section className="mx-auto flex w-full max-w-6xl flex-col rounded-3xl bg-white px-16 py-6 text-black shadow-[0_4px_4px_rgba(0,0,0,0.25)]">
+      <section className="cs-surface-card mx-auto flex w-full max-w-6xl flex-col px-5 py-7 text-(--cs-text-strong) md:px-10 md:py-10">
         <QuizContent
           quiz={quiz}
           selectedAnswer={selectedAnswer}
@@ -181,10 +182,10 @@ export default function QuizInteraction({
         />
       </section>
 
-      <div className="mt-8 flex w-full flex-col items-end gap-4 px-14 text-2xl">
+      <div className="flex w-full flex-col items-end gap-3">
         <button
           type="button"
-          className="text-zinc-500 transition hover:text-black disabled:cursor-not-allowed disabled:text-zinc-300"
+          className="inline-flex min-h-12 min-w-28 items-center justify-center rounded-lg bg-(--cs-brand-700) px-6 text-lg font-semibold text-white shadow-(--cs-shadow-sm) transition hover:bg-(--cs-brand-800) disabled:cursor-not-allowed disabled:bg-(--cs-brand-100) disabled:text-(--cs-brand-700) disabled:shadow-none"
           disabled={!canSubmit || submitAnswer.isPending}
           onClick={handleSubmit}
         >
@@ -205,27 +206,41 @@ export default function QuizInteraction({
       <Modal.Root isOpen={isResultModalOpen} setIsOpen={setIsResultModalOpen}>
         <Modal.Overlay className="p-0">
           <Modal.Content
-            closeButtonClassName="right-5 top-5 size-9 text-zinc-300 hover:bg-transparent hover:text-zinc-400"
-            className="h-88 w-162.5 max-w-[calc(100vw-32px)] rounded-lg p-10 shadow-none"
+            aria-labelledby="quiz-result-title"
+            aria-describedby="quiz-result-description"
+            closeButtonLabel="퀴즈 결과 닫기"
+            closeButtonClassName="right-5 top-5 size-9"
+            className="min-h-80 w-162.5 max-w-[calc(100vw-32px)] p-7 pr-14 md:p-10 md:pr-16"
           >
             {submissionResult && (
               <div className="flex h-full flex-col gap-4">
-                <h2 className="text-3xl leading-tight font-bold text-black">
-                  {submissionResult.isCorrect &&
+                <p className="cs-section-label">
+                  {submissionResult.status === "correct" && "Correct answer"}
+                  {submissionResult.status === "incorrect" && "Try again"}
+                  {submissionResult.status === "error" && "Submission error"}
+                </p>
+                <h2
+                  id="quiz-result-title"
+                  className="text-3xl leading-tight font-bold text-(--cs-text-strong)"
+                >
+                  {submissionResult.status === "correct" &&
                     `정답 : ${submissionResult.answer}`}
-
-                  {!submissionResult.isCorrect && "오답"}
+                  {submissionResult.status === "incorrect" && "아쉬워요"}
+                  {submissionResult.status === "error" && "제출하지 못했어요"}
                 </h2>
 
-                <div className="min-h-0 flex-1 rounded-lg border-2 border-sky-500 px-2 py-2">
-                  <p className="text-xl leading-9 whitespace-pre-line text-black">
+                <div className="min-h-0 flex-1 rounded-xl border border-(--cs-brand-300) bg-(--cs-brand-50) px-4 py-3">
+                  <p
+                    id="quiz-result-description"
+                    className="text-lg leading-8 whitespace-pre-line text-(--cs-text-default) md:text-xl md:leading-9"
+                  >
                     {submissionResult.explanation}
                   </p>
 
-                  {submissionResult.isCorrect &&
+                  {submissionResult.status === "correct" &&
                     submissionResult.isRewardPaid &&
                     submissionResult.rewardAmountKrw !== undefined && (
-                      <p className="mt-4 text-xl leading-9 font-bold text-sky-700">
+                      <p className="mt-4 text-lg leading-8 font-bold text-(--cs-brand-800) md:text-xl">
                         보상으로{" "}
                         {formatRewardAmount(submissionResult.rewardAmountKrw)}
                         원이 지급되었어요.

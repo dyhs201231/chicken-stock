@@ -36,7 +36,7 @@ export default function AvatarButton() {
 
       <Popover.Content align="right">
         <div className="flex min-w-[380px] flex-col px-9 py-7 whitespace-nowrap">
-          <div className="flex items-center gap-3 border-b border-(--cs-color-gray-500) py-2">
+          <div className="flex items-center gap-3 border-b border-(--cs-border-subtle) py-2">
             <Avatar
               type="header"
               src={data.user.profileImageUrl || "/test-image.webp"}
@@ -48,7 +48,7 @@ export default function AvatarButton() {
 
           <Link
             href="/my"
-            className="flex items-center justify-between py-3"
+            className="flex items-center justify-between rounded-lg px-2 py-3 transition hover:bg-(--cs-brand-50)"
             onNavigate={() => setMenuOpen(false)}
           >
             <p className="text-xl">마이페이지</p>
@@ -58,7 +58,7 @@ export default function AvatarButton() {
 
           <button
             type="button"
-            className="flex cursor-pointer items-center justify-between py-3 text-left disabled:cursor-not-allowed disabled:text-black/40"
+            className="flex cursor-pointer items-center justify-between rounded-lg px-2 py-3 text-left transition hover:bg-(--cs-brand-50) disabled:cursor-not-allowed disabled:text-(--cs-text-muted)"
             disabled={isLogoutPending}
             onClick={handleLogout}
           >

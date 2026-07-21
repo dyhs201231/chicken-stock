@@ -114,7 +114,7 @@ export default async function QuizPage({
   };
 
   return (
-    <main className="relative min-h-screen bg-white px-16 py-16 text-black">
+    <main className="relative min-h-[calc(100dvh-74px)] bg-(--cs-surface-base) py-8 text-(--cs-text-strong) md:py-12">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -122,24 +122,35 @@ export default async function QuizPage({
         }}
       />
 
-      <Link
-        aria-label="뒤로가기"
-        className="absolute top-20 left-6 flex size-16 items-center justify-center text-zinc-500 transition-colors hover:text-zinc-800 focus-visible:ring-2 focus-visible:ring-zinc-500 focus-visible:ring-offset-2 focus-visible:outline-none md:top-24 md:left-20"
-        href={articleHref}
-      >
-        <IconChevronLeft aria-hidden="true" className="size-16" stroke={1.8} />
-      </Link>
+      <div className="cs-page-shell">
+        <Link
+          aria-label="아티클로 돌아가기"
+          className="mb-5 inline-flex min-h-10 items-center gap-1 rounded-lg border border-(--cs-border-strong) bg-(--cs-surface-raised) pr-4 pl-2 text-sm font-semibold text-(--cs-brand-800) shadow-(--cs-shadow-sm) transition hover:bg-(--cs-brand-50)"
+          href={articleHref}
+        >
+          <IconChevronLeft aria-hidden="true" className="size-5" stroke={2} />
+          아티클로 돌아가기
+        </Link>
 
-      <div className="mx-auto flex w-full max-w-4xl flex-col gap-16">
-        <p className="w-fit bg-amber-300 px-2 py-1 text-left text-xl font-bold text-zinc-950">
-          Level {label.level} | {label.id}. {label.title}
-        </p>
+        <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
+          <header className="rounded-2xl border border-(--cs-brand-300) bg-(--cs-surface-tint) px-6 py-7 md:px-9">
+            <p className="cs-section-label">
+              Level {label.level} · Knowledge check
+            </p>
+            <h1 className="mt-2 text-3xl font-bold tracking-[-0.03em] text-(--cs-text-strong) md:text-4xl">
+              {label.title}
+            </h1>
+            <p className="mt-2 text-base text-(--cs-text-muted)">
+              배운 내용을 떠올리며 한 문제씩 차분히 풀어보세요.
+            </p>
+          </header>
 
-        <QuizContainer
-          articleId={articleId}
-          initialQuizzes={initialQuizzes}
-          userId={currentUserId}
-        />
+          <QuizContainer
+            articleId={articleId}
+            initialQuizzes={initialQuizzes}
+            userId={currentUserId}
+          />
+        </div>
       </div>
     </main>
   );

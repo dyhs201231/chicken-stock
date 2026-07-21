@@ -14,7 +14,7 @@ export default function LoginButton() {
 
   return (
     <Popover className="flex items-center">
-      <Popover.Trigger className="flex h-[50px] w-[130px] cursor-pointer items-center justify-center text-xl duration-200 hover:font-semibold">
+      <Popover.Trigger className="flex h-10 cursor-pointer items-center justify-center rounded-lg bg-(--cs-brand-700) px-4 text-sm font-semibold text-white duration-200 hover:bg-(--cs-brand-800) md:px-6 md:text-base">
         로그인
       </Popover.Trigger>
 

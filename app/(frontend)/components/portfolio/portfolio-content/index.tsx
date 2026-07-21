@@ -29,7 +29,7 @@ export default function PortfolioContent({
   return (
     <div
       className={twMerge(
-        "col min-h-[calc(100dvh-72px)] p-15",
+        "cs-page-shell col min-h-[calc(100dvh-72px)] py-8 md:py-12",
         selectedTab === "거래내역" &&
           "h-[calc(100dvh-72px)] overflow-hidden",
       )}

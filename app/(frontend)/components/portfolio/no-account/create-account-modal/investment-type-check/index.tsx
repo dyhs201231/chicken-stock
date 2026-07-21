@@ -61,7 +61,7 @@ export default function InvestmentTypeCheck() {
                   !createAccountInfo[field].trim() &&
                   SELECT_TRIGGER_ERROR_CLASS_NAME,
               )}
-              contentClassName="rounded-[10px] border-2 border-(--cs-color-gray-200) py-1 shadow-[0_8px_24px_rgba(0,0,0,0.08)]"
+              contentClassName="rounded-xl border border-(--cs-border-subtle) py-1 shadow-(--cs-shadow-md)"
               optionClassName="min-h-11 px-4 text-base"
               options={options}
               value={createAccountInfo[field]}

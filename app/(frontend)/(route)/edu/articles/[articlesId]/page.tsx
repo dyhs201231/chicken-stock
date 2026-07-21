@@ -111,14 +111,14 @@ function calculateEstimatedReadingMinutes(
 
 function getHeadingClassName(level: number) {
   if (level === 1) {
-    return "text-4xl leading-tight font-bold text-zinc-950";
+    return "text-3xl leading-tight font-bold tracking-[-0.025em] text-(--cs-text-strong)";
   }
 
   if (level === 2) {
-    return "pt-6 text-3xl leading-tight font-bold text-zinc-950";
+    return "pt-5 text-2xl leading-tight font-bold tracking-[-0.02em] text-(--cs-text-strong) md:text-3xl";
   }
 
-  return "pt-3 text-2xl leading-tight font-semibold text-zinc-950";
+  return "pt-2 text-xl leading-tight font-semibold text-(--cs-text-strong) md:text-2xl";
 }
 
 export default async function ArticlePage({
@@ -202,7 +202,7 @@ export default async function ArticlePage({
   };
 
   return (
-    <main className="relative min-h-[calc(100dvh-74px)] bg-white px-5 pt-36 pb-20 text-zinc-950">
+    <main className="relative min-h-[calc(100dvh-74px)] bg-(--cs-surface-base) py-8 text-(--cs-text-strong) md:py-12">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -216,116 +216,146 @@ export default async function ArticlePage({
         userId={currentUserIdParam}
       />
 
-      <Link
-        href={{
-          pathname: "/edu",
-          query: articleListLinkQuery,
-        }}
-        aria-label="학습 목록으로 돌아가기"
-        className="fixed top-20 left-6 z-30 flex size-16 items-center justify-center text-zinc-500 transition-colors hover:text-zinc-800 focus-visible:ring-2 focus-visible:ring-zinc-500 focus-visible:ring-offset-2 focus-visible:outline-none md:top-24 md:left-20"
-      >
-        <IconChevronLeft aria-hidden="true" className="size-16" stroke={1.8} />
-      </Link>
+      <div className="cs-page-shell">
+        <Link
+          href={{
+            pathname: "/edu",
+            query: articleListLinkQuery,
+          }}
+          aria-label="학습 목록으로 돌아가기"
+          className="mb-5 inline-flex min-h-10 items-center gap-1 rounded-lg border border-(--cs-border-strong) bg-(--cs-surface-raised) pr-4 pl-2 text-sm font-semibold text-(--cs-brand-800) shadow-(--cs-shadow-sm) transition hover:bg-(--cs-brand-50)"
+        >
+          <IconChevronLeft aria-hidden="true" className="size-5" stroke={2} />
+          학습 목록
+        </Link>
 
-      <article className="mx-auto max-w-4xl">
-        <h1 className="text-center text-4xl leading-tight font-bold tracking-normal md:text-5xl">
-          {article.title}
-        </h1>
+        <article className="mx-auto max-w-5xl">
+          <header className="cs-surface-card overflow-hidden p-6 md:p-10">
+            <p className="cs-section-label mb-3">
+              Level {articleLevel} · Article {article.id}
+            </p>
+            <h1 className="max-w-3xl text-4xl leading-tight font-bold tracking-[-0.04em] md:text-5xl">
+              {article.title}
+            </h1>
 
-        <div className="mt-5 text-left text-lg font-semibold text-zinc-500 md:text-xl">
-          예상 읽기 시간 : {estimatedReadingMinutes}분
-        </div>
+            <div className="mt-5 flex flex-wrap items-center gap-2 text-sm font-semibold text-(--cs-text-muted)">
+              <span className="rounded-full bg-(--cs-brand-100) px-3 py-1.5 text-(--cs-brand-800)">
+                예상 읽기 {estimatedReadingMinutes}분
+              </span>
+              <span>천천히 읽고 핵심 개념을 익혀보세요.</span>
+            </div>
 
-        {article.imageUrl && (
-          <div className="relative mx-auto mt-14 h-72 w-full max-w-md overflow-hidden rounded-xl bg-zinc-100">
-            <Image
-              src={article.imageUrl}
-              alt={article.title}
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 768px"
-              unoptimized
-            />
-          </div>
-        )}
+            {article.imageUrl && (
+              <div className="relative mt-8 h-64 w-full overflow-hidden rounded-xl bg-(--cs-surface-tint) md:h-96">
+                <Image
+                  src={article.imageUrl}
+                  alt={article.title}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 960px"
+                  unoptimized
+                />
+              </div>
+            )}
+          </header>
 
-        {visibleContentBlocks.length > 0 && (
-          <div
-            id={ARTICLE_PROGRESS_TARGET_ID}
-            className="mx-auto mt-14 max-w-4xl space-y-8 text-zinc-950"
-          >
-            {visibleContentBlocks.map((block, index) => {
-              if (block.type === "heading") {
-                const headingClassName = getHeadingClassName(block.level);
+          {visibleContentBlocks.length > 0 && (
+            <div
+              id={ARTICLE_PROGRESS_TARGET_ID}
+              className="cs-surface-card mx-auto mt-6 max-w-5xl space-y-7 px-6 py-9 text-(--cs-text-default) md:px-14 md:py-12"
+            >
+              {visibleContentBlocks.map((block, index) => {
+                if (block.type === "heading") {
+                  const headingLevel = Math.max(2, block.level);
+                  const headingClassName = getHeadingClassName(headingLevel);
 
-                const HeadingTag = `h${block.level}` as const;
+                  if (headingLevel === 2) {
+                    return (
+                      <h2
+                        key={`${block.text}-${index}`}
+                        className={headingClassName}
+                      >
+                        {block.text}
+                      </h2>
+                    );
+                  }
+
+                  return (
+                    <h3
+                      key={`${block.text}-${index}`}
+                      className={headingClassName}
+                    >
+                      {block.text}
+                    </h3>
+                  );
+                }
+
+                if (block.type === "list") {
+                  return (
+                    <ul
+                      key={`list-${index}`}
+                      className="list-disc space-y-2 pl-6 text-lg leading-8 marker:text-(--cs-brand-600) md:text-xl md:leading-9"
+                    >
+                      {block.items.map((item, itemIndex) => (
+                        <li key={`${item}-${itemIndex}`}>{item}</li>
+                      ))}
+                    </ul>
+                  );
+                }
+
+                if (block.type === "quote") {
+                  return (
+                    <blockquote
+                      key={`${block.text}-${index}`}
+                      className="rounded-r-xl border-l-4 border-(--cs-brand-500) bg-(--cs-brand-50) px-5 py-4 text-lg leading-8 font-medium text-(--cs-text-strong) md:text-xl md:leading-9"
+                    >
+                      {block.text}
+                    </blockquote>
+                  );
+                }
+
+                if (block.type === "divider") {
+                  return (
+                    <hr
+                      key={`divider-${index}`}
+                      className="border-(--cs-border-subtle)"
+                    />
+                  );
+                }
 
                 return (
-                  <HeadingTag
+                  <p
                     key={`${block.text}-${index}`}
-                    className={headingClassName}
+                    className="text-lg leading-8 md:text-xl md:leading-9"
                   >
                     {block.text}
-                  </HeadingTag>
+                  </p>
                 );
-              }
+              })}
+            </div>
+          )}
 
-              if (block.type === "list") {
-                return (
-                  <ul
-                    key={`list-${index}`}
-                    className="list-disc space-y-3 pl-8 text-2xl leading-10 md:text-3xl md:leading-relaxed"
-                  >
-                    {block.items.map((item, itemIndex) => (
-                      <li key={`${item}-${itemIndex}`}>{item}</li>
-                    ))}
-                  </ul>
-                );
-              }
+          {visibleContentBlocks.length === 0 && (
+            <p className="mt-6 rounded-xl border border-(--cs-border-subtle) bg-(--cs-surface-raised) px-5 py-10 text-center text-base text-(--cs-text-muted) shadow-(--cs-shadow-sm)">
+              아직 본문이 준비되지 않았어요.
+            </p>
+          )}
 
-              if (block.type === "quote") {
-                return (
-                  <blockquote
-                    key={`${block.text}-${index}`}
-                    className="border-l-4 border-zinc-300 px-6 py-2 text-2xl leading-10 font-medium text-zinc-950 md:text-3xl md:leading-relaxed"
-                  >
-                    {block.text}
-                  </blockquote>
-                );
-              }
-
-              if (block.type === "divider") {
-                return (
-                  <hr key={`divider-${index}`} className="border-zinc-300" />
-                );
-              }
-
-              return (
-                <p
-                  key={`${block.text}-${index}`}
-                  className="text-2xl leading-10 md:text-3xl md:leading-relaxed"
-                >
-                  {block.text}
-                </p>
-              );
-            })}
-          </div>
-        )}
-
-        {visibleContentBlocks.length === 0 && (
-          <p className="mt-8 rounded-lg bg-white px-5 py-6 text-center text-base text-zinc-500 shadow-sm">
-            아직 본문이 준비되지 않았어요.
-          </p>
-        )}
-
-        <div className="mt-16 flex justify-center">
-          <QuizStartButton
-            href={quizHref}
-            isCompleted={isQuizCompleted}
-            isLoggedIn={Boolean(currentUserIdParam)}
-          />
-        </div>
-      </article>
+          <footer className="mt-6 flex flex-col items-center rounded-2xl border border-(--cs-brand-300) bg-(--cs-surface-tint) px-6 py-8 text-center">
+            <p className="cs-section-label">Knowledge check</p>
+            <h2 className="mt-2 text-2xl font-bold text-(--cs-text-strong)">
+              읽은 내용을 퀴즈로 확인해보세요.
+            </h2>
+            <div className="mt-5">
+              <QuizStartButton
+                href={quizHref}
+                isCompleted={isQuizCompleted}
+                isLoggedIn={Boolean(currentUserIdParam)}
+              />
+            </div>
+          </footer>
+        </article>
+      </div>
     </main>
   );
 }

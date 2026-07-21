@@ -70,7 +70,7 @@ function MarketIndexSparkline({
   return (
     <div
       className={`shrink-0 overflow-hidden ${
-        size === "compact" ? "h-10 w-14" : "h-12 w-20"
+        size === "compact" ? "h-10 w-14" : "h-10 w-14"
       }`}
       aria-hidden="true"
     >
@@ -115,19 +115,19 @@ export default function MarketIndexListItem({
   const titleClassName =
     size === "compact"
       ? "truncate text-xs leading-4 tracking-normal text-zinc-950"
-      : "truncate text-xl tracking-normal text-zinc-950 md:text-xl";
+      : "truncate text-base tracking-normal text-zinc-950 md:text-lg";
   const valueClassName =
     size === "compact"
       ? "mt-0.5 text-xs leading-4 tracking-normal whitespace-nowrap text-zinc-950"
-      : "mt-1 text-lg tracking-normal text-zinc-950 md:text-xl";
+      : "mt-0.5 text-sm tracking-normal text-zinc-950 md:text-base";
 
   return (
     <Link
       href={`/indices/${marketIndex.id}`}
       aria-label={`${marketIndex.name} 상세 보기`}
-      className={`flex items-center rounded-lg transition-colors ${
-        size === "compact" ? "gap-2 px-2 py-1.5" : "gap-3 px-1 py-1"
-      } ${isActive ? "bg-zinc-100" : "hover:bg-zinc-50"}`}
+      className={`flex h-full min-w-0 items-center overflow-hidden rounded-lg transition-colors ${
+        size === "compact" ? "gap-2 px-2 py-1.5" : "gap-3 px-2 py-2"
+      } ${isActive ? "bg-(--cs-brand-100)" : "hover:bg-(--cs-brand-50)"}`}
     >
       <MarketIndexSparkline
         candles={candles}
@@ -135,7 +135,7 @@ export default function MarketIndexListItem({
         size={size}
       />
 
-      <div className="min-w-0 flex-1">
+      <div className="min-w-0 flex-1 overflow-hidden">
         <h3 className={titleClassName}>{marketIndex.name}</h3>
 
         {quote.status === "error" ? (
@@ -144,7 +144,7 @@ export default function MarketIndexListItem({
           </p>
         ) : (
           <>
-            <p className={valueClassName}>
+            <p className={`${valueClassName} truncate`}>
               {formatMarketIndexValue(quote.data.currentValue)}
               <span className={`ml-2 ${trendTextColor}`}>
                 {formatMarketIndexChange(quote.data.changeAmount)}(

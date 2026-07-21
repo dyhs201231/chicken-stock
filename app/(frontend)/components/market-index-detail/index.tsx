@@ -19,7 +19,7 @@ export default function MarketIndexDetail({
   const chartMarketIndex = toMarketIndexChartData(marketIndex);
 
   return (
-    <main className="mx-auto w-full max-w-7xl px-6 py-12 md:px-10">
+    <main className="cs-page-shell py-12">
       <MarketIndexHeader marketIndex={marketIndex} />
 
       <div className="mt-20 grid gap-10 lg:grid-cols-[minmax(0,1fr)_320px]">
@@ -29,7 +29,7 @@ export default function MarketIndexDetail({
             marketIndex={chartMarketIndex}
           />
         ) : (
-          <section className="flex h-130 min-w-0 items-center justify-center rounded-3xl bg-white px-7 py-6 shadow-[0_10px_18px_rgba(0,0,0,0.22)]">
+          <section className="cs-data-panel flex h-130 min-w-0 items-center justify-center px-7 py-6">
             <MarketDataStatus result={marketIndex.chart} />
           </section>
         )}

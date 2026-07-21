@@ -182,8 +182,8 @@ export default function StockDetail({ stock, activeTab }: StockDetailProps) {
   );
 
   return (
-    <main className="mx-auto w-full max-w-355 px-8 py-16 text-zinc-950">
-      <section className="mb-9 flex items-end justify-between gap-8">
+    <main className="cs-page-shell py-8 text-(--cs-text-strong) md:py-12">
+      <section className="mb-8 flex flex-col gap-6 rounded-2xl border border-(--cs-border-subtle) bg-(--cs-surface-raised) p-5 shadow-(--cs-shadow-sm) lg:flex-row lg:items-end lg:justify-between lg:p-7">
         <div className="flex items-center gap-3">
           <StockLogo stock={liveStock} />
 
@@ -191,7 +191,7 @@ export default function StockDetail({ stock, activeTab }: StockDetailProps) {
             <div className="mb-3 flex items-center gap-3">
               <h1 className="text-2xl font-bold">{liveStock.name}</h1>
 
-              <span className="bg-zinc-200 px-2 py-1 text-lg">
+              <span className="rounded-md bg-(--cs-brand-100) px-2 py-1 text-base font-semibold text-(--cs-brand-800)">
                 {marketLabel}
               </span>
             </div>
@@ -237,7 +237,7 @@ export default function StockDetail({ stock, activeTab }: StockDetailProps) {
             </SegmentedControl>
           )}
 
-          <dl className="grid grid-cols-4 gap-10 text-right">
+          <dl className="grid grid-cols-2 gap-5 text-right sm:grid-cols-4 lg:gap-8">
             {rangeStats.map((item) => (
               <div key={item.label}>
                 <dt className="text-base">{item.label}</dt>
@@ -260,7 +260,7 @@ export default function StockDetail({ stock, activeTab }: StockDetailProps) {
             key={tab.value}
             value={tab.value}
             className="rounded-none px-2 py-1"
-            activeClassName="bg-zinc-200"
+            activeClassName="bg-(--cs-brand-100) text-(--cs-brand-800)"
             onFocus={
               tab.value === "portfolio-info" ? prefetchAnalyticsPage : undefined
             }
@@ -274,7 +274,7 @@ export default function StockDetail({ stock, activeTab }: StockDetailProps) {
       </Tab.Root>
 
       {activeTab === "chart-orderbook" && (
-        <div className="grid grid-cols-[minmax(0,1fr)_20rem_20rem] gap-7">
+        <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_20rem_20rem] xl:gap-7">
           <ChartPanel stock={displayStock} />
           <OrderBookPanel
             initialOrderBookSnapshot={liveStock.orderBookSnapshot}
@@ -295,7 +295,7 @@ export default function StockDetail({ stock, activeTab }: StockDetailProps) {
       )}
 
       {activeTab === "portfolio-info" && (
-        <div className="grid grid-cols-[minmax(0,1fr)_20rem_20rem] gap-7">
+        <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_20rem_20rem] xl:gap-7">
           <InfoPanel stock={displayStock} />
           <MyStockPanel stock={displayStock} />
           <OrderHistoryPanel

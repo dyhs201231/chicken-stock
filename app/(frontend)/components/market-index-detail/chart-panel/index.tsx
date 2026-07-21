@@ -172,14 +172,14 @@ export default function MarketIndexChartPanel({
 
   if (chartResult.status === "error") {
     return (
-      <section className="flex h-130 min-w-0 items-center justify-center rounded-3xl bg-white px-7 py-6 shadow-[0_10px_18px_rgba(0,0,0,0.22)]">
+      <section className="cs-data-panel flex h-130 min-w-0 items-center justify-center px-7 py-6">
         <MarketDataStatus result={chartResult} />
       </section>
     );
   }
 
   return (
-    <section className="flex h-130 min-w-0 flex-col rounded-3xl bg-white px-7 py-6 shadow-[0_10px_18px_rgba(0,0,0,0.22)]">
+    <section className="cs-data-panel flex h-130 min-w-0 flex-col px-7 py-6">
       <MarketDataStatus result={chartResult} />
       <RangeToolbar
         selectedRange={selectedRange}

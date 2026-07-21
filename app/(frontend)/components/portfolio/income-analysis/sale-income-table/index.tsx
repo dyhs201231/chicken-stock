@@ -99,7 +99,7 @@ export default function SaleIncomeTable({ rows }: SaleIncomeTableProps) {
         </div>
 
         <div
-          className="min-h-[380px] rounded-lg px-8 py-9 shadow-[3px_6px_10px_rgba(0,0,0,0.25)]"
+          className="cs-surface-card min-h-[380px] px-5 py-6 md:px-8 md:py-9"
           role="rowgroup"
         >
           {rows.length === 0 && (

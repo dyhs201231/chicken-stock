@@ -23,7 +23,7 @@ export default function ArticleProgressIcon({
     return (
       <IconCheck
         aria-label="읽음"
-        className="size-7 shrink-0 text-emerald-400"
+        className="size-7 shrink-0 text-(--cs-brand-600)"
         stroke={2.4}
       />
     );
@@ -41,7 +41,7 @@ export default function ArticleProgressIcon({
     <svg
       role="img"
       aria-label={`진행률 ${progressRate}%`}
-      className="size-7 shrink-0 -rotate-90 text-violet-300"
+      className="size-7 shrink-0 -rotate-90 text-(--cs-brand-300)"
       viewBox="0 0 26 26"
     >
       <circle

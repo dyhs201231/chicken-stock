@@ -50,12 +50,15 @@ export default function EduProgress() {
   const bubbleText = guestBubbleText || progressBubbleText || null;
 
   return (
-    <section className="w-full">
-      <h2 className="mb-5 text-2xl font-semibold tracking-normal text-zinc-950">
-        학습 현황
-      </h2>
+    <section className="flex min-w-0 flex-col">
+      <div className="mb-4 flex items-end justify-between gap-4">
+        <div>
+          <p className="cs-section-label mb-1">01 · Learn</p>
+          <h2 className="cs-section-title">학습 현황</h2>
+        </div>
+      </div>
 
-      <div className="relative aspect-[2.5] overflow-hidden rounded-2xl">
+      <div className="cs-surface-card relative h-96 w-full overflow-hidden lg:h-107.5">
         <div
           aria-hidden="true"
           className="absolute inset-x-0 top-[-35%] h-[200%]"

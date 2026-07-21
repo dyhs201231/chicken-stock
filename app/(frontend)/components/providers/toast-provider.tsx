@@ -32,5 +32,17 @@ export default function ToastProvider({ position }: ToastProviderProps) {
     };
   }, []);
 
-  return isReady ? <Toaster position={position} /> : null;
+  return isReady ? (
+    <Toaster
+      position={position}
+      richColors
+      toastOptions={{
+        classNames: {
+          toast:
+            "!rounded-xl !border-(--cs-border-strong) !bg-(--cs-surface-raised) !text-(--cs-text-strong) !shadow-(--cs-shadow-lg)",
+          description: "!text-(--cs-text-muted)",
+        },
+      }}
+    />
+  ) : null;
 }

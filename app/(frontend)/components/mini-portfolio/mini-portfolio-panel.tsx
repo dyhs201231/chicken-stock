@@ -66,7 +66,7 @@ export default function MiniPortfolioPanel() {
   return (
     <aside
       className={twMerge(
-        "fixed right-6 z-40 w-[300px] overflow-hidden border border-[rgba(123,120,120,0.35)] bg-white shadow-[0_4px_18px_rgba(0,0,0,0.18)] transition-all duration-300 ease-out",
+        "fixed right-4 z-40 w-[min(300px,calc(100vw-32px))] overflow-hidden border border-(--cs-border-strong) bg-(--cs-surface-raised) text-(--cs-text-strong) shadow-(--cs-shadow-lg) transition-all duration-300 ease-out md:right-6",
         isOpen &&
           "col bottom-3 h-[min(450px,calc(100dvh-24px))] gap-5 rounded-(--cs-radius-lg) py-5",
         !isOpen && "bottom-0 h-[30px] rounded-t-(--cs-radius-lg)",

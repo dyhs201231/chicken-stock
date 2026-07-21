@@ -14,14 +14,14 @@ type AnswerButtonProps = {
 
 const answerButtonVariants: Record<AnswerButtonVariant, string> = {
   default:
-    "w-fit justify-start rounded-md border-2 border-transparent bg-white px-1.5 py-0.5 text-left text-3xl leading-tight font-medium",
-  true: "h-44 w-full justify-center rounded-xl border-8 border-(--cs-color-blue-800) bg-white px-6 text-8xl font-black text-(--cs-color-blue-800)",
+    "w-full justify-start rounded-xl border border-(--cs-border-strong) bg-(--cs-surface-raised) px-4 py-3 text-left text-lg leading-7 font-medium hover:border-(--cs-brand-500) hover:bg-(--cs-brand-50) md:px-5 md:text-xl",
+  true: "h-32 w-full justify-center rounded-xl border-4 border-(--cs-color-blue-800) bg-(--cs-surface-raised) px-4 text-6xl font-black text-(--cs-color-blue-800) md:h-40 md:border-6 md:text-8xl",
   false:
-    "h-44 w-full justify-center rounded-2xl border-8 border-[#FF5A60] bg-white px-6 text-8xl font-black text-[#FF5A60]",
+    "h-32 w-full justify-center rounded-xl border-4 border-[#FF5A60] bg-(--cs-surface-raised) px-4 text-6xl font-black text-[#FF5A60] md:h-40 md:border-6 md:text-8xl",
 };
 
 const selectedAnswerButtonVariants: Record<AnswerButtonVariant, string> = {
-  default: "border-[#2563EB] bg-[#2563EB]/10",
+  default: "border-(--cs-brand-600) bg-(--cs-brand-100) text-(--cs-brand-800)",
   true: "bg-[#4d61f529]",
   false: "bg-red-50",
 };
@@ -66,6 +66,7 @@ export default function AnswerButton({
   return (
     <button
       type="button"
+      aria-pressed={isSelected}
       className={twMerge(
         "flex items-center transition",
         answerButtonVariants[variant],

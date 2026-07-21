@@ -12,7 +12,7 @@ type RelatedIndexListProps = {
 
 function RelatedIndexListFallback() {
   return (
-    <aside className="rounded-3xl bg-white px-6 py-6 shadow-[0_10px_18px_rgba(0,0,0,0.22)]">
+    <aside className="cs-data-panel px-6 py-6">
       <div className="h-5 w-20 rounded bg-zinc-100" />
 
       <div className="mt-4">
@@ -64,7 +64,7 @@ export default function RelatedIndexList({
   }
 
   return (
-    <aside className="rounded-3xl bg-white px-6 py-6 shadow-[0_10px_18px_rgba(0,0,0,0.22)]">
+    <aside className="cs-data-panel px-6 py-6">
       <h2 className="text-base leading-5 font-semibold text-zinc-950">
         지수/환율
       </h2>

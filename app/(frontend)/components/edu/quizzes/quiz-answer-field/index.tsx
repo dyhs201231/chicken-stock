@@ -43,7 +43,7 @@ export default function QuizAnswerField({
       <label className="w-full max-w-xl">
         <span className="sr-only">주관식 답안</span>
         <Input
-          inputClassName="h-24 border-b-2 border-black text-center text-6xl font-black placeholder:text-black placeholder:opacity-100"
+          inputClassName="h-20 border-b-2 border-(--cs-brand-500) text-center text-4xl font-bold placeholder:text-(--cs-text-muted) placeholder:opacity-100 md:h-24 md:text-5xl"
           disabled={disabled}
           value={shortAnswer}
           variant="underline"
@@ -57,10 +57,10 @@ export default function QuizAnswerField({
     const trueFalseOptions = getTrueFalseOptions(optionText);
 
     return (
-      <div className="grid w-full max-w-4xl grid-cols-2 gap-6">
-        {trueFalseOptions.map((option) => (
+      <div className="grid w-full max-w-4xl grid-cols-2 gap-3 md:gap-6">
+        {trueFalseOptions.map((option, index) => (
           <AnswerButton
-            key={option}
+            key={`${option}-${index}`}
             disabled={disabled}
             isSelected={selectedAnswer === option}
             variant={getTrueFalseVariant(option)}
@@ -74,10 +74,10 @@ export default function QuizAnswerField({
   }
 
   return (
-    <div className="flex w-full max-w-5xl flex-col items-start gap-3">
+    <div className="flex w-full max-w-5xl flex-col items-stretch gap-3">
       {optionText.map((option, index) => (
         <AnswerButton
-          key={option}
+          key={`${option}-${index}`}
           disabled={disabled}
           isSelected={selectedAnswer === option}
           onClick={() => onSelectAnswer(option)}

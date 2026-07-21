@@ -33,18 +33,25 @@ export default function IndexList({ initialIndices }: IndexListProps) {
   const shouldShowFallback = marketIndexes.length === 0;
 
   return (
-    <section className="w-auto bg-white pt-16 pr-8 pb-8 pl-8">
-      {shouldShowFallback ? (
-        <IndexListFallback />
-      ) : (
-        <ul className="flex h-full flex-col justify-between gap-3.5">
-          {marketIndexes.map((marketIndex) => (
-            <li key={marketIndex.id}>
-              <MarketIndex marketIndex={marketIndex} />
-            </li>
-          ))}
-        </ul>
-      )}
+    <section className="flex min-w-0 flex-col">
+      <div className="mb-4">
+        <p className="cs-section-label mb-1">02 · Market</p>
+        <h2 className="cs-section-title">주요 지수</h2>
+      </div>
+
+      <div className="cs-surface-card h-96 min-w-0 overflow-hidden p-4 md:p-5 lg:h-107.5 lg:p-6">
+        {shouldShowFallback ? (
+          <IndexListFallback />
+        ) : (
+          <ul className="grid h-full min-w-0 grid-rows-5 gap-1">
+            {marketIndexes.map((marketIndex) => (
+              <li key={marketIndex.id} className="min-h-0 min-w-0 overflow-hidden">
+                <MarketIndex marketIndex={marketIndex} />
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </section>
   );
 }

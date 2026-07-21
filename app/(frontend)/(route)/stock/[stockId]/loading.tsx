@@ -1,6 +1,6 @@
 export default function StockDetailLoading() {
   return (
-    <main className="mx-auto w-full max-w-355 px-8 py-16 text-zinc-950">
+    <main className="cs-page-shell py-8 text-(--cs-text-strong) md:py-12">
       <section className="mb-9 flex items-end justify-between gap-8">
         <div className="flex items-center gap-3">
           <div className="h-14 w-14 rounded-full bg-zinc-200" />
@@ -30,8 +30,8 @@ export default function StockDetailLoading() {
         <div className="h-10 w-48 rounded-md bg-zinc-200" />
       </div>
 
-      <div className="grid grid-cols-[minmax(0,1fr)_20rem_20rem] gap-7">
-        <section className="h-130 rounded-3xl bg-white px-7 py-6 shadow-[0_10px_18px_rgba(0,0,0,0.22)]">
+      <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_20rem_20rem] xl:gap-7">
+        <section className="cs-data-panel h-130 px-7 py-6">
           <div className="mb-6 flex gap-3">
             <div className="h-8 w-16 rounded-md bg-zinc-200" />
             <div className="h-8 w-16 rounded-md bg-zinc-200" />
@@ -40,7 +40,7 @@ export default function StockDetailLoading() {
           <div className="h-[25rem] rounded-xl bg-zinc-100" />
         </section>
 
-        <section className="h-130 overflow-hidden rounded-3xl bg-white px-5 py-5 shadow-[0_10px_18px_rgba(0,0,0,0.22)]">
+        <section className="cs-data-panel h-130 overflow-hidden px-5 py-5">
           <div className="mb-5 h-7 w-24 rounded-md bg-zinc-200" />
           <div className="space-y-2">
             {Array.from({ length: 10 }, (_, index) => (
@@ -56,7 +56,7 @@ export default function StockDetailLoading() {
           </div>
         </section>
 
-        <section className="h-130 rounded-3xl bg-white px-5 py-5 shadow-[0_10px_18px_rgba(0,0,0,0.22)]">
+        <section className="cs-data-panel h-130 px-5 py-5">
           <div className="mb-5 flex gap-4">
             <div className="h-8 w-20 rounded-md bg-zinc-200" />
             <div className="h-8 w-20 rounded-md bg-zinc-200" />

@@ -37,7 +37,10 @@ export default function CurrencyExchangeModal() {
 
   return (
     <Modal.Root isOpen={isOpen} setIsOpen={handleOpenChange}>
-      <button onClick={() => handleOpenChange(true)} className="cursor-pointer">
+      <button
+        onClick={() => handleOpenChange(true)}
+        className="cursor-pointer rounded-lg bg-(--cs-brand-700) px-4 py-2.5 font-semibold text-white transition hover:bg-(--cs-brand-800)"
+      >
         환전
       </button>
 

@@ -52,7 +52,7 @@ export default function TransactionHistory() {
       />
 
       <section className="grid min-h-0 flex-1 grid-cols-1 grid-rows-2 gap-6 overflow-hidden p-4 xl:grid-cols-2 xl:grid-rows-1">
-        <div className="col min-h-0 overflow-hidden rounded-lg px-8 py-9 shadow-[3px_6px_10px_rgba(0,0,0,0.25)]">
+        <div className="cs-surface-card col min-h-0 overflow-hidden px-5 py-6 md:px-8 md:py-9">
           <TransactionFilter
             selectedFilter={selectedFilter}
             setSelectedFilter={(filter) => {
@@ -70,7 +70,7 @@ export default function TransactionHistory() {
           </div>
         </div>
 
-        <div className="min-h-0 overflow-y-auto rounded-lg px-10 py-9 shadow-[3px_6px_10px_rgba(0,0,0,0.25)]">
+        <div className="cs-surface-card min-h-0 overflow-y-auto px-5 py-6 md:px-10 md:py-9">
           {selectedTransaction && (
             <TransactionDetail
               item={selectedItem}

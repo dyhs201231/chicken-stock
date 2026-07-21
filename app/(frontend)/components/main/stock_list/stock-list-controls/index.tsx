@@ -39,7 +39,7 @@ export default function StockListControls({
   onPeriodChange,
 }: StockListControlsProps) {
   return (
-    <div className="flex flex-wrap items-center justify-end gap-8">
+    <div className="flex flex-wrap items-center justify-end gap-3 md:gap-5">
       <SegmentedControl
         aria-label="시장 선택"
         onValueChange={onMarketChange}

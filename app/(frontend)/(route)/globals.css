@@ -2,8 +2,31 @@
 @import "react-datepicker/dist/react-datepicker.css";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f4f7d5;
+  --foreground: #292d2a;
+  --cs-surface-canvas: #f4f7d5;
+  --cs-surface-base: #f7f9e8;
+  --cs-surface-raised: #fbfcef;
+  --cs-surface-tint: #edf7ed;
+  --cs-surface-strong: #dff0df;
+  --cs-text-strong: #292d2a;
+  --cs-text-default: #454a46;
+  --cs-text-muted: #747d75;
+  --cs-border-subtle: #dfe7dd;
+  --cs-border-strong: #c5d3c4;
+  --cs-brand-50: #eef8ef;
+  --cs-brand-100: #d9f0dc;
+  --cs-brand-300: #a8dcae;
+  --cs-brand-500: #69be78;
+  --cs-brand-600: #4ea765;
+  --cs-brand-700: #377c4d;
+  --cs-brand-800: #285d3b;
+  --cs-focus: #377c4d;
+  --cs-shadow-sm: 0 1px 2px rgba(35, 55, 38, 0.05);
+  --cs-shadow-md: 0 8px 24px rgba(50, 75, 50, 0.08);
+  --cs-shadow-lg: 0 18px 48px rgba(50, 75, 50, 0.12);
+  --cs-content-max: 1440px;
+  --cs-page-gutter: clamp(20px, 4vw, 56px);
   --cs-color-blue-100: #c6d2ff;
   --cs-color-blue-200: #9bcbde;
   --cs-color-blue-300: #2b9dd1;
@@ -88,6 +111,73 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-atoz), Arial, Helvetica, sans-serif;
+  line-height: 1.5;
+  text-rendering: optimizeLegibility;
+  background-image:
+    radial-gradient(circle at 8% 3%, rgba(255, 255, 255, 0.78) 0 7rem, transparent 7.1rem),
+    radial-gradient(circle at 94% 18%, rgba(168, 220, 174, 0.24) 0 10rem, transparent 10.1rem);
+  background-attachment: fixed;
+}
+
+::selection {
+  background: var(--cs-brand-300);
+  color: var(--cs-text-strong);
+}
+
+:where(a, button, input, select, textarea):focus-visible {
+  outline: 2px solid var(--cs-focus);
+  outline-offset: 3px;
+}
+
+.cs-page-shell {
+  width: min(100%, var(--cs-content-max));
+  margin-inline: auto;
+  padding-inline: var(--cs-page-gutter);
+}
+
+.cs-surface-card {
+  border: 1px solid var(--cs-border-subtle);
+  border-radius: var(--cs-radius-2xl);
+  background: var(--cs-surface-raised);
+  box-shadow: var(--cs-shadow-md);
+}
+
+.cs-data-panel {
+  border: 1px solid var(--cs-border-subtle);
+  border-radius: var(--cs-radius-2xl);
+  background: var(--cs-surface-raised);
+  box-shadow: var(--cs-shadow-md);
+}
+
+.cs-section-label {
+  color: var(--cs-brand-700);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.cs-section-title {
+  color: var(--cs-text-strong);
+  font-size: clamp(24px, 2vw, 32px);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.25;
+}
+
+.cs-muted {
+  color: var(--cs-text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }
 
 @utility row {
@@ -159,8 +249,8 @@ body {
 .income-month-calendar.react-datepicker {
   width: fit-content;
   border: 0;
-  background: #ffffff;
-  color: #18181b;
+  background: var(--cs-surface-raised);
+  color: var(--cs-text-strong);
   font-family: var(--font-atoz), Arial, Helvetica, sans-serif;
 }
 
@@ -203,7 +293,7 @@ body {
   justify-content: center;
   margin: 0;
   border-radius: var(--cs-radius-md);
-  color: #18181b;
+  color: var(--cs-text-strong);
   font-size: var(--cs-typography-medium-14-font-size);
   font-weight: var(--cs-typography-medium-font-weight);
   line-height: 1;
@@ -214,7 +304,7 @@ body {
 
 .income-month-calendar
   .react-datepicker__month-text:not([aria-disabled="true"]):hover {
-  background: #f4f4f5;
+  background: var(--cs-brand-50);
 }
 
 .income-month-calendar .react-datepicker__month-text--today {
@@ -222,14 +312,14 @@ body {
 }
 
 .income-month-calendar .react-datepicker__month-text--keyboard-selected {
-  background: #f4f4f5;
-  color: #18181b;
+  background: var(--cs-brand-100);
+  color: var(--cs-brand-800);
 }
 
 .income-month-calendar .react-datepicker__month-text--selected,
 .income-month-calendar
   .react-datepicker__month-text--selected:not([aria-disabled="true"]):hover {
-  background: #18181b;
+  background: var(--cs-brand-700);
   color: #ffffff;
 }
 

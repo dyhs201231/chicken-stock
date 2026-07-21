@@ -40,12 +40,15 @@ export default function DeleteAccount() {
             <div className="flex h-full flex-col items-center justify-center gap-4 text-xl">
               {!isDeleteAccountSuccess && (
                 <>
-                  <p>정말 탈퇴하시겠습니까?</p>
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-(--cs-text-strong)">정말 탈퇴하시겠습니까?</p>
+                    <p className="mt-2 text-sm text-(--cs-text-muted)">탈퇴 후에는 계정 정보를 복구할 수 없습니다.</p>
+                  </div>
 
-                  <div className="flex gap-10">
+                  <div className="mt-4 flex gap-3">
                     <button
                       type="button"
-                      className="w-15 cursor-pointer disabled:cursor-not-allowed disabled:text-black/40"
+                      className="min-h-10 cursor-pointer rounded-lg bg-red-600 px-5 font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-40"
                       disabled={isDeleteAccountPending}
                       onClick={handleDeleteAccount}
                     >
@@ -54,7 +57,7 @@ export default function DeleteAccount() {
 
                     <button
                       type="button"
-                      className="w-15 cursor-pointer disabled:cursor-not-allowed disabled:text-black/40"
+                      className="min-h-10 cursor-pointer rounded-lg border border-(--cs-border-strong) bg-(--cs-surface-base) px-5 font-semibold text-(--cs-text-default) transition hover:bg-(--cs-brand-50) disabled:cursor-not-allowed disabled:opacity-40"
                       disabled={isDeleteAccountPending}
                       onClick={() => setIsOpen(false)}
                     >
@@ -73,7 +76,7 @@ export default function DeleteAccount() {
 
                   <button
                     type="button"
-                    className="w-15 cursor-pointer"
+                    className="mt-4 min-h-10 cursor-pointer rounded-lg bg-(--cs-brand-700) px-5 font-semibold text-white transition hover:bg-(--cs-brand-800)"
                     onClick={() => window.location.replace("/")}
                   >
                     확인

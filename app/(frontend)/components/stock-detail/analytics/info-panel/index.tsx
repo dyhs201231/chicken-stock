@@ -161,7 +161,7 @@ export default function InfoPanel({ stock }: StockOnlyProps) {
   })();
 
   return (
-    <section className="grid h-130 grid-cols-[10rem_minmax(0,1fr)] rounded-3xl bg-white px-7 py-6 shadow-[0_10px_18px_rgba(0,0,0,0.22)]">
+    <section className="cs-data-panel grid h-130 grid-cols-[8rem_minmax(0,1fr)] px-5 py-5 sm:grid-cols-[10rem_minmax(0,1fr)] md:px-7 md:py-6">
       <aside>
         <h2 className="mb-6 text-xl font-semibold tracking-normal">
           주요 정보
