@@ -10,7 +10,7 @@ export default function DefaultAccount({
   initialPortfolio,
 }: DefaultAccountProps) {
   return (
-    <div className="col gap-12 md:gap-20">
+    <div className="col gap-5">
       <AccountData initialPortfolio={initialPortfolio} />
       <BalanceData initialPortfolio={initialPortfolio} />
     </div>

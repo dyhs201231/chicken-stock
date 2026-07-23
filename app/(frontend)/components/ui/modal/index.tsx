@@ -66,7 +66,7 @@ const defaultTriggerClassName =
   "inline-flex min-h-10 cursor-pointer items-center justify-center rounded-lg border-0 bg-(--cs-brand-700) px-4 font-[inherit] font-semibold text-white transition-colors hover:bg-(--cs-brand-800) disabled:cursor-not-allowed disabled:opacity-50";
 
 const defaultOverlayClassName =
-  "fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-[#243429]/55 p-4 backdrop-blur-sm transition-opacity motion-reduce:transition-none md:p-6";
+  "fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-zinc-950/55 p-4 backdrop-blur-sm transition-opacity motion-reduce:transition-none md:p-6";
 
 const defaultContentClassName =
   "relative max-h-[min(720px,calc(100dvh-32px))] w-[min(100%,480px)] transform-gpu overflow-auto rounded-2xl border border-(--cs-border-strong) bg-(--cs-surface-raised) p-6 text-(--cs-text-strong) shadow-(--cs-shadow-lg) outline-none transition-[opacity,transform] will-change-[opacity,transform] motion-reduce:transform-none motion-reduce:transition-none md:p-8";

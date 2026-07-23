@@ -11,7 +11,6 @@ type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "size"> & {
   placeholder?: string;
   className?: string;
   inputClassName?: string;
-  focusable?: boolean;
   leftAddon?: ReactNode;
   rightAddon?: ReactNode;
   errorMessage?: ReactNode;
@@ -19,23 +18,15 @@ type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, "size"> & {
   ref?: Ref<HTMLInputElement>;
 };
 
-const inputVariants: Record<InputVariant, { base: string; focus: string }> = {
-  underline: {
-    base: "rounded-none border-0 border-b border-(--cs-border-strong) bg-transparent px-0 shadow-none",
-    focus: "focus:border-(--cs-brand-700) focus:ring-0",
-  },
-  pill: {
-    base: "rounded-lg border border-(--cs-border-subtle) bg-(--cs-surface-base) px-2.5 shadow-none",
-    focus: "focus:border-(--cs-brand-500) focus:ring-2 focus:ring-(--cs-brand-100)",
-  },
-  box: {
-    base: "rounded-lg border border-(--cs-border-subtle) bg-(--cs-surface-raised) px-3 shadow-(--cs-shadow-sm)",
-    focus: "focus:border-(--cs-brand-500) focus:ring-2 focus:ring-(--cs-brand-100)",
-  },
+const inputVariants: Record<InputVariant, string> = {
+  underline:
+    "rounded-none border-0 border-b border-(--cs-border-strong) bg-transparent px-0 shadow-none focus:border-(--cs-border-strong)",
+  pill: "rounded-lg border border-(--cs-border-subtle) bg-(--cs-surface-base) px-2.5 shadow-none focus:border-(--cs-border-subtle)",
+  box: "rounded-lg border border-(--cs-border-subtle) bg-(--cs-surface-raised) px-3 shadow-(--cs-shadow-sm) focus:border-(--cs-border-subtle)",
 };
 
 const sizeClassName: Record<InputSize, string> = {
-  sm: "h-7 text-sm",
+  sm: "h-9 text-sm",
   md: "h-10 text-base",
 };
 
@@ -48,7 +39,6 @@ export default function Input({
   inputClassName = "",
   variant = "box",
   size = "md",
-  focusable = true,
   type = "text",
   leftAddon,
   rightAddon,
@@ -80,12 +70,11 @@ export default function Input({
           aria-describedby={describedBy}
           aria-invalid={showErrorMessage ? true : ariaInvalid}
           className={twMerge(
-            "w-full min-w-0 text-(--cs-text-strong) transition outline-none placeholder:text-(--cs-text-muted) disabled:cursor-not-allowed disabled:bg-(--cs-surface-base) disabled:text-(--cs-text-muted)",
+            "w-full min-w-0 text-(--cs-text-strong) transition outline-none placeholder:text-(--cs-text-muted) focus:ring-0 focus:outline-none focus-visible:ring-0 focus-visible:outline-none disabled:cursor-not-allowed disabled:bg-(--cs-surface-base) disabled:text-(--cs-text-muted)",
             type === "number"
               ? "[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
               : undefined,
-            inputVariants[variant].base,
-            focusable ? inputVariants[variant].focus : undefined,
+            inputVariants[variant],
             sizeClassName[size],
             leftAddon ? "pl-7" : undefined,
             rightAddon ? "pr-8" : undefined,

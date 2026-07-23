@@ -283,7 +283,7 @@ export default function Select({
         aria-expanded={currentOpen}
         aria-haspopup="listbox"
         className={twMerge(
-          "inline-flex h-10 w-full min-w-0 cursor-pointer items-center justify-between gap-3 rounded-lg border border-(--cs-border-subtle) bg-(--cs-surface-raised) px-3 text-left text-base text-(--cs-text-strong) shadow-(--cs-shadow-sm) transition outline-none hover:border-(--cs-border-strong) focus-visible:border-(--cs-brand-500) focus-visible:ring-2 focus-visible:ring-(--cs-brand-100) disabled:cursor-not-allowed disabled:bg-(--cs-surface-base) disabled:text-(--cs-text-muted)",
+          "inline-flex h-10 w-full min-w-0 cursor-pointer items-center justify-between gap-3 rounded-lg border border-(--cs-border-subtle) bg-(--cs-surface-raised) px-3 text-left text-base text-(--cs-text-strong) shadow-(--cs-shadow-sm) transition outline-none hover:border-(--cs-border-strong) focus-visible:border-(--cs-border-subtle) focus-visible:outline-none disabled:cursor-not-allowed disabled:bg-(--cs-surface-base) disabled:text-(--cs-text-muted)",
           triggerClassName,
         )}
         data-state={currentOpen ? "open" : "closed"}
@@ -333,7 +333,9 @@ export default function Select({
                 aria-selected={selected}
                 className={twMerge(
                   "flex min-h-9 w-full cursor-pointer items-center justify-between gap-2 px-3 py-2 text-left text-sm text-(--cs-text-strong) transition hover:bg-(--cs-brand-50) disabled:cursor-not-allowed disabled:text-(--cs-text-muted)",
-                  selected ? "bg-(--cs-brand-100) font-semibold text-(--cs-brand-800)" : undefined,
+                  selected
+                    ? "bg-(--cs-brand-100) font-semibold text-(--cs-brand-800)"
+                    : undefined,
                   optionClassName,
                 )}
                 disabled={option.disabled}

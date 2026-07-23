@@ -14,14 +14,14 @@ type AnswerButtonProps = {
 
 const answerButtonVariants: Record<AnswerButtonVariant, string> = {
   default:
-    "w-full justify-start rounded-xl border border-(--cs-border-strong) bg-(--cs-surface-raised) px-4 py-3 text-left text-lg leading-7 font-medium hover:border-(--cs-brand-500) hover:bg-(--cs-brand-50) md:px-5 md:text-xl",
-  true: "h-32 w-full justify-center rounded-xl border-4 border-(--cs-color-blue-800) bg-(--cs-surface-raised) px-4 text-6xl font-black text-(--cs-color-blue-800) md:h-40 md:border-6 md:text-8xl",
+    "w-full justify-start rounded-lg border border-transparent bg-zinc-50 px-4 py-3 text-left text-base leading-6 font-medium break-words hover:bg-zinc-100 md:px-5 md:text-lg md:leading-7",
+  true: "h-24 w-full justify-center rounded-xl border-2 border-(--cs-color-blue-800) bg-white px-4 text-(--cs-color-blue-800) hover:bg-blue-50 md:h-28 md:px-6",
   false:
-    "h-32 w-full justify-center rounded-xl border-4 border-[#FF5A60] bg-(--cs-surface-raised) px-4 text-6xl font-black text-[#FF5A60] md:h-40 md:border-6 md:text-8xl",
+    "h-24 w-full justify-center rounded-xl border-2 border-[#FF5A60] bg-white px-4 text-[#FF5A60] hover:bg-red-50 md:h-28 md:px-6",
 };
 
 const selectedAnswerButtonVariants: Record<AnswerButtonVariant, string> = {
-  default: "border-(--cs-brand-600) bg-(--cs-brand-100) text-(--cs-brand-800)",
+  default: "border-[#2563EB] bg-[#2563EB]/10",
   true: "bg-[#4d61f529]",
   false: "bg-red-50",
 };
@@ -66,7 +66,6 @@ export default function AnswerButton({
   return (
     <button
       type="button"
-      aria-pressed={isSelected}
       className={twMerge(
         "flex items-center transition",
         answerButtonVariants[variant],
@@ -82,6 +81,7 @@ export default function AnswerButton({
           <Image
             alt=""
             aria-hidden="true"
+            className="h-12 w-auto md:h-16"
             height={trueFalseIcon.height}
             src={trueFalseIcon.src}
             width={trueFalseIcon.width}

@@ -1,5 +1,3 @@
-import Link from "next/link";
-import { IconChevronLeft } from "@tabler/icons-react";
 import { getCachedEducationArticle } from "@/app/(backend)/lib/education";
 import { getArticleQuizzes } from "@/app/(backend)/lib/quizzes";
 import AuthRequiredRedirect from "@/app/(frontend)/components/auth-guard/auth-required-redirect";
@@ -44,18 +42,7 @@ async function getQuizArticleContext(quizId: string, level?: string) {
     article = await getCachedEducationArticle(articleId, Number(levelParam));
   }
 
-  let articleHref: { pathname: string; query: { level: string } } | string =
-    `/edu/articles/${articleId}`;
-
-  if (levelParam) {
-    articleHref = {
-      pathname: `/edu/articles/${articleId}`,
-      query: { level: levelParam },
-    };
-  }
-
   return {
-    articleHref,
     articleId,
     label: {
       level: article?.educationSummary.stage ?? levelParam ?? "-",
@@ -91,7 +78,7 @@ export default async function QuizPage({
   }
 
   const currentUserId = String(currentUser.id);
-  const { articleHref, articleId, label } = articleContext;
+  const { articleId, label } = articleContext;
   const initialQuizzes: QuizContentData[] = await getArticleQuizzes(
     articleId,
     currentUser.id,
@@ -114,7 +101,7 @@ export default async function QuizPage({
   };
 
   return (
-    <main className="relative min-h-[calc(100dvh-74px)] bg-(--cs-surface-base) py-8 text-(--cs-text-strong) md:py-12">
+    <main className="min-h-[calc(100dvh-74px)] bg-[#f8f8f9] px-5 pt-8 pb-8 text-black md:px-8 md:pt-12 md:pb-12 lg:pb-16">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -122,35 +109,20 @@ export default async function QuizPage({
         }}
       />
 
-      <div className="cs-page-shell">
-        <Link
-          aria-label="아티클로 돌아가기"
-          className="mb-5 inline-flex min-h-10 items-center gap-1 rounded-lg border border-(--cs-border-strong) bg-(--cs-surface-raised) pr-4 pl-2 text-sm font-semibold text-(--cs-brand-800) shadow-(--cs-shadow-sm) transition hover:bg-(--cs-brand-50)"
-          href={articleHref}
-        >
-          <IconChevronLeft aria-hidden="true" className="size-5" stroke={2} />
-          아티클로 돌아가기
-        </Link>
+      <div className="mx-auto w-full max-w-4xl">
+        <section className="rounded-2xl bg-white p-5 md:p-8 lg:p-10">
+          <p className="inline-flex rounded-full bg-amber-100 px-3 py-1.5 text-sm font-semibold text-amber-900 md:text-base">
+            Level {label.level} | {label.id}. {label.title}
+          </p>
 
-        <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
-          <header className="rounded-2xl border border-(--cs-brand-300) bg-(--cs-surface-tint) px-6 py-7 md:px-9">
-            <p className="cs-section-label">
-              Level {label.level} · Knowledge check
-            </p>
-            <h1 className="mt-2 text-3xl font-bold tracking-[-0.03em] text-(--cs-text-strong) md:text-4xl">
-              {label.title}
-            </h1>
-            <p className="mt-2 text-base text-(--cs-text-muted)">
-              배운 내용을 떠올리며 한 문제씩 차분히 풀어보세요.
-            </p>
-          </header>
-
-          <QuizContainer
-            articleId={articleId}
-            initialQuizzes={initialQuizzes}
-            userId={currentUserId}
-          />
-        </div>
+          <div className="mt-6 md:mt-8">
+            <QuizContainer
+              articleId={articleId}
+              initialQuizzes={initialQuizzes}
+              userId={currentUserId}
+            />
+          </div>
+        </section>
       </div>
     </main>
   );

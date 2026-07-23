@@ -35,7 +35,7 @@ export default function AvatarButton() {
       </Popover.Trigger>
 
       <Popover.Content align="right">
-        <div className="flex min-w-[380px] flex-col px-9 py-7 whitespace-nowrap">
+        <div className="flex w-[calc(100vw-2.5rem)] max-w-95 flex-col px-5 py-5 whitespace-nowrap md:px-9 md:py-7">
           <div className="flex items-center gap-3 border-b border-(--cs-border-subtle) py-2">
             <Avatar
               type="header"

@@ -53,7 +53,8 @@ type SegmentedControlComponent = ((
 };
 
 const selectedVariants: Record<SegmentedStyle, string> = {
-  panel: "bg-(--cs-surface-raised) text-(--cs-brand-800) shadow-(--cs-shadow-sm)",
+  panel:
+    "bg-(--cs-surface-raised) text-(--cs-brand-800) shadow-(--cs-shadow-sm)",
   invertedPanel:
     "bg-(--cs-brand-100) text-(--cs-brand-800) shadow-(--cs-shadow-sm)",
   text: "text-white",
@@ -140,8 +141,10 @@ function SegmentedControlRoot({
     <div
       aria-label={ariaLabel}
       className={twMerge(
-        "inline-flex h-9 items-center rounded-lg border border-(--cs-border-subtle) p-0.5 text-sm font-semibold text-(--cs-text-strong)",
-        style === "invertedPanel" ? "bg-(--cs-surface-raised)" : "bg-(--cs-surface-strong)",
+        "inline-flex h-10 items-center rounded-lg border border-(--cs-border-subtle) p-0.5 text-sm font-semibold text-(--cs-text-strong)",
+        style === "invertedPanel"
+          ? "bg-(--cs-surface-raised)"
+          : "bg-(--cs-surface-strong)",
         className,
       )}
       role="radiogroup"

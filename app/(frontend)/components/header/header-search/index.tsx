@@ -275,7 +275,6 @@ export default function HeaderSearch() {
           placeholder="검색어를 입력해주세요"
           variant="pill"
           autoFocus={searchOpen}
-          focusable={false}
           value={searchValue}
           aria-activedescendant={activeSearchResultId}
           aria-autocomplete="list"

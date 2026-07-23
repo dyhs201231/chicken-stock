@@ -20,11 +20,7 @@ export default function StockList({ initialStocksPage }: StockListProps) {
       ? initialStocksPage
       : undefined;
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useStocksInfiniteQuery(
-      selectedMarket,
-      selectedRanking,
-      queryInitialData,
-    );
+    useStocksInfiniteQuery(selectedMarket, selectedRanking, queryInitialData);
 
   const stocks = useMemo(
     () => data?.pages.flatMap((page) => page.stocks) ?? [],
@@ -57,11 +53,12 @@ export default function StockList({ initialStocksPage }: StockListProps) {
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   return (
-    <section className="cs-surface-card mt-6 w-full overflow-hidden text-(--cs-text-strong) md:mt-8">
-      <div className="flex flex-wrap items-end justify-between gap-5 border-b border-(--cs-border-subtle) px-5 py-6 md:px-7">
+    <section className="mt-5 w-full rounded-2xl bg-white px-5 text-(--cs-text-strong) md:px-7">
+      <div className="flex flex-wrap items-end justify-between gap-5 py-5">
         <div>
-          <p className="cs-section-label mb-1">03 · Discover</p>
-          <h2 className="cs-section-title">실시간 차트</h2>
+          <h2 className="text-xl leading-tight font-bold tracking-[-0.02em] text-(--cs-text-strong)">
+            실시간 차트
+          </h2>
         </div>
 
         <StockListControls
@@ -74,7 +71,7 @@ export default function StockList({ initialStocksPage }: StockListProps) {
         />
       </div>
 
-      <div className="overflow-x-auto px-5 pt-5 md:px-7">
+      <div className="overflow-x-auto pt-2">
         <StockListTable
           isLoading={isLoading}
           selectedRanking={selectedRanking}

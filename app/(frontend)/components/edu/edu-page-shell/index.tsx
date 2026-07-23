@@ -7,38 +7,30 @@ type EduPageShellProps = {
 
 export default function EduPageShell({ children }: EduPageShellProps) {
   return (
-    <main className="relative min-h-[calc(100dvh-74px)] overflow-hidden bg-(--cs-surface-base) py-10 text-(--cs-text-strong) md:py-16">
-      <div
+    <main className="relative min-h-[calc(100dvh-74px)] overflow-hidden px-5">
+      <Image
+        src="/images/edu/edu-background.webp"
+        alt=""
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 h-[680px] overflow-hidden [mask-image:linear-gradient(to_bottom,black_0%,black_62%,transparent_100%)]"
-      >
-        <Image
-          src="/images/edu/edu-background.webp"
-          alt=""
-          fill
-          className="object-cover object-top"
-          priority
-          sizes="100vw"
-        />
-      </div>
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -top-24 right-[-8rem] size-80 rounded-full border-[42px] border-white/20 md:size-112"
+        fill
+        className="object-cover object-center"
+        priority
+        sizes="100vw"
       />
 
-      <section className="cs-page-shell relative z-10">
-        <div className="max-w-3xl">
-          <p className="cs-section-label">Learning journey</p>
-          <h1 className="mt-3 text-4xl leading-tight font-bold tracking-[-0.04em] md:text-6xl">
-            투자 공부를
-            <br className="hidden sm:block" /> 단계별로 시작해보세요
+      <section className="relative z-10 mx-auto flex min-h-[calc(100dvh-74px)] w-full max-w-7xl flex-col items-center gap-8 pt-12 pb-12 md:block md:min-h-237.5 md:pt-32">
+        <div className="mx-auto max-w-5xl text-center text-black">
+          <h1 className="text-4xl leading-tight font-bold tracking-normal md:text-6xl lg:text-8xl">
+            레벨별로 학습해보세요!
           </h1>
-          <p className="mt-5 max-w-2xl text-lg leading-8 text-(--cs-text-muted) md:text-xl">
-            기초 개념부터 차근차근 익히고, 퀴즈로 이해도를 확인해보세요.
+          <p className="mt-4 text-xl leading-tight font-medium tracking-normal md:text-3xl lg:text-4xl">
+            학습하고 퀴즈 맞혀 크레딧을 얻어보세요
           </p>
         </div>
 
-        <div className="mt-10 w-full md:mt-14">{children}</div>
+        <div className="mt-8 flex w-full flex-col items-center gap-8 md:mt-0">
+          {children}
+        </div>
       </section>
     </main>
   );

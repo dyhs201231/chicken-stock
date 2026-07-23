@@ -50,38 +50,36 @@ export default function EduProgress() {
   const bubbleText = guestBubbleText || progressBubbleText || null;
 
   return (
-    <section className="flex min-w-0 flex-col">
+    <section className="flex min-w-0 flex-col rounded-2xl bg-white p-5 lg:h-full">
       <div className="mb-4 flex items-end justify-between gap-4">
         <div>
-          <p className="cs-section-label mb-1">01 · Learn</p>
-          <h2 className="cs-section-title">학습 현황</h2>
+          <h2 className="text-xl leading-tight font-bold tracking-[-0.02em] text-(--cs-text-strong)">
+            학습 현황
+          </h2>
         </div>
       </div>
 
-      <div className="cs-surface-card relative h-96 w-full overflow-hidden lg:h-107.5">
-        <div
-          aria-hidden="true"
-          className="absolute inset-x-0 top-[-35%] h-[200%]"
-        >
-          <Image
+      <div className="relative h-28 w-full overflow-hidden rounded-xl">
+        <div aria-hidden="true" className="absolute inset-0">
+          {/* <Image
             src="/images/main/edu-progress.webp"
             alt=""
             fill
             priority
             fetchPriority="high"
-            sizes="(max-width: 768px) calc(100vw - 80px), 50vw"
+            sizes="(max-width: 1024px) calc(100vw - 40px), 25vw"
             className="object-fill brightness-95 saturate-115"
-          />
+          /> */}
         </div>
 
-        <div className="absolute inset-x-0 bottom-8 flex justify-center md:bottom-12">
-          <div className="relative h-44 w-56 md:h-60 md:w-72">
+        <div className="absolute inset-y-0 left-3 flex items-end">
+          <div className="relative h-24 w-32">
             <Image
               src={characterImages.nest}
               alt=""
               width={172}
               height={110}
-              className="absolute bottom-0 left-1/2 w-44 -translate-x-1/2 md:w-56"
+              className="absolute bottom-0 left-1/2 w-24 -translate-x-1/2"
             />
 
             <Image
@@ -90,14 +88,14 @@ export default function EduProgress() {
               width={119}
               height={145}
               loading="eager"
-              className="absolute bottom-12 left-1/2 w-28 -translate-x-1/2 md:bottom-16 md:w-40"
+              className="absolute bottom-6 left-1/2 w-14 -translate-x-1/2"
               unoptimized
             />
           </div>
         </div>
 
         {bubbleText && (
-          <div className="absolute top-[11%] left-[58%] h-20 w-20 md:h-28 md:w-32">
+          <div className="absolute top-1 right-2 h-20 w-24">
             <Image
               src="/images/main/rounded-speech-bubble.webp"
               alt=""
@@ -107,7 +105,7 @@ export default function EduProgress() {
               unoptimized
             />
 
-            <p className="absolute top-[43%] left-[50%] w-[66%] -translate-x-1/2 -translate-y-1/2 text-center text-xs leading-snug font-semibold text-zinc-950 md:text-sm">
+            <p className="absolute top-[43%] left-1/2 w-3/4 -translate-x-1/2 -translate-y-1/2 text-center text-xs leading-4 font-semibold text-zinc-950">
               {bubbleText}
             </p>
           </div>

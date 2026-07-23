@@ -13,13 +13,13 @@ export default function PortfolioTab() {
       defaultValue={selectedTab}
       direction="row"
       type="fill"
-      className="mb-8 w-full overflow-x-auto rounded-none border-b border-(--cs-border-strong) bg-transparent p-0 md:mb-12"
+      className="w-full overflow-x-auto rounded-none bg-transparent p-0"
     >
       {PORTFOLIO_TAB.map((tab) => (
         <Tab.Item
           key={tab}
-          className="shrink-0 rounded-none px-5 py-3 text-base font-semibold md:px-10 md:py-4 md:text-xl"
-          activeClassName="bg-(--cs-brand-100) text-(--cs-brand-800)"
+          className="shrink-0 rounded-none px-4 py-3 text-base font-semibold md:px-6 md:text-lg"
+          activeClassName="bg-transparent text-[#df2b2e]"
           value={tab}
           onClick={() => {
             if (tab === "예상 배당금") {

@@ -21,11 +21,11 @@ export default function LoginButton() {
       <Popover.Content align="right">
         <Button
           variant="custom"
-          className="flex h-[68px] w-[380px] items-center justify-center gap-4 whitespace-nowrap"
+          className="flex h-16 w-[calc(100vw-2.5rem)] max-w-95 items-center justify-center gap-3 px-4 whitespace-nowrap"
           onClick={handleGoogleLogin}
         >
           <GoogleLogo />
-          <span className="text-xl">구글 계정으로 로그인</span>
+          <span className="text-base md:text-xl">구글 계정으로 로그인</span>
         </Button>
       </Popover.Content>
     </Popover>

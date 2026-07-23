@@ -67,7 +67,7 @@ export default async function Home() {
   ]);
 
   return (
-    <main className="cs-page-shell py-8 md:py-12">
+    <main className="min-h-[calc(100dvh-74px)] bg-[#f8f8f9] py-8 md:py-12">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -75,23 +75,14 @@ export default async function Home() {
         }}
       />
 
-      <header className="mb-8 max-w-3xl md:mb-10">
-        <p className="cs-section-label mb-3">Market & learning</p>
-        <h1 className="text-3xl leading-tight font-bold tracking-[-0.035em] text-(--cs-text-strong) md:text-5xl">
-          배우고, 직접 경험하며,
-          <br />내 투자 감각을 키워보세요.
-        </h1>
-        <p className="mt-4 max-w-xl text-base text-(--cs-text-muted) md:text-lg">
-          시장의 흐름과 학습 진도를 한 화면에서 확인할 수 있어요.
-        </p>
-      </header>
+      <div className="cs-page-shell">
+        <div className="grid min-w-0 grid-cols-1 gap-5 lg:grid-cols-[minmax(0,3fr)_minmax(0,1fr)] lg:items-stretch">
+          <IndexList initialIndices={initialIndices} />
+          <EduProgress />
+        </div>
 
-      <div className="grid min-w-0 gap-5 lg:grid-cols-[minmax(0,1.65fr)_minmax(19rem,0.75fr)]">
-        <EduProgress />
-        <IndexList initialIndices={initialIndices} />
+        <StockList initialStocksPage={initialStocksPage} />
       </div>
-
-      <StockList initialStocksPage={initialStocksPage} />
     </main>
   );
 }

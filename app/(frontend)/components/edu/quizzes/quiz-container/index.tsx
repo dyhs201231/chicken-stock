@@ -55,7 +55,7 @@ export default function QuizContainer({
 
   if (isLoading) {
     return (
-      <section className="cs-surface-card mx-auto flex min-h-96 w-full max-w-6xl flex-col items-center justify-center px-6 py-6 text-2xl font-medium text-(--cs-text-muted) md:px-16">
+      <section className="flex min-h-64 w-full flex-col items-center justify-center px-5 py-8 text-base font-medium text-zinc-500 md:text-lg">
         퀴즈를 불러오는 중이에요.
       </section>
     );
@@ -63,7 +63,7 @@ export default function QuizContainer({
 
   if (isError || articleId <= 0) {
     return (
-      <section className="cs-surface-card mx-auto flex min-h-96 w-full max-w-6xl flex-col items-center justify-center px-6 py-6 text-center text-2xl font-medium text-rose-600 md:px-16">
+      <section className="flex min-h-64 w-full flex-col items-center justify-center px-5 py-8 text-center text-base font-medium text-rose-600 md:text-lg">
         {articleId <= 0 && "올바르지 않은 퀴즈 경로예요."}
         {articleId > 0 && errorMessage}
       </section>
@@ -72,7 +72,7 @@ export default function QuizContainer({
 
   if (!currentQuiz) {
     return (
-      <section className="cs-surface-card mx-auto flex min-h-96 w-full max-w-6xl flex-col items-center justify-center px-6 py-6 text-center text-2xl font-medium text-(--cs-text-muted) md:px-16">
+      <section className="flex min-h-64 w-full flex-col items-center justify-center px-5 py-8 text-center text-base font-medium text-zinc-500 md:text-lg">
         아직 이 아티클에 연결된 퀴즈가 없어요.
       </section>
     );

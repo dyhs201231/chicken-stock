@@ -2,29 +2,29 @@
 @import "react-datepicker/dist/react-datepicker.css";
 
 :root {
-  --background: #f4f7d5;
-  --foreground: #292d2a;
-  --cs-surface-canvas: #f4f7d5;
-  --cs-surface-base: #f7f9e8;
-  --cs-surface-raised: #fbfcef;
-  --cs-surface-tint: #edf7ed;
-  --cs-surface-strong: #dff0df;
-  --cs-text-strong: #292d2a;
-  --cs-text-default: #454a46;
-  --cs-text-muted: #747d75;
-  --cs-border-subtle: #dfe7dd;
-  --cs-border-strong: #c5d3c4;
-  --cs-brand-50: #eef8ef;
-  --cs-brand-100: #d9f0dc;
-  --cs-brand-300: #a8dcae;
-  --cs-brand-500: #69be78;
-  --cs-brand-600: #4ea765;
-  --cs-brand-700: #377c4d;
-  --cs-brand-800: #285d3b;
-  --cs-focus: #377c4d;
-  --cs-shadow-sm: 0 1px 2px rgba(35, 55, 38, 0.05);
-  --cs-shadow-md: 0 8px 24px rgba(50, 75, 50, 0.08);
-  --cs-shadow-lg: 0 18px 48px rgba(50, 75, 50, 0.12);
+  --background: #ffffff;
+  --foreground: #171717;
+  --cs-surface-canvas: #ffffff;
+  --cs-surface-base: #fafafa;
+  --cs-surface-raised: #ffffff;
+  --cs-surface-tint: #f7f7f7;
+  --cs-surface-strong: #eeeeee;
+  --cs-text-strong: #18181b;
+  --cs-text-default: #3f3f46;
+  --cs-text-muted: #71717a;
+  --cs-border-subtle: #e4e4e7;
+  --cs-border-strong: #d4d4d8;
+  --cs-brand-50: #fafafa;
+  --cs-brand-100: #f4f4f5;
+  --cs-brand-300: #d4d4d8;
+  --cs-brand-500: #52525b;
+  --cs-brand-600: #3f3f46;
+  --cs-brand-700: #27272a;
+  --cs-brand-800: #18181b;
+  --cs-focus: #27272a;
+  --cs-shadow-sm: 0 1px 2px rgba(24, 24, 27, 0.05);
+  --cs-shadow-md: 0 8px 24px rgba(24, 24, 27, 0.08);
+  --cs-shadow-lg: 0 18px 48px rgba(24, 24, 27, 0.12);
   --cs-content-max: 1440px;
   --cs-page-gutter: clamp(20px, 4vw, 56px);
   --cs-color-blue-100: #c6d2ff;
@@ -112,11 +112,9 @@ body {
   color: var(--foreground);
   font-family: var(--font-atoz), Arial, Helvetica, sans-serif;
   line-height: 1.5;
+  overflow-wrap: break-word;
   text-rendering: optimizeLegibility;
-  background-image:
-    radial-gradient(circle at 8% 3%, rgba(255, 255, 255, 0.78) 0 7rem, transparent 7.1rem),
-    radial-gradient(circle at 94% 18%, rgba(168, 220, 174, 0.24) 0 10rem, transparent 10.1rem);
-  background-attachment: fixed;
+  word-break: keep-all;
 }
 
 ::selection {
@@ -124,9 +122,25 @@ body {
   color: var(--cs-text-strong);
 }
 
-:where(a, button, input, select, textarea):focus-visible {
+:where(a, button):focus-visible {
   outline: 2px solid var(--cs-focus);
   outline-offset: 3px;
+}
+
+:where(input, select, textarea):focus,
+:where(input, select, textarea):focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.cs-toast-close {
+  top: 50% !important;
+  right: 12px !important;
+  bottom: auto !important;
+  left: auto !important;
+  margin: 0 !important;
+  border: 0 !important;
+  transform: translateY(-50%) !important;
 }
 
 .cs-page-shell {
@@ -143,10 +157,8 @@ body {
 }
 
 .cs-data-panel {
-  border: 1px solid var(--cs-border-subtle);
   border-radius: var(--cs-radius-2xl);
   background: var(--cs-surface-raised);
-  box-shadow: var(--cs-shadow-md);
 }
 
 .cs-section-label {

@@ -3,7 +3,6 @@ import type {
   MarketIndexCandleData,
   MarketIndexViewData,
 } from "../../types/market-index";
-import MarketDataStatus from "../market-data-status";
 import {
   formatMarketIndexChange,
   formatMarketIndexPercent,
@@ -64,7 +63,9 @@ function MarketIndexSparkline({
     ? `${chartPoints} ${SPARKLINE_WIDTH},${SPARKLINE_HEIGHT} 0,${SPARKLINE_HEIGHT}`
     : "";
   const trend =
-    marketIndex.quote.status === "error" ? "flat" : marketIndex.quote.data.trend;
+    marketIndex.quote.status === "error"
+      ? "flat"
+      : marketIndex.quote.data.trend;
   const strokeColor = getMarketIndexTrendStrokeColor(trend);
 
   return (
@@ -114,12 +115,16 @@ export default function MarketIndexListItem({
   );
   const titleClassName =
     size === "compact"
-      ? "truncate text-xs leading-4 tracking-normal text-zinc-950"
-      : "truncate text-base tracking-normal text-zinc-950 md:text-lg";
+      ? "min-w-0 truncate text-xs leading-4 tracking-normal text-zinc-950"
+      : "min-w-0 truncate text-base tracking-normal text-zinc-950 md:text-lg";
   const valueClassName =
     size === "compact"
-      ? "mt-0.5 text-xs leading-4 tracking-normal whitespace-nowrap text-zinc-950"
-      : "mt-0.5 text-sm tracking-normal text-zinc-950 md:text-base";
+      ? "shrink-0 text-xs leading-4 font-semibold tracking-normal whitespace-nowrap text-zinc-950"
+      : "shrink-0 text-sm font-semibold tracking-normal whitespace-nowrap text-zinc-950 md:text-base";
+  const changeClassName =
+    size === "compact"
+      ? "mt-0.5 truncate text-xs leading-4 tracking-normal"
+      : "mt-0.5 truncate text-sm tracking-normal md:text-base";
 
   return (
     <Link
@@ -136,29 +141,23 @@ export default function MarketIndexListItem({
       />
 
       <div className="min-w-0 flex-1 overflow-hidden">
-        <h3 className={titleClassName}>{marketIndex.name}</h3>
-
         {quote.status === "error" ? (
-          <p className={`${valueClassName} text-zinc-500`}>
-            정보를 불러오지 못했습니다.
-          </p>
+          <>
+            <h3 className={titleClassName}>{marketIndex.name}</h3>
+            <p className={`${changeClassName} text-zinc-500`}>-</p>
+          </>
         ) : (
           <>
-            <p className={`${valueClassName} truncate`}>
-              {formatMarketIndexValue(quote.data.currentValue)}
-              <span className={`ml-2 ${trendTextColor}`}>
-                {formatMarketIndexChange(quote.data.changeAmount)}(
-                {formatMarketIndexPercent(quote.data.changeRate)})
-              </span>
+            <div className="flex min-w-0 items-baseline gap-2">
+              <h3 className={titleClassName}>{marketIndex.name}</h3>
+              <p className={valueClassName}>
+                {formatMarketIndexValue(quote.data.currentValue)}
+              </p>
+            </div>
+            <p className={`${changeClassName} ${trendTextColor}`}>
+              {formatMarketIndexChange(quote.data.changeAmount)} (
+              {formatMarketIndexPercent(quote.data.changeRate)})
             </p>
-            {size === "default" && quote.status === "fallback" && (
-              <MarketDataStatus result={quote} />
-            )}
-            {size === "default" &&
-              quote.status === "success" &&
-              marketIndex.chart.status !== "success" && (
-                <MarketDataStatus result={marketIndex.chart} />
-              )}
           </>
         )}
       </div>

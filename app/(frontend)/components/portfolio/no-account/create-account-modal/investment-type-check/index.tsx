@@ -7,9 +7,9 @@ import { twMerge } from "tailwind-merge";
 import { isInvestmentTypeSurveyComplete } from "../../../../../lib/classify-investment-type";
 
 const SELECT_TRIGGER_CLASS_NAME =
-  "h-8 rounded-[10px] border-2 border-(--cs-color-gray-200) px-4  shadow-none hover:border-zinc-300 focus-visible:border-zinc-400 focus-visible:ring-0 [&_svg]:size-7 [&_svg]:text-(--cs-color-gray-400)";
+  "h-10 rounded-lg border border-(--cs-border-subtle) px-3 shadow-none hover:border-(--cs-border-strong) [&_svg]:size-5 [&_svg]:text-(--cs-text-muted)";
 const SELECT_TRIGGER_ERROR_CLASS_NAME =
-  "border-red-500 bg-red-50 hover:border-red-500 focus-visible:border-red-500";
+  "border-red-500 bg-red-50 hover:border-red-500";
 
 export default function InvestmentTypeCheck() {
   const {
@@ -39,19 +39,22 @@ export default function InvestmentTypeCheck() {
 
   return (
     <>
-      <div className="col center gap-7">
+      <div className="col center w-full gap-5">
         {INVESTMENT_SELECTS.map(({ id, label, field, options }) => (
           <div
-            className="row center w-[485px] gap-4 whitespace-nowrap"
+            className="flex w-full max-w-[485px] flex-col gap-2 sm:flex-row sm:items-center sm:gap-4"
             key={field}
           >
-            <label className="w-[130px] text-end text-xl" htmlFor={id}>
+            <label
+              className="w-full text-base sm:w-[130px] sm:text-right"
+              htmlFor={id}
+            >
               {label}
             </label>
 
             <Select
               id={id}
-              className="w-[200px]"
+              className="w-full sm:w-[200px]"
               aria-invalid={
                 isValidationRequested && !createAccountInfo[field].trim()
               }
@@ -62,7 +65,7 @@ export default function InvestmentTypeCheck() {
                   SELECT_TRIGGER_ERROR_CLASS_NAME,
               )}
               contentClassName="rounded-xl border border-(--cs-border-subtle) py-1 shadow-(--cs-shadow-md)"
-              optionClassName="min-h-11 px-4 text-base"
+              optionClassName="min-h-10 px-3 text-base"
               options={options}
               value={createAccountInfo[field]}
               onValueChange={(value) => handleValueChange(field, value)}
@@ -72,11 +75,19 @@ export default function InvestmentTypeCheck() {
       </div>
 
       <div className="row justify-end gap-3">
-        <Button variant="step-controls" onClick={() => setStep(step - 1)}>
+        <Button
+          className="h-11 min-h-11 w-auto min-w-24 max-w-none flex-none rounded-lg px-5 text-base"
+          variant="step-controls"
+          onClick={() => setStep(step - 1)}
+        >
           이전
         </Button>
 
-        <Button variant="step-controls" onClick={handleNextButtonClick}>
+        <Button
+          className="h-11 min-h-11 w-auto min-w-24 max-w-none flex-none rounded-lg px-5 text-base"
+          variant="step-controls"
+          onClick={handleNextButtonClick}
+        >
           다음
         </Button>
       </div>

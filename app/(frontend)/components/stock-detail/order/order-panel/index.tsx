@@ -138,7 +138,7 @@ export default function OrderPanel({
 
   return (
     <section className="cs-data-panel flex h-130 flex-col overflow-hidden text-sm leading-tight text-(--cs-text-strong) tabular-nums">
-      <div className="shrink-0 px-4 pt-3">
+      <div className="shrink-0 px-4 pt-4">
         <Tab.Root
           className="gap-3 bg-transparent p-0 text-lg"
           type="underline"

@@ -38,8 +38,6 @@ export default function MonthSelector({
 
   return (
     <section className="row items-center gap-10 text-sm font-medium">
-      <span>월</span>
-
       <div className="row items-center gap-8">
         <button
           className="cursor-pointer px-1"

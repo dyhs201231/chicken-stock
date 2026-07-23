@@ -1,7 +1,5 @@
-import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
-import { IconChevronLeft } from "@tabler/icons-react";
 import { getCachedEducationArticle } from "@/app/(backend)/lib/education";
 import { getArticleQuizProgress } from "@/app/(backend)/lib/quizzes";
 import { getCurrentUser } from "../../../../lib/auth-check";
@@ -94,6 +92,17 @@ function getContentTextLength(
       return totalLength;
     }
 
+    if (block.type === "table") {
+      return (
+        totalLength +
+        [...block.headers, ...block.rows.flat()].reduce(
+          (tableTextLength, cell) =>
+            tableTextLength + cell.replace(/\s/g, "").length,
+          0,
+        )
+      );
+    }
+
     return totalLength + block.text.replace(/\s/g, "").length;
   }, 0);
 }
@@ -109,16 +118,16 @@ function calculateEstimatedReadingMinutes(
   );
 }
 
-function getHeadingClassName(level: number) {
+function getHeadingClassName(level: number, isFirstBlock: boolean) {
   if (level === 1) {
-    return "text-3xl leading-tight font-bold tracking-[-0.025em] text-(--cs-text-strong)";
+    return "text-4xl leading-tight font-bold text-zinc-950";
   }
 
   if (level === 2) {
-    return "pt-5 text-2xl leading-tight font-bold tracking-[-0.02em] text-(--cs-text-strong) md:text-3xl";
+    return `${isFirstBlock ? "" : "pt-6 "}text-3xl leading-tight font-bold text-zinc-950`;
   }
 
-  return "pt-2 text-xl leading-tight font-semibold text-(--cs-text-strong) md:text-2xl";
+  return `${isFirstBlock ? "" : "pt-3 "}text-2xl leading-tight font-semibold text-zinc-950`;
 }
 
 export default async function ArticlePage({
@@ -170,10 +179,6 @@ export default async function ArticlePage({
 
   const isQuizCompleted = quizProgress?.isCorrect === true;
   const quizHref = `/edu/quizzes/${articlesId}?level=${articleLevel}`;
-  const articleListLinkQuery = {
-    openLevel: String(article.educationSummary.stage),
-  };
-
   const seoTitle = `${article.title} - Level ${articleLevel} 주식 투자 학습 | Chicken Stock`;
   const seoDescription = createArticleDescription(
     article.title,
@@ -202,7 +207,7 @@ export default async function ArticlePage({
   };
 
   return (
-    <main className="relative min-h-[calc(100dvh-74px)] bg-(--cs-surface-base) py-8 text-(--cs-text-strong) md:py-12">
+    <main className="min-h-[calc(100dvh-74px)] bg-[#f8f8f9] px-5 pt-8 pb-8 text-zinc-950 md:px-8 md:pt-12 md:pb-12 lg:pb-16">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -216,77 +221,50 @@ export default async function ArticlePage({
         userId={currentUserIdParam}
       />
 
-      <div className="cs-page-shell">
-        <Link
-          href={{
-            pathname: "/edu",
-            query: articleListLinkQuery,
-          }}
-          aria-label="학습 목록으로 돌아가기"
-          className="mb-5 inline-flex min-h-10 items-center gap-1 rounded-lg border border-(--cs-border-strong) bg-(--cs-surface-raised) pr-4 pl-2 text-sm font-semibold text-(--cs-brand-800) shadow-(--cs-shadow-sm) transition hover:bg-(--cs-brand-50)"
-        >
-          <IconChevronLeft aria-hidden="true" className="size-5" stroke={2} />
-          학습 목록
-        </Link>
+      <div className="mx-auto max-w-4xl">
+        <article className="rounded-2xl bg-white p-5 md:p-8 lg:p-10">
+          <h1 className="text-center text-4xl leading-tight font-bold tracking-normal md:text-5xl">
+            {article.title}
+          </h1>
 
-        <article className="mx-auto max-w-5xl">
-          <header className="cs-surface-card overflow-hidden p-6 md:p-10">
-            <p className="cs-section-label mb-3">
-              Level {articleLevel} · Article {article.id}
-            </p>
-            <h1 className="max-w-3xl text-4xl leading-tight font-bold tracking-[-0.04em] md:text-5xl">
-              {article.title}
-            </h1>
+          <div className="mt-3 text-center text-base font-medium text-zinc-500 md:mt-4 md:text-lg">
+            예상 읽기 시간 : {estimatedReadingMinutes}분
+          </div>
 
-            <div className="mt-5 flex flex-wrap items-center gap-2 text-sm font-semibold text-(--cs-text-muted)">
-              <span className="rounded-full bg-(--cs-brand-100) px-3 py-1.5 text-(--cs-brand-800)">
-                예상 읽기 {estimatedReadingMinutes}분
-              </span>
-              <span>천천히 읽고 핵심 개념을 익혀보세요.</span>
+          {article.imageUrl && (
+            <div className="relative mx-auto mt-14 h-72 w-full max-w-md overflow-hidden rounded-xl bg-zinc-100">
+              <Image
+                src={article.imageUrl}
+                alt={article.title}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 768px"
+                unoptimized
+              />
             </div>
-
-            {article.imageUrl && (
-              <div className="relative mt-8 h-64 w-full overflow-hidden rounded-xl bg-(--cs-surface-tint) md:h-96">
-                <Image
-                  src={article.imageUrl}
-                  alt={article.title}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, 960px"
-                  unoptimized
-                />
-              </div>
-            )}
-          </header>
+          )}
 
           {visibleContentBlocks.length > 0 && (
             <div
               id={ARTICLE_PROGRESS_TARGET_ID}
-              className="cs-surface-card mx-auto mt-6 max-w-5xl space-y-7 px-6 py-9 text-(--cs-text-default) md:px-14 md:py-12"
+              className={`${article.imageUrl ? "mt-10" : "mt-8"} mx-auto max-w-4xl space-y-3 text-zinc-950 md:space-y-4`}
             >
               {visibleContentBlocks.map((block, index) => {
                 if (block.type === "heading") {
-                  const headingLevel = Math.max(2, block.level);
-                  const headingClassName = getHeadingClassName(headingLevel);
+                  const headingClassName = getHeadingClassName(
+                    block.level,
+                    index === 0,
+                  );
 
-                  if (headingLevel === 2) {
-                    return (
-                      <h2
-                        key={`${block.text}-${index}`}
-                        className={headingClassName}
-                      >
-                        {block.text}
-                      </h2>
-                    );
-                  }
+                  const HeadingTag = `h${block.level}` as const;
 
                   return (
-                    <h3
+                    <HeadingTag
                       key={`${block.text}-${index}`}
                       className={headingClassName}
                     >
                       {block.text}
-                    </h3>
+                    </HeadingTag>
                   );
                 }
 
@@ -294,7 +272,7 @@ export default async function ArticlePage({
                   return (
                     <ul
                       key={`list-${index}`}
-                      className="list-disc space-y-2 pl-6 text-lg leading-8 marker:text-(--cs-brand-600) md:text-xl md:leading-9"
+                      className="list-disc space-y-2 pl-6 text-lg leading-8 md:pl-8 md:text-xl md:leading-9"
                     >
                       {block.items.map((item, itemIndex) => (
                         <li key={`${item}-${itemIndex}`}>{item}</li>
@@ -307,7 +285,7 @@ export default async function ArticlePage({
                   return (
                     <blockquote
                       key={`${block.text}-${index}`}
-                      className="rounded-r-xl border-l-4 border-(--cs-brand-500) bg-(--cs-brand-50) px-5 py-4 text-lg leading-8 font-medium text-(--cs-text-strong) md:text-xl md:leading-9"
+                      className="border-l-4 border-zinc-300 px-5 py-2 text-lg leading-8 font-medium text-zinc-950 md:px-6 md:text-xl md:leading-9"
                     >
                       {block.text}
                     </blockquote>
@@ -316,10 +294,54 @@ export default async function ArticlePage({
 
                 if (block.type === "divider") {
                   return (
-                    <hr
-                      key={`divider-${index}`}
-                      className="border-(--cs-border-subtle)"
-                    />
+                    <hr key={`divider-${index}`} className="border-zinc-300" />
+                  );
+                }
+
+                if (block.type === "table") {
+                  return (
+                    <div
+                      key={`table-${index}`}
+                      className="my-2 overflow-x-auto rounded-xl bg-zinc-50"
+                    >
+                      <table className="w-full min-w-128 border-collapse text-left text-base leading-6 md:text-lg md:leading-7">
+                        <thead className="bg-zinc-100 text-zinc-950">
+                          <tr>
+                            {block.headers.map((header, headerIndex) => (
+                              <th
+                                key={`${header}-${headerIndex}`}
+                                scope="col"
+                                className="px-4 py-3 font-semibold md:px-5"
+                              >
+                                {header}
+                              </th>
+                            ))}
+                          </tr>
+                        </thead>
+
+                        <tbody>
+                          {block.rows.map((row, rowIndex) => (
+                            <tr
+                              key={`row-${rowIndex}`}
+                              className="border-t border-zinc-200"
+                            >
+                              {row.map((cell, cellIndex) => (
+                                <td
+                                  key={`${cell}-${cellIndex}`}
+                                  className={`px-4 py-3 align-top md:px-5 ${
+                                    cellIndex === 0
+                                      ? "font-medium text-zinc-950"
+                                      : "text-zinc-700"
+                                  }`}
+                                >
+                                  {cell}
+                                </td>
+                              ))}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
                   );
                 }
 
@@ -336,24 +358,18 @@ export default async function ArticlePage({
           )}
 
           {visibleContentBlocks.length === 0 && (
-            <p className="mt-6 rounded-xl border border-(--cs-border-subtle) bg-(--cs-surface-raised) px-5 py-10 text-center text-base text-(--cs-text-muted) shadow-(--cs-shadow-sm)">
+            <p className="mt-8 rounded-lg bg-white px-5 py-6 text-center text-base text-zinc-500 shadow-sm">
               아직 본문이 준비되지 않았어요.
             </p>
           )}
 
-          <footer className="mt-6 flex flex-col items-center rounded-2xl border border-(--cs-brand-300) bg-(--cs-surface-tint) px-6 py-8 text-center">
-            <p className="cs-section-label">Knowledge check</p>
-            <h2 className="mt-2 text-2xl font-bold text-(--cs-text-strong)">
-              읽은 내용을 퀴즈로 확인해보세요.
-            </h2>
-            <div className="mt-5">
-              <QuizStartButton
-                href={quizHref}
-                isCompleted={isQuizCompleted}
-                isLoggedIn={Boolean(currentUserIdParam)}
-              />
-            </div>
-          </footer>
+          <div className="mt-16 flex justify-center">
+            <QuizStartButton
+              href={quizHref}
+              isCompleted={isQuizCompleted}
+              isLoggedIn={Boolean(currentUserIdParam)}
+            />
+          </div>
         </article>
       </div>
     </main>

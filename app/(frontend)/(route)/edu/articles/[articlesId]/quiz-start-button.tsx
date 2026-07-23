@@ -10,7 +10,7 @@ type QuizStartButtonProps = {
 };
 
 const buttonClassName =
-  "inline-flex min-h-12 items-center justify-center rounded-lg bg-(--cs-brand-700) px-7 text-lg font-semibold text-white shadow-(--cs-shadow-sm) transition-colors hover:bg-(--cs-brand-800)";
+  "inline-flex min-h-12 items-center justify-center rounded-lg bg-zinc-950 px-7 text-lg font-semibold text-white transition-colors hover:bg-zinc-800 focus-visible:ring-2 focus-visible:ring-zinc-500 focus-visible:ring-offset-2 focus-visible:outline-none md:min-h-14 md:px-10 md:text-2xl";
 
 export default function QuizStartButton({
   href,
@@ -21,7 +21,7 @@ export default function QuizStartButton({
     return (
       <button
         type="button"
-        className="inline-flex min-h-12 cursor-not-allowed items-center justify-center rounded-lg bg-(--cs-brand-100) px-7 text-lg font-semibold text-(--cs-brand-700) opacity-70"
+        className="inline-flex min-h-12 cursor-not-allowed items-center justify-center rounded-lg bg-zinc-300 px-7 text-lg font-semibold text-zinc-500 md:min-h-14 md:px-10 md:text-2xl"
         disabled
       >
         퀴즈 완료
