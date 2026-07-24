@@ -2,7 +2,7 @@
 
 ## Goal
 
-Place `/images/main/edu_progress_egg.png` at the right side of the learning-progress card while keeping the text on the left.
+Place `/images/main/edu_progress_egg.webp` at the right side of the learning-progress card while keeping the text on the left.
 
 ## Design
 

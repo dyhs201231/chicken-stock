@@ -122,13 +122,11 @@ export default function EduProgress() {
           )}
 
           {!isLoggedIn && (
-            <>
-              <p className={`text-xs font-semibold ${levelTheme.text}`}>
-                <span className="font-bold">학습을 시작해 볼까요?</span>
-                <br />
-                <span>가입하고 나만의 학습 기록을 쌓아보세요.</span>
-              </p>
-            </>
+            <p className={`text-xs font-semibold ${levelTheme.text}`}>
+              <span className="font-bold">학습을 시작해 볼까요?</span>
+              <br />
+              <span>가입하고 나만의 학습 기록을 쌓아보세요.</span>
+            </p>
           )}
         </div>
 
