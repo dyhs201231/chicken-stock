@@ -16,10 +16,18 @@ const LEVEL_THEMES: Record<
     text: string;
   }
 > = {
+  0: {
+    background: "bg-[#EAEBCD]",
+    characterAlt: "학습 전 비회원을 위한 이미지",
+    characterImage: "/images/main/edu_progress_empty.webp",
+    progressGradient: "from-[#FFB285] to-[#FF8F5B]",
+    progressTrack: "bg-[#FFD9C2]",
+    text: "text-[#555647]",
+  },
   1: {
     background: "bg-[#EAEBCD]",
     characterAlt: "알에서 성장 중인 레벨 1 학습 캐릭터",
-    characterImage: "/images/main/edu_progress_egg.png",
+    characterImage: "/images/main/edu_progress_egg.webp",
     progressGradient: "from-[#FFB285] to-[#FF8F5B]",
     progressTrack: "bg-[#FFD9C2]",
     text: "text-[#555647]",
@@ -27,7 +35,7 @@ const LEVEL_THEMES: Record<
   2: {
     background: "bg-[#FDE0AF]",
     characterAlt: "병아리로 성장한 레벨 2 학습 캐릭터",
-    characterImage: "/images/main/edu_progress_chick.png",
+    characterImage: "/images/main/edu_progress_chick.webp",
     progressGradient: "from-[#F5D564] to-[#E9AE36]",
     progressTrack: "bg-[#EDF098]",
     text: "text-[#644B21]",
@@ -35,7 +43,7 @@ const LEVEL_THEMES: Record<
   3: {
     background: "bg-[#FDD3C5]",
     characterAlt: "닭으로 성장한 레벨 3 학습 캐릭터",
-    characterImage: "/images/main/edu_progress_chicken.png",
+    characterImage: "/images/main/edu_progress_chicken.webp",
     progressGradient: "from-[#FFBE82] to-[#F08C62]",
     progressTrack: "bg-[#FFFAC9]",
     text: "text-[#672F1D]",
@@ -71,7 +79,7 @@ export default function EduProgress() {
     return Math.floor(totalProgressRate / articles.length);
   }, [educationSummaries]);
 
-  const levelTheme = LEVEL_THEMES[userLevel ?? 1] ?? LEVEL_THEMES[1];
+  const levelTheme = LEVEL_THEMES[userLevel ?? 0] ?? LEVEL_THEMES[0];
 
   return (
     <section
@@ -89,25 +97,37 @@ export default function EduProgress() {
         aria-label={`레벨 ${userLevel} 학습 현황`}
       >
         <div className="flex h-full min-w-0 flex-1 flex-col justify-center gap-1">
-          <h3 className={`font-semibold ${levelTheme.text}`}>
-            레벨 {userLevel}
-          </h3>
-          <div
-            className={`h-2.5 w-full overflow-hidden rounded-full ${levelTheme.progressTrack}`}
-            role="progressbar"
-            aria-label={`레벨 ${userLevel} 학습 진행률`}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-valuenow={progressRate}
-          >
-            <div
-              className={`h-full rounded-full bg-linear-to-r ${levelTheme.progressGradient}`}
-              style={{ width: `${progressRate}%` }}
-            />
-          </div>
-          <p className={`text-sm font-semibold ${levelTheme.text}`}>
-            {progressRate}%
-          </p>
+          {isLoggedIn && (
+            <>
+              <h3 className={`font-semibold ${levelTheme.text}`}>
+                레벨 {userLevel}
+              </h3>
+              <div
+                className={`h-2.5 w-full overflow-hidden rounded-full ${levelTheme.progressTrack}`}
+                role="progressbar"
+                aria-label={`레벨 ${userLevel} 학습 진행률`}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={progressRate}
+              >
+                <div
+                  className={`h-full rounded-full bg-linear-to-r ${levelTheme.progressGradient}`}
+                  style={{ width: `${progressRate}%` }}
+                />
+              </div>
+              <p className={`text-sm font-semibold ${levelTheme.text}`}>
+                {progressRate}%
+              </p>
+            </>
+          )}
+
+          {!isLoggedIn && (
+            <p className={`text-xs font-semibold ${levelTheme.text}`}>
+              <span className="font-bold">학습을 시작해 볼까요?</span>
+              <br />
+              <span>가입하고 나만의 학습 기록을 쌓아보세요.</span>
+            </p>
+          )}
         </div>
 
         <figure className="ml-auto shrink-0">
