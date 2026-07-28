@@ -1,14 +1,11 @@
 import type { Metadata } from "next";
 
 import { getCachedMarketIndexViews } from "../../(backend)/lib/market-indices";
-import {
-  DEFAULT_STOCKS_PAGE,
-  STOCKS_PAGE_SIZE,
-  getCachedStocksPage,
-} from "../../(backend)/lib/stocks";
+import { getCachedStocksRanking } from "../../(backend)/lib/stocks";
 import EduProgress from "../components/main/edu-progress";
 import IndexList from "../components/main/index_list";
 import StockList from "../components/main/stock_list";
+import { loadHomeInitialData } from "./home-page-data";
 
 const SITE_URL = "https://chicken-stock.com/";
 const SITE_NAME = "Chicken Stock";
@@ -56,15 +53,16 @@ const websiteJsonLd = {
 };
 
 export default async function Home() {
-  const [initialIndices, initialStocksPage] = await Promise.all([
-    getCachedMarketIndexViews(),
-    getCachedStocksPage({
-      limit: STOCKS_PAGE_SIZE,
-      market: "all",
-      page: DEFAULT_STOCKS_PAGE,
-      ranking: "tradingAmount",
-    }),
-  ]);
+  const { initialIndices, initialStocksRanking } = await loadHomeInitialData({
+    loadMarketIndices: getCachedMarketIndexViews,
+    loadStocksRanking: () =>
+      getCachedStocksRanking({
+        limit: 10,
+        market: "all",
+        period: "live",
+        ranking: "tradingAmount",
+      }),
+  });
 
   return (
     <main className="min-h-[calc(100dvh-74px)] bg-[#f8f8f9] py-8 md:py-12">
@@ -81,7 +79,7 @@ export default async function Home() {
           <EduProgress />
         </div>
 
-        <StockList initialStocksPage={initialStocksPage} />
+        <StockList initialStocksPage={initialStocksRanking} />
       </div>
     </main>
   );

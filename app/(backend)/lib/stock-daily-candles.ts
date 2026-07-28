@@ -1,3 +1,5 @@
+import { parseMarketTimeToMinutes } from "./market-time.ts";
+
 const DAILY_CANDLE_INTERVAL_CODE = "1D";
 const MIN_PRICE = 0.01;
 
@@ -25,6 +27,7 @@ type ExistingDailyCandle = {
   lowPrice: number;
   openPrice: number;
   timestamp: bigint;
+  tradingValue: number;
   volume: number;
 };
 
@@ -41,6 +44,7 @@ type BuildMissingDailyCandlesParams = {
 
 type GetCompletedMarketDateKeysParams = {
   closedDateKeys?: Iterable<string>;
+  closeTimeByDateKey?: ReadonlyMap<string, string | null>;
   countryCode: MarketCountryCode;
   lookbackDays: number;
   now?: Date;
@@ -157,6 +161,23 @@ function roundPrice(value: number) {
   return Math.max(MIN_PRICE, Math.round(value * 100) / 100);
 }
 
+function getEstimatedTradingValue(candle: {
+  closePrice: number;
+  highPrice: number;
+  lowPrice: number;
+  openPrice: number;
+  volume: number;
+}) {
+  const typicalPrice =
+    (candle.openPrice +
+      candle.highPrice +
+      candle.lowPrice +
+      candle.closePrice) /
+    4;
+
+  return Math.round(typicalPrice * candle.volume * 100) / 100;
+}
+
 function getPriceTick(price: number) {
   return price >= 1000 ? 1 : MIN_PRICE;
 }
@@ -195,13 +216,15 @@ function buildMarketLikeDailyCandle({
 
   const highExtraRate = 0.003 + getDeterministicUnit(seed, "high") * 0.018;
   const lowExtraRate = 0.003 + getDeterministicUnit(seed, "low") * 0.018;
-  const highPrice = roundPrice(Math.max(openPrice, closePrice) * (1 + highExtraRate));
+  const highPrice = roundPrice(
+    Math.max(openPrice, closePrice) * (1 + highExtraRate),
+  );
   const lowPrice = roundPrice(
     Math.min(openPrice, closePrice) * (1 - lowExtraRate),
   );
-  const volume = 1_000 + Math.floor(getDeterministicUnit(seed, "volume") * 49_000);
-
-  return {
+  const volume =
+    1_000 + Math.floor(getDeterministicUnit(seed, "volume") * 49_000);
+  const candle = {
     closePrice,
     highPrice: Math.max(highPrice, openPrice, closePrice),
     intervalCode: DAILY_CANDLE_INTERVAL_CODE,
@@ -210,6 +233,11 @@ function buildMarketLikeDailyCandle({
     ticker,
     timestamp: getDateKeyTimestamp(dateKey),
     volume,
+  };
+
+  return {
+    ...candle,
+    tradingValue: getEstimatedTradingValue(candle),
   };
 }
 
@@ -222,17 +250,18 @@ function isCurrentMarketDateCompleted(
   config: MarketConfig,
   currentMarketDateKey: string,
   dateKey: string,
+  closeTime: string | null | undefined,
 ) {
   if (dateKey !== currentMarketDateKey) {
     return true;
   }
 
   const parts = getZonedDateTimeParts(now, config.timeZone);
+  const closeMinutes =
+    parseMarketTimeToMinutes(closeTime) ??
+    toMinutes(config.closeHour, config.closeMinute);
 
-  return (
-    toMinutes(parts.hour, parts.minute) >=
-    toMinutes(config.closeHour, config.closeMinute)
-  );
+  return toMinutes(parts.hour, parts.minute) >= closeMinutes;
 }
 
 export function getMarketDateTimestamp(
@@ -247,6 +276,7 @@ export function getMarketDateTimestamp(
 
 export function getCompletedMarketDateKeys({
   closedDateKeys = [],
+  closeTimeByDateKey = new Map(),
   countryCode,
   lookbackDays,
   now = new Date(),
@@ -263,7 +293,13 @@ export function getCompletedMarketDateKeys({
     if (
       !isWeekend(dateKey) &&
       !closedDates.has(dateKey) &&
-      isCurrentMarketDateCompleted(now, config, currentMarketDateKey, dateKey)
+      isCurrentMarketDateCompleted(
+        now,
+        config,
+        currentMarketDateKey,
+        dateKey,
+        closeTimeByDateKey.get(dateKey),
+      )
     ) {
       completedDateKeys.push(dateKey);
     }
@@ -284,7 +320,11 @@ export function buildMissingDailyCandles({
     existingCandles.map((candle) => [candle.timestamp.toString(), candle]),
   );
   const sortedCandles = [...existingCandles].sort((left, right) =>
-    left.timestamp < right.timestamp ? -1 : left.timestamp > right.timestamp ? 1 : 0,
+    left.timestamp < right.timestamp
+      ? -1
+      : left.timestamp > right.timestamp
+        ? 1
+        : 0,
   );
   const missingCandles: MissingDailyCandle[] = [];
 
@@ -348,6 +388,7 @@ export async function ensureListedDailyCandles({
 
   const holidays = await prisma.marketHoliday.findMany({
     select: {
+      closeTime: true,
       countryCode: true,
       isClosed: true,
       marketDate: true,
@@ -356,7 +397,6 @@ export async function ensureListedDailyCandles({
       countryCode: {
         in: [...countryCodes],
       },
-      isClosed: true,
       marketDate: {
         gte: new Date(
           Date.UTC(
@@ -370,15 +410,25 @@ export async function ensureListedDailyCandles({
   });
 
   const closedDateKeysByCountry = new Map<MarketCountryCode, Set<string>>();
+  const closeTimeByDateKeyByCountry = new Map<
+    MarketCountryCode,
+    Map<string, string | null>
+  >();
   countryCodes.forEach((code) => {
     closedDateKeysByCountry.set(code, new Set());
+    closeTimeByDateKeyByCountry.set(code, new Map());
   });
   holidays.forEach((holiday) => {
     const holidayCountryCode = toMarketCountryCode(holiday.countryCode);
+    const dateKey = holiday.marketDate.toISOString().slice(0, 10);
 
-    closedDateKeysByCountry
+    if (holiday.isClosed) {
+      closedDateKeysByCountry.get(holidayCountryCode)?.add(dateKey);
+    }
+
+    closeTimeByDateKeyByCountry
       .get(holidayCountryCode)
-      ?.add(holiday.marketDate.toISOString().slice(0, 10));
+      ?.set(dateKey, holiday.closeTime);
   });
 
   const completedDateKeysByCountry = new Map(
@@ -386,6 +436,7 @@ export async function ensureListedDailyCandles({
       code,
       getCompletedMarketDateKeys({
         closedDateKeys: closedDateKeysByCountry.get(code),
+        closeTimeByDateKey: closeTimeByDateKeyByCountry.get(code),
         countryCode: code,
         lookbackDays,
         now,
@@ -406,6 +457,7 @@ export async function ensureListedDailyCandles({
           lowPrice: true,
           openPrice: true,
           timestamp: true,
+          tradingValue: true,
           volume: true,
         },
         take: lookbackDays + 30,
@@ -429,8 +481,9 @@ export async function ensureListedDailyCandles({
   const missingCandles = stocks.flatMap((stock) =>
     buildMissingDailyCandles({
       completedDateKeys:
-        completedDateKeysByCountry.get(toMarketCountryCode(stock.countryCode)) ??
-        [],
+        completedDateKeysByCountry.get(
+          toMarketCountryCode(stock.countryCode),
+        ) ?? [],
       existingCandles: stock.candles.map((candle) => ({
         closePrice: toFinitePrice(candle.closePrice),
         highPrice: toFinitePrice(candle.highPrice),
@@ -438,6 +491,7 @@ export async function ensureListedDailyCandles({
         lowPrice: toFinitePrice(candle.lowPrice),
         openPrice: toFinitePrice(candle.openPrice),
         timestamp: candle.timestamp,
+        tradingValue: toFinitePrice(candle.tradingValue),
         volume: toFinitePrice(candle.volume),
       })),
       fallbackPrice:
@@ -463,6 +517,7 @@ export async function ensureListedDailyCandles({
           highPrice: candle.highPrice,
           lowPrice: candle.lowPrice,
           openPrice: candle.openPrice,
+          tradingValue: candle.tradingValue,
           volume: candle.volume,
         },
         where: {

@@ -1,32 +1,51 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getStocksRanking } from "../../lib/stocks";
 import {
-  DEFAULT_STOCKS_PAGE,
-  STOCKS_PAGE_SIZE,
-  getStocksPage,
-  parsePositiveInteger,
+  getCanonicalStockRankingQuery,
+  getStockRankingCacheControl,
   parseStockMarketFilter,
   parseStockRanking,
-} from "../../lib/stocks";
+  parseStockRankingLimit,
+  parseStockRankingPeriod,
+} from "../../lib/stock-ranking";
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = request.nextUrl;
+    const canonicalQuery = getCanonicalStockRankingQuery(searchParams);
+
+    if (request.nextUrl.search !== `?${canonicalQuery}`) {
+      const canonicalUrl = request.nextUrl.clone();
+      canonicalUrl.search = canonicalQuery;
+      const redirectResponse = NextResponse.redirect(canonicalUrl, 307);
+
+      redirectResponse.headers.set("Cache-Control", "private, no-store");
+
+      return redirectResponse;
+    }
+
     const market = parseStockMarketFilter(searchParams.get("market"));
     const ranking = parseStockRanking(searchParams.get("ranking"));
-    const page = parsePositiveInteger(
-      searchParams.get("page"),
-      DEFAULT_STOCKS_PAGE,
-    );
-    const limit = Math.min(
-      parsePositiveInteger(searchParams.get("limit"), STOCKS_PAGE_SIZE),
-      STOCKS_PAGE_SIZE,
-    );
-    const stocksPage = await getStocksPage({ limit, market, page, ranking });
-
-    return NextResponse.json({
-      ok: true,
-      data: stocksPage,
+    const period = parseStockRankingPeriod(searchParams.get("period"));
+    const limit = parseStockRankingLimit(searchParams.get("limit"));
+    const stocksRanking = await getStocksRanking({
+      limit,
+      market,
+      period,
+      ranking,
     });
+
+    return NextResponse.json(
+      {
+        ok: true,
+        data: stocksRanking,
+      },
+      {
+        headers: {
+          "Cache-Control": getStockRankingCacheControl(period),
+        },
+      },
+    );
   } catch (error) {
     const message =
       process.env.NODE_ENV === "production"

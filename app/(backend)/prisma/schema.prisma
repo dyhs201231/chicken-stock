@@ -656,6 +656,7 @@ model StockCandle {
   highPrice    Decimal @map("high_price")
   lowPrice     Decimal @map("low_price")
   closePrice   Decimal @map("close_price")
+  tradingValue Decimal @map("trading_value") @db.Decimal(30, 2)
   volume       Decimal
   stock        Stock   @relation(fields: [ticker], references: [ticker])
 

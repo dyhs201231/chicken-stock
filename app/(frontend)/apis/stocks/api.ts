@@ -3,6 +3,9 @@ import { createStockOrderHeaders } from "./create-order-headers";
 import type {
   StockData,
   StockMarket,
+  StockMarketFilter,
+  StockRankingKey,
+  StockRankingPeriod,
 } from "../../components/main/stock_list/types";
 import type { ChartCandleData } from "../../components/stock-detail/order/chart-panel/types";
 import type {
@@ -17,9 +20,13 @@ export type StockTradeOrderType = "BUY" | "SELL";
 export type StockTradeOrderStatus = "PENDING" | "COMPLETED" | "CANCELED";
 export type StockOrderPriceType = "LIMIT" | "MARKET";
 
-export type StocksPage = {
+export type StocksRankingData = {
   stocks: StockData[];
-  nextPage: number | null;
+  asOf: string;
+  periodStart: string | null;
+  periodEnd: string | null;
+  hasMore: boolean;
+  marketOpen: boolean;
 };
 
 export type StockSearchResult = {
@@ -34,7 +41,7 @@ export type StockSearchResult = {
 type StocksResponse =
   | {
       ok: true;
-      data: StocksPage;
+      data: StocksRankingData;
     }
   | {
       ok: false;
@@ -204,19 +211,28 @@ type StockOrderCancelResponse =
       error: string;
     };
 
+export function getStocksRankingRequestParams(
+  market: StockMarketFilter,
+  ranking: StockRankingKey,
+  period: StockRankingPeriod,
+  limit: number,
+) {
+  return {
+    market,
+    ranking,
+    period,
+    limit,
+  };
+}
+
 export async function fetchStocks(
-  market: string,
-  ranking: string,
-  page: number,
+  market: StockMarketFilter,
+  ranking: StockRankingKey,
+  period: StockRankingPeriod,
+  limit: number,
 ) {
   const { data } = await requests.get<StocksResponse>("/api/stocks", {
-    params: {
-      market,
-      ranking,
-      market_status: "LISTED",
-      page,
-      limit: STOCKS_PAGE_SIZE,
-    },
+    params: getStocksRankingRequestParams(market, ranking, period, limit),
   });
 
   if (!data.ok) {
