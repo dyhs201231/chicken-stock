@@ -1,6 +1,7 @@
 import "server-only";
 
 import { prisma } from "./prisma";
+import { parseMarketTimeToMinutes } from "./market-time.ts";
 
 export type MarketSessionCountryCode = "KR" | "US";
 
@@ -110,20 +111,6 @@ function getCheckedDateKey(
     String(parts.month).padStart(2, "0"),
     String(parts.day).padStart(2, "0"),
   ].join("-");
-}
-
-function parseTimeToMinutes(value: string | null) {
-  if (!value) {
-    return null;
-  }
-
-  const match = /^(\d{2}):(\d{2})$/.exec(value);
-
-  if (!match) {
-    return null;
-  }
-
-  return toMinutes(Number(match[1]), Number(match[2]));
 }
 
 function toMarketDate(dateKey: string) {
@@ -267,10 +254,10 @@ export async function getMarketSessionStatus(
 
   const currentMinutes = toMinutes(parts.hour, parts.minute);
   const openMinutes =
-    parseTimeToMinutes(marketHoliday?.openTime ?? null) ??
+    parseMarketTimeToMinutes(marketHoliday?.openTime) ??
     toMinutes(session.openHour, session.openMinute);
   const closeMinutes =
-    parseTimeToMinutes(marketHoliday?.closeTime ?? null) ??
+    parseMarketTimeToMinutes(marketHoliday?.closeTime) ??
     toMinutes(session.closeHour, session.closeMinute);
   const isOpen = currentMinutes >= openMinutes && currentMinutes < closeMinutes;
 

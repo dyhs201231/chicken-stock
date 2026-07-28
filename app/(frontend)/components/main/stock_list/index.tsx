@@ -1,43 +1,84 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useStocksInfiniteQuery } from "../../../apis/stocks/queries";
+import { useEffect, useRef, useState } from "react";
 import StockListControls from "./stock-list-controls";
 import StockListTable from "./stock-list-table";
-import type { StocksPage } from "../../../apis/stocks/api";
+import type { StocksRankingData } from "../../../apis/stocks/api";
+import type {
+  StockMarketFilter,
+  StockRankingKey,
+  StockRankingPeriod,
+} from "./types";
+import { STOCKS_PAGE_SIZE } from "../../../apis/stocks/api";
+import { useStocksQuery } from "../../../apis/stocks/queries";
+import {
+  STOCK_RANKING_MAX_VISIBLE_LIMIT,
+  getNextStockRankingVisibleLimit,
+} from "./stock-list-state";
 
 type StockListProps = {
-  initialStocksPage?: StocksPage;
+  initialStocksPage?: StocksRankingData;
 };
 
 export default function StockList({ initialStocksPage }: StockListProps) {
-  const [selectedMarket, setSelectedMarket] = useState("all");
-  const [selectedRanking, setSelectedRanking] = useState("tradingAmount");
-  const [selectedPeriod, setSelectedPeriod] = useState("live");
+  const [selectedMarket, setSelectedMarket] =
+    useState<StockMarketFilter>("all");
+  const [selectedRanking, setSelectedRanking] =
+    useState<StockRankingKey>("tradingAmount");
+  const [selectedPeriod, setSelectedPeriod] =
+    useState<StockRankingPeriod>("live");
+  const [visibleLimit, setVisibleLimit] = useState(STOCKS_PAGE_SIZE);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const requestVersionRef = useRef(0);
   const queryInitialData =
-    selectedMarket === "all" && selectedRanking === "tradingAmount"
+    selectedMarket === "all" &&
+    selectedRanking === "tradingAmount" &&
+    selectedPeriod === "live" &&
+    visibleLimit === STOCKS_PAGE_SIZE
       ? initialStocksPage
       : undefined;
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useStocksInfiniteQuery(selectedMarket, selectedRanking, queryInitialData);
-
-  const stocks = useMemo(
-    () => data?.pages.flatMap((page) => page.stocks) ?? [],
-    [data],
+  const { data, dataRanking, isError, isFetching, isLoading } = useStocksQuery(
+    selectedMarket,
+    selectedRanking,
+    selectedPeriod,
+    visibleLimit,
+    queryInitialData,
   );
+  const stocks = data?.stocks ?? [];
 
   useEffect(() => {
     const loadMoreElement = loadMoreRef.current;
+    const observedLimit = visibleLimit;
+    const observedRequestVersion = requestVersionRef.current;
 
-    if (!loadMoreElement || !hasNextPage) {
+    if (
+      !loadMoreElement ||
+      !data?.hasMore ||
+      isError ||
+      isFetching ||
+      observedLimit >= STOCK_RANKING_MAX_VISIBLE_LIMIT
+    ) {
       return;
     }
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && !isFetchingNextPage) {
-          void fetchNextPage();
+        if (
+          entry.isIntersecting &&
+          data.hasMore &&
+          !isError &&
+          !isFetching &&
+          observedLimit < STOCK_RANKING_MAX_VISIBLE_LIMIT
+        ) {
+          setVisibleLimit((currentLimit) =>
+            getNextStockRankingVisibleLimit({
+              currentLimit,
+              currentRequestVersion: requestVersionRef.current,
+              observedLimit,
+              observedRequestVersion,
+              pageSize: STOCKS_PAGE_SIZE,
+            }),
+          );
         }
       },
       {
@@ -50,7 +91,25 @@ export default function StockList({ initialStocksPage }: StockListProps) {
     return () => {
       observer.disconnect();
     };
-  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+  }, [data?.hasMore, isError, isFetching, visibleLimit]);
+
+  function handleMarketChange(market: StockMarketFilter) {
+    requestVersionRef.current += 1;
+    setSelectedMarket(market);
+    setVisibleLimit(STOCKS_PAGE_SIZE);
+  }
+
+  function handleRankingChange(ranking: StockRankingKey) {
+    requestVersionRef.current += 1;
+    setSelectedRanking(ranking);
+    setVisibleLimit(STOCKS_PAGE_SIZE);
+  }
+
+  function handlePeriodChange(period: StockRankingPeriod) {
+    requestVersionRef.current += 1;
+    setSelectedPeriod(period);
+    setVisibleLimit(STOCKS_PAGE_SIZE);
+  }
 
   return (
     <section className="mt-5 w-full rounded-2xl bg-white px-5 text-(--cs-text-strong) md:px-7">
@@ -65,25 +124,40 @@ export default function StockList({ initialStocksPage }: StockListProps) {
           selectedMarket={selectedMarket}
           selectedPeriod={selectedPeriod}
           selectedRanking={selectedRanking}
-          onMarketChange={setSelectedMarket}
-          onPeriodChange={setSelectedPeriod}
-          onRankingChange={setSelectedRanking}
+          onMarketChange={handleMarketChange}
+          onPeriodChange={handlePeriodChange}
+          onRankingChange={handleRankingChange}
         />
       </div>
 
       <div className="overflow-x-auto pt-2">
         <StockListTable
+          isError={isError}
           isLoading={isLoading}
-          selectedRanking={selectedRanking}
+          selectedRanking={dataRanking}
           stocks={stocks}
         />
       </div>
 
       <div ref={loadMoreRef} className="h-10" aria-hidden="true" />
 
-      {isFetchingNextPage && (
-        <div className="py-4 text-center text-sm text-zinc-400">
-          종목을 더 불러오는 중입니다.
+      {isFetching && !isLoading && (
+        <div
+          aria-live="polite"
+          className="py-4 text-center text-sm text-zinc-400"
+          role="status"
+        >
+          종목 순위를 갱신하는 중입니다.
+        </div>
+      )}
+
+      {isError && stocks.length > 0 && (
+        <div
+          aria-live="polite"
+          className="py-4 text-center text-sm text-red-500"
+          role="status"
+        >
+          종목 순위를 갱신하지 못했습니다. 기존 정보를 표시합니다.
         </div>
       )}
     </section>

@@ -274,6 +274,7 @@ async function updateDailyCandleAfterExecution(
   },
 ): Promise<boolean> {
   const timestamp = getDailyCandleTimestamp(executedAt, countryCode);
+  const tradingValue = getFillAmount(executionPrice, quantity);
   const candleId = {
     ticker_intervalCode_timestamp: {
       intervalCode: DAILY_CANDLE_INTERVAL_CODE,
@@ -295,6 +296,7 @@ async function updateDailyCandleAfterExecution(
         openPrice: executionPrice,
         ticker,
         timestamp,
+        tradingValue,
         volume: quantity,
       },
     });
@@ -306,6 +308,9 @@ async function updateDailyCandleAfterExecution(
       closePrice: executionPrice,
       highPrice: maxDecimal(currentCandle.highPrice, executionPrice),
       lowPrice: minDecimal(currentCandle.lowPrice, executionPrice),
+      tradingValue: {
+        increment: tradingValue,
+      },
       volume: {
         increment: quantity,
       },

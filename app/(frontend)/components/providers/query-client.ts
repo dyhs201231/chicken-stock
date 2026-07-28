@@ -1,4 +1,4 @@
-import { QueryClient } from "@tanstack/react-query";
+import { isServer, QueryClient } from "@tanstack/react-query";
 import { isAxiosError } from "axios";
 
 function shouldRetryQuery(failureCount: number, error: unknown) {
@@ -28,11 +28,16 @@ const makeQueryClient = () =>
     },
   });
 
-let client: QueryClient | null = null;
+let browserQueryClient: QueryClient | null = null;
 
 export const getQueryClient = () => {
-  if (!client) {
-    client = makeQueryClient();
+  if (isServer) {
+    return makeQueryClient();
   }
-  return client;
+
+  if (!browserQueryClient) {
+    browserQueryClient = makeQueryClient();
+  }
+
+  return browserQueryClient;
 };
