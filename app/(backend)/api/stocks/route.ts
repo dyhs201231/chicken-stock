@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getStocksRanking } from "../../lib/stocks";
+import { getCachedStocksRanking } from "../../lib/stocks";
 import {
   getCanonicalStockRankingQuery,
   getStockRankingCacheControl,
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     const ranking = parseStockRanking(searchParams.get("ranking"));
     const period = parseStockRankingPeriod(searchParams.get("period"));
     const limit = parseStockRankingLimit(searchParams.get("limit"));
-    const stocksRanking = await getStocksRanking({
+    const stocksRanking = await getCachedStocksRanking({
       limit,
       market,
       period,
@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
       },
       {
         headers: {
-          "Cache-Control": getStockRankingCacheControl(period),
+          "Cache-Control": getStockRankingCacheControl(),
         },
       },
     );

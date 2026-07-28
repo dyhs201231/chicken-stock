@@ -16,6 +16,7 @@ export type StockRankingPeriod =
 type StockRankingMarketCountryCode = "KR" | "US";
 
 type StockRankingWindowInput = {
+  activeDateKey?: string;
   closedDateKeys?: Iterable<string>;
   closeTimeByDateKey?: ReadonlyMap<string, string | null>;
   countryCode: StockRankingMarketCountryCode;
@@ -149,6 +150,7 @@ export function getCanonicalStockRankingQuery(searchParams: URLSearchParams) {
 }
 
 export function getStockRankingWindow({
+  activeDateKey,
   closedDateKeys,
   closeTimeByDateKey,
   countryCode,
@@ -162,13 +164,14 @@ export function getStockRankingWindow({
     return null;
   }
 
-  const [endDateKey] = getCompletedMarketDateKeys({
+  const [completedDateKey] = getCompletedMarketDateKeys({
     closedDateKeys,
     closeTimeByDateKey,
     countryCode,
     lookbackDays: 1,
     now,
   });
+  const endDateKey = activeDateKey ?? completedDateKey;
 
   if (!endDateKey) {
     return null;
@@ -193,8 +196,6 @@ export function getStockRankingWindow({
   return { endDateKey, startDateKey };
 }
 
-export function getStockRankingCacheControl(period: StockRankingPeriod) {
-  return period === "live"
-    ? "public, max-age=0, s-maxage=5"
-    : "public, max-age=0, s-maxage=30, stale-while-revalidate=30";
+export function getStockRankingCacheControl() {
+  return "public, max-age=0, s-maxage=5";
 }

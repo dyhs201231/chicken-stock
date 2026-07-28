@@ -184,12 +184,11 @@ export function useStocksQuery(
     placeholderData: keepPreviousData,
     refetchInterval: (query) =>
       getStockRankingRefetchInterval(
-        period,
         query.state.data?.marketOpen ?? true,
       ),
-    refetchOnReconnect: period === "live" ? "always" : false,
-    refetchOnWindowFocus: period === "live" ? "always" : false,
-    staleTime: period === "live" ? 5_000 : 30_000,
+    refetchOnReconnect: "always",
+    refetchOnWindowFocus: "always",
+    staleTime: 5_000,
   });
   const displaySnapshot = getStockRankingDisplaySnapshot({
     currentData: query.data,

@@ -36,14 +36,6 @@ type RankedStockRow = {
   volume: DecimalLike;
 };
 
-type LiveRankedStockRow = RankedStockRow & {
-  asOf: Date | null;
-};
-
-type HistoricalRankedStockRow = RankedStockRow & {
-  asOfTimestamp: bigint | null;
-};
-
 type StockRankingWindow = {
   startDateKey: string;
   endDateKey: string;
@@ -176,7 +168,7 @@ async function getLiveRankingRows({
   limit: number;
   ranking: StockRankingKey;
 }) {
-  return prisma.$queryRaw<LiveRankedStockRow[]>(Prisma.sql`
+  return prisma.$queryRaw<RankedStockRow[]>(Prisma.sql`
     WITH "rankedStocks" AS (
       SELECT s."id",
              s."name",
@@ -185,8 +177,7 @@ async function getLiveRankingRows({
              s."current_price" AS "currentPrice",
              s."change_rate" AS "changeRate",
              s."trading_value" AS "tradingValue",
-             s."volume",
-             s."updated_at" AS "updatedAt"
+             s."volume"
       FROM "public"."Stock" s
       WHERE s."market_status" = ${"LISTED"}::"Stock_market_status"
         AND ${getCountryCondition(countryCodes)}
@@ -198,8 +189,7 @@ async function getLiveRankingRows({
            "currentPrice",
            "changeRate",
            "tradingValue",
-           "volume",
-           MAX("updatedAt") OVER () AS "asOf"
+           "volume"
     FROM "rankedStocks"
     ORDER BY ${getRankingExpression(ranking)} DESC, "id" ASC
     LIMIT ${limit + 1}
@@ -217,7 +207,7 @@ async function getHistoricalRankingRows({
   ranking: StockRankingKey;
   windowsByCountry: Map<"KR" | "US", StockRankingWindow>;
 }) {
-  return prisma.$queryRaw<HistoricalRankedStockRow[]>(Prisma.sql`
+  return prisma.$queryRaw<RankedStockRow[]>(Prisma.sql`
     WITH "rankedStocks" AS (
       SELECT s."id",
              s."name",
@@ -226,8 +216,7 @@ async function getHistoricalRankingRows({
              s."current_price" AS "currentPrice",
              s."change_rate" AS "changeRate",
              COALESCE(SUM(c."trading_value"), 0::numeric) AS "tradingValue",
-             COALESCE(SUM(c."volume"), 0::numeric) AS "volume",
-             MAX(c."timestamp") AS "latestCandleTimestamp"
+             COALESCE(SUM(c."volume"), 0::numeric) AS "volume"
       FROM "public"."Stock" s
       LEFT JOIN "public"."Stock_candle" c
         ON c."ticker" = s."ticker"
@@ -244,8 +233,7 @@ async function getHistoricalRankingRows({
            "currentPrice",
            "changeRate",
            "tradingValue",
-           "volume",
-           MAX("latestCandleTimestamp") OVER () AS "asOfTimestamp"
+           "volume"
     FROM "rankedStocks"
     ORDER BY ${getRankingExpression(ranking)} DESC, "id" ASC
     LIMIT ${limit + 1}
@@ -315,9 +303,18 @@ export async function getStocksRanking({
       ),
     ]),
   );
+  const marketSessionsByCountry = new Map(
+    marketSessions.flatMap((session) =>
+      session ? [[session.countryCode, session] as const] : [],
+    ),
+  );
   const windowsByCountry = new Map(
     countryCodes.flatMap((countryCode) => {
+      const marketSession = marketSessionsByCountry.get(countryCode);
       const window = getStockRankingWindow({
+        activeDateKey: marketSession?.isOpen
+          ? marketSession.checkedAt
+          : undefined,
         closedDateKeys: closedDateKeysByCountry.get(countryCode),
         closeTimeByDateKey: closeTimeByDateKeyByCountry.get(countryCode),
         countryCode,
@@ -345,23 +342,10 @@ export async function getStocksRanking({
           windowsByCountry,
         });
   const visibleRows = rows.slice(0, rankingLimit);
-  const firstRow = rows[0];
-  const asOf =
-    period === "live"
-      ? firstRow && "asOf" in firstRow && firstRow.asOf
-        ? firstRow.asOf.toISOString()
-        : now.toISOString()
-      : firstRow &&
-          "asOfTimestamp" in firstRow &&
-          firstRow.asOfTimestamp !== null
-        ? new Date(Number(firstRow.asOfTimestamp)).toISOString()
-        : periodEnd
-          ? `${periodEnd}T00:00:00.000Z`
-          : now.toISOString();
 
   return {
     stocks: formatStocks(visibleRows, ranking),
-    asOf,
+    asOf: now.toISOString(),
     periodStart,
     periodEnd,
     hasMore: rows.length > rankingLimit,
