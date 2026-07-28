@@ -14,7 +14,6 @@ import { useStocksQuery } from "../../../apis/stocks/queries";
 import {
   STOCK_RANKING_MAX_VISIBLE_LIMIT,
   getNextStockRankingVisibleLimit,
-  getStockRankingBasisLabel,
 } from "./stock-list-state";
 
 type StockListProps = {
@@ -38,15 +37,7 @@ export default function StockList({ initialStocksPage }: StockListProps) {
     visibleLimit === STOCKS_PAGE_SIZE
       ? initialStocksPage
       : undefined;
-  const {
-    data,
-    dataPeriod,
-    dataRanking,
-    isError,
-    isFetching,
-    isLoading,
-    isPlaceholderData,
-  } = useStocksQuery(
+  const { data, dataRanking, isError, isFetching, isLoading } = useStocksQuery(
     selectedMarket,
     selectedRanking,
     selectedPeriod,
@@ -54,13 +45,6 @@ export default function StockList({ initialStocksPage }: StockListProps) {
     queryInitialData,
   );
   const stocks = data?.stocks ?? [];
-  const basisLabel = getStockRankingBasisLabel({
-    asOf: data?.asOf,
-    isPlaceholderData,
-    period: dataPeriod,
-    periodEnd: data?.periodEnd ?? null,
-    periodStart: data?.periodStart ?? null,
-  });
 
   useEffect(() => {
     const loadMoreElement = loadMoreRef.current;
@@ -148,7 +132,6 @@ export default function StockList({ initialStocksPage }: StockListProps) {
 
       <div className="overflow-x-auto pt-2">
         <StockListTable
-          basisLabel={basisLabel}
           isError={isError}
           isLoading={isLoading}
           selectedRanking={dataRanking}

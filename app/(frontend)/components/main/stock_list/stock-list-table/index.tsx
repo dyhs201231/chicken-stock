@@ -1,13 +1,22 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import StockListRow from "../stock-list-row";
 import type { StockData, StockRankingKey } from "../types";
 
 type StockListTableProps = {
-  basisLabel: string;
   stocks: StockData[];
   selectedRanking: StockRankingKey;
   isError?: boolean;
   isLoading?: boolean;
 };
+
+const seoulTimeFormatter = new Intl.DateTimeFormat("en-GB", {
+  hour: "2-digit",
+  hour12: false,
+  minute: "2-digit",
+  timeZone: "Asia/Seoul",
+});
 
 function getRankingLabel(selectedRanking: StockRankingKey) {
   if (selectedRanking === "tradingVolume") {
@@ -18,19 +27,32 @@ function getRankingLabel(selectedRanking: StockRankingKey) {
 }
 
 export default function StockListTable({
-  basisLabel,
   isError = false,
   isLoading = false,
   stocks,
   selectedRanking,
 }: StockListTableProps) {
+  const [seoulTime, setSeoulTime] = useState("--:--");
   const rankingLabel = getRankingLabel(selectedRanking);
+
+  useEffect(() => {
+    function updateSeoulTime() {
+      setSeoulTime(seoulTimeFormatter.format(new Date()));
+    }
+
+    updateSeoulTime();
+    const intervalId = window.setInterval(updateSeoulTime, 1_000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, []);
 
   return (
     <>
       <div className="grid min-w-230 grid-cols-[2.5rem_3.25rem_minmax(16rem,1fr)_12rem_minmax(8rem,1fr)_10rem_12rem] items-center gap-4 border-b border-(--cs-border-subtle) pb-3 text-sm text-(--cs-text-muted)">
         <span className="col-span-3 flex h-4 items-center text-left leading-none">
-          순위 / 오늘 {basisLabel}
+          순위 / 오늘 {seoulTime}
         </span>
         <span className="col-start-4 flex h-4 items-center justify-end leading-none">
           현재가
