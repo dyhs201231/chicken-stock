@@ -107,7 +107,7 @@ export default function ExchangeForm({
               환전할 금액
             </label>
             <span className="text-sm text-zinc-500">
-              환전 가능{" "}
+              환전 가능
               {exchangeData.type === "krwToUsd" &&
                 `${data.krwBalance.toLocaleString()}원`}
               {exchangeData.type === "usdToKrw" &&

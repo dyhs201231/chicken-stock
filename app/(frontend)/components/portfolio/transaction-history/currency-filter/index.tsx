@@ -17,7 +17,7 @@ export default function CurrencyFilter({
   usdBalance,
 }: CurrencyFilterProps) {
   return (
-    <section className="col gap-4 rounded-2xl bg-white p-6 text-lg md:p-8">
+    <section className="col gap-0 rounded-2xl bg-white p-6 text-lg md:gap-4 md:p-8">
       <SegmentedControl
         aria-label="통화 선택"
         className="w-fit"
@@ -33,11 +33,13 @@ export default function CurrencyFilter({
         ))}
       </SegmentedControl>
 
-      <p>
-        주문 가능 {selectedCurrency}{" "}
-        {selectedCurrency === "원화" && formatWon(krwBalance)}
-        {selectedCurrency === "달러" && formatUsd(usdBalance)}
-      </p>
+      <div className="flex flex-col items-end text-right md:flex-row md:items-center md:gap-1 md:text-left">
+        <p>주문 가능 {selectedCurrency}</p>
+        <p>
+          {selectedCurrency === "원화" && formatWon(krwBalance)}
+          {selectedCurrency === "달러" && formatUsd(usdBalance)}
+        </p>
+      </div>
     </section>
   );
 }

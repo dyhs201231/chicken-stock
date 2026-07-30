@@ -33,24 +33,18 @@ function getStaticChartY(value: number, min: number, max: number) {
     STATIC_CHART_PADDING.bottom;
   const denominator = max - min || 1;
 
-  return (
-    STATIC_CHART_PADDING.top + ((max - value) / denominator) * chartHeight
-  );
+  return STATIC_CHART_PADDING.top + ((max - value) / denominator) * chartHeight;
 }
 
 function getStaticChartX(index: number, candleCount: number) {
   const chartWidth =
-    STATIC_CHART_WIDTH -
-    STATIC_CHART_PADDING.left -
-    STATIC_CHART_PADDING.right;
+    STATIC_CHART_WIDTH - STATIC_CHART_PADDING.left - STATIC_CHART_PADDING.right;
 
   if (candleCount <= 1) {
     return STATIC_CHART_PADDING.left + chartWidth;
   }
 
-  return (
-    STATIC_CHART_PADDING.left + (index / (candleCount - 1)) * chartWidth
-  );
+  return STATIC_CHART_PADDING.left + (index / (candleCount - 1)) * chartWidth;
 }
 
 function StaticMarketIndexChartPreview({
@@ -81,7 +75,7 @@ function StaticMarketIndexChartPreview({
   return (
     <svg
       aria-hidden="true"
-      className="h-full w-full"
+      className="h-full w-[calc(100%-1.75rem)] xl:w-full"
       viewBox={`0 0 ${STATIC_CHART_WIDTH} ${STATIC_CHART_HEIGHT}`}
       preserveAspectRatio="none"
     >
@@ -186,7 +180,10 @@ export default function MarketIndexChartPanel({
 
       <div className="relative min-h-0 flex-1">
         {isHydrated ? (
-          <div ref={chartContainerRef} className="h-full w-full" />
+          <div
+            ref={chartContainerRef}
+            className="h-full w-[calc(100%-1.75rem)] xl:w-full"
+          />
         ) : (
           <StaticMarketIndexChartPreview candles={chartCandles} />
         )}
@@ -197,6 +194,7 @@ export default function MarketIndexChartPanel({
           crosshairPriceLabel={crosshairPriceLabel}
           currentPriceLabel={currentPriceLabel}
           currentPriceLabelClassName={currentPriceLabelClassName}
+          highLowLabelClassName="text-[10px] xl:text-xs"
           highLabelPosition={highLabelPosition}
           lowLabelPosition={lowLabelPosition}
           priceAxisTickLabels={priceAxisTickLabels}

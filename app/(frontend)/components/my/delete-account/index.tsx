@@ -31,10 +31,10 @@ export default function DeleteAccount() {
         onClick={() => setIsOpen(true)}
       >
         <span>
-          <span className="block text-xl font-bold tracking-[-0.02em] transition-colors group-hover:text-red-700">
+          <span className="block text-lg font-bold tracking-[-0.02em] transition-colors group-hover:text-red-700 md:text-xl">
             회원 탈퇴
           </span>
-          <span className="mt-1 block text-sm text-(--cs-text-muted)">
+          <span className="mt-1 block text-xs text-(--cs-text-muted) md:text-sm">
             계정과 투자 정보를 영구적으로 삭제합니다.
           </span>
         </span>
@@ -53,10 +53,10 @@ export default function DeleteAccount() {
             {!isDeleteAccountSuccess && (
               <>
                 <div className="text-center">
-                  <p className="text-2xl font-bold text-(--cs-text-strong)">
+                  <p className="text-xl font-bold text-(--cs-text-strong) md:text-2xl">
                     정말 탈퇴하시겠습니까?
                   </p>
-                  <p className="mt-2 text-sm text-(--cs-text-muted)">
+                  <p className="mt-2 text-xs text-(--cs-text-muted) md:text-sm">
                     탈퇴 후에는 계정 정보를 복구할 수 없습니다.
                   </p>
                 </div>
@@ -64,7 +64,7 @@ export default function DeleteAccount() {
                 <div className="mt-4 flex gap-3">
                   <button
                     type="button"
-                    className="min-h-11 cursor-pointer rounded-lg bg-red-600 px-5 text-base font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="min-h-11 cursor-pointer rounded-lg bg-red-600 px-5 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-40 md:text-base"
                     disabled={isDeleteAccountPending}
                     onClick={handleDeleteAccount}
                   >
@@ -73,7 +73,7 @@ export default function DeleteAccount() {
 
                   <button
                     type="button"
-                    className="min-h-11 cursor-pointer rounded-lg border border-(--cs-border-strong) bg-(--cs-surface-base) px-5 text-base font-semibold text-(--cs-text-default) transition hover:bg-(--cs-brand-50) disabled:cursor-not-allowed disabled:opacity-40"
+                    className="min-h-11 cursor-pointer rounded-lg border border-(--cs-border-strong) bg-(--cs-surface-base) px-5 text-sm font-semibold text-(--cs-text-default) transition hover:bg-(--cs-brand-50) disabled:cursor-not-allowed disabled:opacity-40 md:text-base"
                     disabled={isDeleteAccountPending}
                     onClick={() => setIsOpen(false)}
                   >
@@ -85,14 +85,14 @@ export default function DeleteAccount() {
 
             {isDeleteAccountSuccess && (
               <>
-                <div className="text-center text-lg">
+                <div className="text-center text-base md:text-lg">
                   <p>회원 탈퇴가 완료되었습니다.</p>
                   <p>이용해 주셔서 감사합니다.</p>
                 </div>
 
                 <button
                   type="button"
-                  className="mt-4 min-h-11 cursor-pointer rounded-lg bg-(--cs-brand-700) px-5 text-base font-semibold text-white transition hover:bg-(--cs-brand-800)"
+                  className="mt-4 min-h-11 cursor-pointer rounded-lg bg-(--cs-brand-700) px-5 text-sm font-semibold text-white transition hover:bg-(--cs-brand-800) md:text-base"
                   onClick={() => window.location.replace("/")}
                 >
                   확인

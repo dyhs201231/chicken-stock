@@ -258,9 +258,14 @@ export default function HeaderSearch() {
       open={searchOpen}
       onOpenChange={setSearchOpen}
     >
-      <Popover.Trigger className="relative hidden h-10 w-48 items-center rounded-xl border border-(--cs-border-subtle) bg-(--cs-surface-base) pr-3 pl-9 text-left text-sm text-(--cs-text-muted) transition hover:border-(--cs-border-strong) md:inline-flex lg:w-64">
-        <SearchIcon className="absolute left-1 size-5" />
-        <span className="truncate">종목, 티커를 검색해보세요.</span>
+      <Popover.Trigger
+        aria-label="종목 검색"
+        className="relative inline-flex size-10 items-center justify-center rounded-xl border border-transparent bg-transparent text-left text-sm text-(--cs-text-muted) transition hover:bg-(--cs-brand-50) md:w-48 md:justify-start md:border-(--cs-border-subtle) md:bg-(--cs-surface-base) md:pr-3 md:pl-9 md:hover:border-(--cs-border-strong) md:hover:bg-(--cs-surface-base) lg:w-64"
+      >
+        <SearchIcon className="size-5 md:absolute md:left-1" />
+        <span className="hidden truncate md:block">
+          종목, 티커를 검색해보세요.
+        </span>
       </Popover.Trigger>
 
       <Popover.Content

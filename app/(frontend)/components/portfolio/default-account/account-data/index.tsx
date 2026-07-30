@@ -28,16 +28,16 @@ export default function AccountData({ initialPortfolio }: AccountDataProps) {
         계좌 {data.accountNumber}
       </div>
 
-      <div className="row flex-wrap items-end justify-between gap-6">
-        <div>
-          <p className="text-4xl font-bold tracking-[-0.04em] text-(--cs-text-strong) md:text-5xl">
+      <div className="flex flex-col items-end gap-4 md:flex-row md:flex-wrap md:justify-between md:gap-6">
+        <div className="text-right">
+          <p className="text-3xl font-bold tracking-[-0.04em] text-(--cs-text-strong) md:text-5xl">
             {totalAccountAmount === null
               ? "환율 확인 불가"
               : `${totalAccountAmount.toLocaleString()}원`}
           </p>
         </div>
 
-        <div className="row flex-wrap gap-3">
+        <div className="row w-full flex-wrap justify-end gap-3 md:w-auto">
           <Link
             href="/edu"
             className="row center min-h-10 cursor-pointer rounded-lg border border-(--cs-border-strong) bg-(--cs-surface-raised) px-4 font-semibold text-(--cs-brand-800) shadow-(--cs-shadow-sm) transition hover:bg-(--cs-brand-50)"

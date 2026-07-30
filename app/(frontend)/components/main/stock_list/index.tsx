@@ -130,7 +130,7 @@ export default function StockList({ initialStocksPage }: StockListProps) {
         />
       </div>
 
-      <div className="overflow-x-auto pt-2">
+      <div className="min-w-0 overflow-hidden pt-2">
         <StockListTable
           isError={isError}
           isLoading={isLoading}

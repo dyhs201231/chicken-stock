@@ -99,7 +99,9 @@ export default function EduProgress() {
         <div className="flex h-full min-w-0 flex-1 flex-col justify-center gap-1">
           {isLoggedIn && (
             <>
-              <h3 className={`font-semibold ${levelTheme.text}`}>
+              <h3
+                className={`font-semibold whitespace-nowrap ${levelTheme.text}`}
+              >
                 레벨 {userLevel}
               </h3>
               <div
@@ -122,10 +124,15 @@ export default function EduProgress() {
           )}
 
           {!isLoggedIn && (
-            <p className={`text-xs font-semibold ${levelTheme.text}`}>
-              <span className="font-bold">학습을 시작해 볼까요?</span>
-              <br />
-              <span>가입하고 나만의 학습 기록을 쌓아보세요.</span>
+            <p
+              className={`text-[11px] leading-4 font-semibold xl:text-xs ${levelTheme.text}`}
+            >
+              <span className="block font-bold whitespace-nowrap">
+                학습을 시작해 볼까요?
+              </span>
+              <span className="block break-keep lg:whitespace-nowrap">
+                가입하고 나만의 학습 기록을 쌓아보세요.
+              </span>
             </p>
           )}
         </div>

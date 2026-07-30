@@ -37,12 +37,12 @@ export default function StockListRow({ stock }: StockListRowProps) {
       <Link
         href={`/stock/${stock.id}/order`}
         prefetch={false}
-        className="grid grid-cols-[2.5rem_3.25rem_minmax(16rem,1fr)_12rem_minmax(8rem,1fr)_10rem_12rem] items-center gap-4 border-b border-(--cs-border-subtle) py-3 text-lg transition-colors last:border-b-0 hover:bg-(--cs-brand-50)"
+        className="grid grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-3 border-b border-(--cs-border-subtle) py-3 text-lg transition-colors last:border-b-0 hover:bg-(--cs-brand-50) md:grid-cols-[2rem_2.25rem_minmax(0,1fr)_7rem_5rem_8rem] md:gap-[3px] lg:grid-cols-[2.5rem_3.25rem_minmax(10rem,16rem)_minmax(8rem,1fr)_minmax(6rem,0.8fr)_minmax(10rem,1fr)] lg:gap-3"
       >
         <span className="text-left text-base">{stock.rank}</span>
 
         <span
-          className={`flex size-8 shrink-0 items-center justify-center rounded-full border text-base font-bold ${logoColorClassName}`}
+          className={`hidden size-8 shrink-0 items-center justify-center rounded-full border text-base font-bold md:flex ${logoColorClassName}`}
           aria-hidden="true"
         >
           {stock.logoLabel}
@@ -52,9 +52,11 @@ export default function StockListRow({ stock }: StockListRowProps) {
           {stock.name}
         </strong>
 
-        <span className="col-start-4 text-right">{stock.price}</span>
+        <span className="hidden text-right md:col-start-4 md:block lg:text-left">
+          {stock.price}
+        </span>
 
-        <span className="col-start-5 translate-x-1/2 text-center">
+        <span className="hidden text-center md:col-start-5 md:block">
           <span
             className={`inline-flex rounded-full px-2 py-0.5 text-base ${changeRateClassName}`}
           >
@@ -62,7 +64,18 @@ export default function StockListRow({ stock }: StockListRowProps) {
           </span>
         </span>
 
-        <span className="col-start-7 text-right">{stock.rankingValue}</span>
+        <span className="hidden text-right whitespace-nowrap md:col-start-6 md:block lg:text-left">
+          {stock.rankingValue}
+        </span>
+
+        <span className="col-start-3 flex flex-col items-end gap-1 text-right md:hidden">
+          <span>{stock.price}</span>
+          <span
+            className={`inline-flex rounded-full px-2 py-0.5 text-sm ${changeRateClassName}`}
+          >
+            {stock.changeRate}
+          </span>
+        </span>
       </Link>
     </li>
   );

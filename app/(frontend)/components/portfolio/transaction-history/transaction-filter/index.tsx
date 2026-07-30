@@ -12,19 +12,21 @@ export default function TransactionFilter({
   setSelectedFilter,
 }: TransactionFilterProps) {
   return (
-    <SegmentedControl
-      aria-label="거래 유형 선택"
-      className="w-fit"
-      onValueChange={(value) =>
-        setSelectedFilter(value as TransactionHistoryFilter)
-      }
-      value={selectedFilter}
-    >
-      {TRANSACTION_HISTORY_FILTERS.map((filter) => (
-        <SegmentedControl.Item key={filter} value={filter}>
-          {filter}
-        </SegmentedControl.Item>
-      ))}
-    </SegmentedControl>
+    <div className="pb-5 md:pb-8">
+      <SegmentedControl
+        aria-label="거래 유형 선택"
+        className="w-fit"
+        onValueChange={(value) =>
+          setSelectedFilter(value as TransactionHistoryFilter)
+        }
+        value={selectedFilter}
+      >
+        {TRANSACTION_HISTORY_FILTERS.map((filter) => (
+          <SegmentedControl.Item key={filter} value={filter}>
+            {filter}
+          </SegmentedControl.Item>
+        ))}
+      </SegmentedControl>
+    </div>
   );
 }

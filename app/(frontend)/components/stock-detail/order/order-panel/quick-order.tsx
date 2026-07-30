@@ -170,7 +170,7 @@ export default function QuickOrder({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col px-5 pb-5">
-      <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+      <div className="scrollbar-hide min-h-0 flex-1 overflow-y-auto pr-1">
         <div className="mt-5">
           <div className="flex items-center gap-2">
             <input

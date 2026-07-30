@@ -72,6 +72,7 @@ export default function StockListControls({
 
       <SegmentedControl
         aria-label="랭킹 기준"
+        className="hidden md:inline-flex"
         onValueChange={(value) => {
           if (rankingOptions.some((option) => option.value === value)) {
             onRankingChange(value as StockRankingKey);

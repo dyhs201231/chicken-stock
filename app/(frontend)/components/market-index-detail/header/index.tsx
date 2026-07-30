@@ -31,10 +31,13 @@ export default function MarketIndexHeader({
   marketIndex,
 }: MarketIndexHeaderProps) {
   const quote = marketIndex.quote;
-  const candles = marketIndex.chart.status === "error" ? [] : marketIndex.chart.data;
+  const candles =
+    marketIndex.chart.status === "error" ? [] : marketIndex.chart.data;
   const latest = candles.at(-1);
-  const high52w = candles.length > 0 ? Math.max(...candles.map(({ high }) => high)) : null;
-  const low52w = candles.length > 0 ? Math.min(...candles.map(({ low }) => low)) : null;
+  const high52w =
+    candles.length > 0 ? Math.max(...candles.map(({ high }) => high)) : null;
+  const low52w =
+    candles.length > 0 ? Math.min(...candles.map(({ low }) => low)) : null;
   const trendTextColor = getMarketIndexTrendTextColor(
     quote.status === "error" ? "flat" : quote.data.trend,
   );
@@ -45,24 +48,26 @@ export default function MarketIndexHeader({
     <header className="flex flex-col gap-6 rounded-2xl bg-white p-5 lg:flex-row lg:items-start lg:justify-between lg:p-7">
       <div className="min-w-0">
         <h1 className="text-2xl leading-8 tracking-normal text-zinc-950">
-          {marketIndex.name}{" "}
+          {marketIndex.name}
           {quote.status === "error"
             ? "-"
             : formatMarketIndexValue(quote.data.currentValue)}
         </h1>
 
-        <div className="flow-root h-8">
+        <div className="flow-root h-14 xl:h-8">
           {quote.status !== "error" && (
-            <p className="mt-3 text-base leading-5 text-zinc-950">
-              전일 대비{" "}
-              <span className={trendTextColor}>
-                {formatMarketIndexChange(quote.data.changeAmount)}(
-                {formatMarketIndexPercent(quote.data.changeRate)})
-              </span>
-              <span className="ml-3 text-zinc-500">
+            <div className="mt-3 flex flex-col items-start gap-1 text-base leading-5 text-zinc-950 xl:flex-row xl:items-baseline xl:gap-3">
+              <p>
+                전일 대비
+                <span className={trendTextColor}>
+                  {formatMarketIndexChange(quote.data.changeAmount)}(
+                  {formatMarketIndexPercent(quote.data.changeRate)})
+                </span>
+              </p>
+              <p className="whitespace-nowrap text-zinc-500">
                 {realtimeText} | {countryText}
-              </span>
-            </p>
+              </p>
+            </div>
           )}
         </div>
         <div className="flow-root h-12">

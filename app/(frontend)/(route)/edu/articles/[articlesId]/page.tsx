@@ -120,14 +120,14 @@ function calculateEstimatedReadingMinutes(
 
 function getHeadingClassName(level: number, isFirstBlock: boolean) {
   if (level === 1) {
-    return "text-4xl leading-tight font-bold text-zinc-950";
+    return "text-3xl leading-tight font-bold text-zinc-950 md:text-4xl";
   }
 
   if (level === 2) {
-    return `${isFirstBlock ? "" : "pt-6 "}text-3xl leading-tight font-bold text-zinc-950`;
+    return `${isFirstBlock ? "" : "pt-4 md:pt-6 "}text-2xl leading-tight font-bold text-zinc-950 md:text-3xl`;
   }
 
-  return `${isFirstBlock ? "" : "pt-3 "}text-2xl leading-tight font-semibold text-zinc-950`;
+  return `${isFirstBlock ? "" : "pt-2 md:pt-3 "}text-xl leading-tight font-semibold text-zinc-950 md:text-2xl`;
 }
 
 export default async function ArticlePage({
@@ -207,7 +207,7 @@ export default async function ArticlePage({
   };
 
   return (
-    <main className="min-h-[calc(100dvh-74px)] bg-[#f8f8f9] px-5 pt-8 pb-8 text-zinc-950 md:px-8 md:pt-12 md:pb-12 lg:pb-16">
+    <main className="min-h-[calc(100dvh-74px)] bg-[#f8f8f9] px-4 pt-5 pb-6 text-zinc-950 md:px-8 md:pt-12 md:pb-12 lg:pb-16">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -222,17 +222,17 @@ export default async function ArticlePage({
       />
 
       <div className="mx-auto max-w-4xl">
-        <article className="rounded-2xl bg-white p-5 md:p-8 lg:p-10">
-          <h1 className="text-center text-4xl leading-tight font-bold tracking-normal md:text-5xl">
+        <article className="rounded-2xl bg-white p-4 md:p-8 lg:p-10">
+          <h1 className="text-center text-3xl leading-tight font-bold tracking-normal md:text-5xl">
             {article.title}
           </h1>
 
-          <div className="mt-3 text-center text-base font-medium text-zinc-500 md:mt-4 md:text-lg">
+          <div className="mt-2 text-center text-sm font-medium text-zinc-500 md:mt-4 md:text-lg">
             예상 읽기 시간 : {estimatedReadingMinutes}분
           </div>
 
           {article.imageUrl && (
-            <div className="relative mx-auto mt-14 h-72 w-full max-w-md overflow-hidden rounded-xl bg-zinc-100">
+            <div className="relative mx-auto mt-8 h-56 w-full max-w-md overflow-hidden rounded-xl bg-zinc-100 md:mt-14 md:h-72">
               <Image
                 src={article.imageUrl}
                 alt={article.title}
@@ -247,7 +247,7 @@ export default async function ArticlePage({
           {visibleContentBlocks.length > 0 && (
             <div
               id={ARTICLE_PROGRESS_TARGET_ID}
-              className={`${article.imageUrl ? "mt-10" : "mt-8"} mx-auto max-w-4xl space-y-3 text-zinc-950 md:space-y-4`}
+              className={`${article.imageUrl ? "mt-6 md:mt-10" : "mt-5 md:mt-8"} mx-auto max-w-4xl space-y-2 text-zinc-950 md:space-y-4`}
             >
               {visibleContentBlocks.map((block, index) => {
                 if (block.type === "heading") {
@@ -272,7 +272,7 @@ export default async function ArticlePage({
                   return (
                     <ul
                       key={`list-${index}`}
-                      className="list-disc space-y-2 pl-6 text-lg leading-8 md:pl-8 md:text-xl md:leading-9"
+                      className="list-disc space-y-1.5 pl-5 text-base leading-7 md:space-y-2 md:pl-8 md:text-xl md:leading-9"
                     >
                       {block.items.map((item, itemIndex) => (
                         <li key={`${item}-${itemIndex}`}>{item}</li>
@@ -285,7 +285,7 @@ export default async function ArticlePage({
                   return (
                     <blockquote
                       key={`${block.text}-${index}`}
-                      className="border-l-4 border-zinc-300 px-5 py-2 text-lg leading-8 font-medium text-zinc-950 md:px-6 md:text-xl md:leading-9"
+                      className="border-l-4 border-zinc-300 px-3 py-1.5 text-base leading-7 font-medium text-zinc-950 md:px-6 md:py-2 md:text-xl md:leading-9"
                     >
                       {block.text}
                     </blockquote>
@@ -302,16 +302,16 @@ export default async function ArticlePage({
                   return (
                     <div
                       key={`table-${index}`}
-                      className="my-2 overflow-x-auto rounded-xl bg-zinc-50"
+                      className="my-1 overflow-x-auto rounded-xl bg-zinc-50 md:my-2"
                     >
-                      <table className="w-full min-w-128 border-collapse text-left text-base leading-6 md:text-lg md:leading-7">
+                      <table className="w-full min-w-112 border-collapse text-left text-sm leading-5 md:min-w-128 md:text-lg md:leading-7">
                         <thead className="bg-zinc-100 text-zinc-950">
                           <tr>
                             {block.headers.map((header, headerIndex) => (
                               <th
                                 key={`${header}-${headerIndex}`}
                                 scope="col"
-                                className="px-4 py-3 font-semibold md:px-5"
+                                className="px-3 py-2 font-semibold md:px-5 md:py-3"
                               >
                                 {header}
                               </th>
@@ -328,7 +328,7 @@ export default async function ArticlePage({
                               {row.map((cell, cellIndex) => (
                                 <td
                                   key={`${cell}-${cellIndex}`}
-                                  className={`px-4 py-3 align-top md:px-5 ${
+                                  className={`px-3 py-2 align-top md:px-5 md:py-3 ${
                                     cellIndex === 0
                                       ? "font-medium text-zinc-950"
                                       : "text-zinc-700"
@@ -348,7 +348,7 @@ export default async function ArticlePage({
                 return (
                   <p
                     key={`${block.text}-${index}`}
-                    className="text-lg leading-8 md:text-xl md:leading-9"
+                    className="text-base leading-7 md:text-xl md:leading-9"
                   >
                     {block.text}
                   </p>
@@ -358,12 +358,12 @@ export default async function ArticlePage({
           )}
 
           {visibleContentBlocks.length === 0 && (
-            <p className="mt-8 rounded-lg bg-white px-5 py-6 text-center text-base text-zinc-500 shadow-sm">
+            <p className="mt-5 rounded-lg bg-white px-4 py-4 text-center text-sm text-zinc-500 shadow-sm md:mt-8 md:px-5 md:py-6 md:text-base">
               아직 본문이 준비되지 않았어요.
             </p>
           )}
 
-          <div className="mt-16 flex justify-center">
+          <div className="mt-10 flex justify-center md:mt-16">
             <QuizStartButton
               href={quizHref}
               isCompleted={isQuizCompleted}

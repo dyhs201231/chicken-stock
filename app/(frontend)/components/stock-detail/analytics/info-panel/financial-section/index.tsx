@@ -33,8 +33,10 @@ export default function FinancialSection({ stock }: StockOnlyProps) {
 
   return (
     <section>
-      <h3 className="mb-5 text-xl font-semibold tracking-normal">재무</h3>
-      <div className="mb-10 grid grid-cols-3 gap-4">
+      <h3 className="mb-4 text-lg font-semibold tracking-normal md:mb-5 md:text-xl">
+        재무
+      </h3>
+      <div className="mb-6 grid grid-cols-1 gap-2 md:mb-10 md:grid-cols-3 md:gap-4">
         <MetricCard
           label="부채비율"
           value={formatMetricValue(stock.financialMetric?.debtRatio)}
@@ -51,8 +53,10 @@ export default function FinancialSection({ stock }: StockOnlyProps) {
         />
       </div>
 
-      <h4 className="mb-3 text-lg font-semibold tracking-normal">재무제표</h4>
-      <div className="mb-3 flex gap-6 text-xs">
+      <h4 className="mb-2 text-base font-semibold tracking-normal md:mb-3 md:text-lg">
+        재무제표
+      </h4>
+      <div className="mb-3 flex gap-4 overflow-x-auto text-xs whitespace-nowrap md:gap-6">
         {statementTabs.map((tab) => (
           <button
             key={tab}

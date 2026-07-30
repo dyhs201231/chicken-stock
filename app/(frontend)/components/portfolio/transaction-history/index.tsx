@@ -43,7 +43,7 @@ export default function TransactionHistory() {
       : itemByStockId.get(selectedTransaction.stockId);
 
   return (
-    <div className="col min-h-0 flex-1 gap-5 overflow-hidden">
+    <div className="col flex-1 gap-5 overflow-visible xl:min-h-0 xl:overflow-hidden">
       <CurrencyFilter
         krwBalance={data.krwBalance}
         selectedCurrency={selectedCurrency}
@@ -51,8 +51,8 @@ export default function TransactionHistory() {
         usdBalance={data.usdBalance}
       />
 
-      <section className="grid min-h-0 flex-1 grid-cols-1 grid-rows-2 gap-5 overflow-hidden xl:grid-cols-2 xl:grid-rows-1">
-        <div className="col min-h-0 overflow-hidden rounded-2xl bg-white p-6 md:p-8">
+      <section className="grid flex-none grid-cols-1 grid-rows-[400px_400px] gap-5 overflow-visible xl:min-h-0 xl:flex-1 xl:grid-cols-2 xl:grid-rows-1 xl:overflow-hidden">
+        <div className="col h-[400px] min-h-0 overflow-hidden rounded-2xl bg-white p-4 md:p-8 xl:h-auto">
           <TransactionFilter
             selectedFilter={selectedFilter}
             setSelectedFilter={(filter) => {
@@ -70,7 +70,7 @@ export default function TransactionHistory() {
           </div>
         </div>
 
-        <div className="min-h-0 [scrollbar-width:none] overflow-y-auto rounded-2xl bg-white p-6 md:p-8 [&::-webkit-scrollbar]:hidden">
+        <div className="h-[400px] min-h-0 [scrollbar-width:none] overflow-y-auto rounded-2xl bg-white p-4 md:p-8 xl:h-auto [&::-webkit-scrollbar]:hidden">
           {selectedTransaction && (
             <TransactionDetail
               item={selectedItem}
@@ -79,7 +79,7 @@ export default function TransactionHistory() {
           )}
 
           {!selectedTransaction && (
-            <div className="row center h-full text-lg text-(--cs-color-gray-700)">
+            <div className="row center h-full text-base text-(--cs-color-gray-700) md:text-lg">
               거래를 선택해 주세요.
             </div>
           )}

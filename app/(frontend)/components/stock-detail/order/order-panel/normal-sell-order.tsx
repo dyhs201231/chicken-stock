@@ -154,7 +154,7 @@ export default function NormalSellOrder({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col px-5 pb-5">
-      <div className="min-h-0 flex-1 overflow-y-auto pr-1">
+      <div className="scrollbar-hide min-h-0 flex-1 overflow-y-auto pr-1">
         <div className="mt-5 grid gap-3">
           <div className="grid grid-cols-[5.75rem_minmax(0,1fr)] items-center gap-3 text-lg">
             <span className="font-semibold">주문 유형</span>
