@@ -1,0 +1,39 @@
+name: Scheduler watchdog
+
+on:
+  schedule:
+    - cron: "2-59/5 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: scheduler-watchdog
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    env:
+      SCHEDULER_HEALTH_TOKEN: ${{ secrets.SCHEDULER_HEALTH_TOKEN }}
+      SCHEDULER_HEALTH_URL: https://www.chicken-stock.com/api/internal/agents/scheduler-health
+    steps:
+      - name: Check scheduler health
+        shell: bash
+        run: |
+          if [[ -z "${SCHEDULER_HEALTH_TOKEN}" ]]; then
+            echo "SCHEDULER_HEALTH_TOKEN is not configured" >&2
+            exit 1
+          fi
+
+          curl \
+            --fail-with-body \
+            --max-time 60 \
+            --silent \
+            --show-error \
+            --config - <<CURL_CONFIG
+          url = "${SCHEDULER_HEALTH_URL}"
+          header = "Authorization: Bearer ${SCHEDULER_HEALTH_TOKEN}"
+          CURL_CONFIG
