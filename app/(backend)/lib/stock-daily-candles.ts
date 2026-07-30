@@ -1,6 +1,8 @@
+import { Prisma } from "../generated/prisma/client.ts";
 import { parseMarketTimeToMinutes } from "./market-time.ts";
 
 const DAILY_CANDLE_INTERVAL_CODE = "1D";
+const CANDLE_UPSERT_BATCH_SIZE = 250;
 const MIN_PRICE = 0.01;
 
 type MarketCountryCode = "KR" | "US";
@@ -33,6 +35,19 @@ type ExistingDailyCandle = {
 
 type MissingDailyCandle = ExistingDailyCandle & {
   ticker: string;
+};
+
+type StockQuoteUpdate = {
+  changeAmount: number;
+  changeRate: number;
+  currentPrice: number;
+  dayHigh: number;
+  dayLow: number;
+  high52w: number;
+  low52w: number;
+  previousClose: number;
+  tradingValue: number;
+  volume: number;
 };
 
 type BuildMissingDailyCandlesParams = {
@@ -136,6 +151,10 @@ function toFinitePrice(value: unknown) {
   }
 
   return Number(value);
+}
+
+function toDecimal(value: number, decimalPlaces = 2) {
+  return new Prisma.Decimal(value.toFixed(decimalPlaces));
 }
 
 function hashString(value: string) {
@@ -375,6 +394,61 @@ export function buildMissingDailyCandles({
   return missingCandles;
 }
 
+export function buildStockQuoteUpdate({
+  existingCandles,
+  generatedCandles,
+  high52w,
+  low52w,
+}: {
+  existingCandles: ExistingDailyCandle[];
+  generatedCandles: MissingDailyCandle[];
+  high52w: number;
+  low52w: number;
+}): StockQuoteUpdate | null {
+  if (generatedCandles.length === 0) {
+    return null;
+  }
+
+  const candlesByTimestamp = new Map(
+    existingCandles.map((candle) => [candle.timestamp.toString(), candle]),
+  );
+  generatedCandles.forEach((candle) => {
+    candlesByTimestamp.set(candle.timestamp.toString(), candle);
+  });
+  const [latest, previous] = [...candlesByTimestamp.values()].sort(
+    (left, right) =>
+      left.timestamp > right.timestamp
+        ? -1
+        : left.timestamp < right.timestamp
+          ? 1
+          : 0,
+  );
+
+  if (!latest || !Number.isFinite(latest.closePrice) || latest.closePrice <= 0) {
+    return null;
+  }
+
+  const previousClose =
+    previous && previous.closePrice > 0 ? previous.closePrice : latest.closePrice;
+  const changeAmount =
+    Math.round((latest.closePrice - previousClose) * 100) / 100;
+  const changeRate =
+    Math.round((changeAmount / previousClose) * 100 * 10_000) / 10_000;
+
+  return {
+    changeAmount,
+    changeRate,
+    currentPrice: latest.closePrice,
+    dayHigh: latest.highPrice,
+    dayLow: latest.lowPrice,
+    high52w: Math.max(high52w, latest.highPrice),
+    low52w: Math.min(low52w, latest.lowPrice),
+    previousClose,
+    tradingValue: latest.tradingValue,
+    volume: latest.volume,
+  };
+}
+
 export async function ensureListedDailyCandles({
   countryCode,
   lookbackDays = 7,
@@ -444,32 +518,8 @@ export async function ensureListedDailyCandles({
     ]),
   );
 
-  const stocks = await prisma.stock.findMany({
-    select: {
-      candles: {
-        orderBy: {
-          timestamp: "desc",
-        },
-        select: {
-          closePrice: true,
-          highPrice: true,
-          intervalCode: true,
-          lowPrice: true,
-          openPrice: true,
-          timestamp: true,
-          tradingValue: true,
-          volume: true,
-        },
-        take: lookbackDays + 30,
-        where: {
-          intervalCode: DAILY_CANDLE_INTERVAL_CODE,
-        },
-      },
-      countryCode: true,
-      currentPrice: true,
-      previousClose: true,
-      ticker: true,
-    },
+  const listedStocks = await prisma.stock.findMany({
+    select: { id: true },
     where: {
       countryCode: {
         in: [...countryCodes],
@@ -477,14 +527,63 @@ export async function ensureListedDailyCandles({
       marketStatus: "LISTED",
     },
   });
+  const stockIds = listedStocks.map((stock) => stock.id).sort((a, b) => a - b);
 
-  const missingCandles = stocks.flatMap((stock) =>
-    buildMissingDailyCandles({
-      completedDateKeys:
-        completedDateKeysByCountry.get(
-          toMarketCountryCode(stock.countryCode),
-        ) ?? [],
-      existingCandles: stock.candles.map((candle) => ({
+  if (stockIds.length === 0) {
+    return {
+      created: 0,
+      lookbackDays,
+      stocks: 0,
+    };
+  }
+
+  const transactionResult = await prisma.$transaction(async (tx) => {
+    await tx.$queryRaw`
+      SELECT "id"
+      FROM "Stock"
+      WHERE "id" IN (${Prisma.join(stockIds)})
+      ORDER BY "id" ASC
+      FOR UPDATE
+    `;
+
+    const stocks = await tx.stock.findMany({
+      orderBy: { id: "asc" },
+      select: {
+        candles: {
+          orderBy: {
+            timestamp: "desc",
+          },
+          select: {
+            closePrice: true,
+            highPrice: true,
+            intervalCode: true,
+            lowPrice: true,
+            openPrice: true,
+            timestamp: true,
+            tradingValue: true,
+            volume: true,
+          },
+          take: lookbackDays + 30,
+          where: {
+            intervalCode: DAILY_CANDLE_INTERVAL_CODE,
+          },
+        },
+        countryCode: true,
+        currentPrice: true,
+        high52w: true,
+        id: true,
+        low52w: true,
+        previousClose: true,
+        ticker: true,
+      },
+      where: {
+        id: { in: stockIds },
+        marketStatus: "LISTED",
+      },
+    });
+
+    const stockCandleResults = stocks.map((stock) => {
+      const existingCandles = stock.candles.map((candle) => ({
         closePrice: toFinitePrice(candle.closePrice),
         highPrice: toFinitePrice(candle.highPrice),
         intervalCode: candle.intervalCode,
@@ -493,48 +592,153 @@ export async function ensureListedDailyCandles({
         timestamp: candle.timestamp,
         tradingValue: toFinitePrice(candle.tradingValue),
         volume: toFinitePrice(candle.volume),
-      })),
-      fallbackPrice:
-        toFinitePrice(stock.previousClose) || toFinitePrice(stock.currentPrice),
-      ticker: stock.ticker,
-    }),
-  );
+      }));
+      const generatedCandles = buildMissingDailyCandles({
+        completedDateKeys:
+          completedDateKeysByCountry.get(
+            toMarketCountryCode(stock.countryCode),
+          ) ?? [],
+        existingCandles,
+        fallbackPrice:
+          toFinitePrice(stock.previousClose) ||
+          toFinitePrice(stock.currentPrice),
+        ticker: stock.ticker,
+      });
 
-  if (missingCandles.length === 0) {
-    return {
-      created: 0,
-      lookbackDays,
-      stocks: stocks.length,
-    };
-  }
+      return {
+        generatedCandles,
+        quoteUpdate: buildStockQuoteUpdate({
+          existingCandles,
+          generatedCandles,
+          high52w: toFinitePrice(stock.high52w),
+          low52w: toFinitePrice(stock.low52w),
+        }),
+        stockId: stock.id,
+      };
+    });
+    const missingCandles = stockCandleResults.flatMap(
+      ({ generatedCandles }) => generatedCandles,
+    );
 
-  const result = await prisma.$transaction(
-    missingCandles.map((candle) =>
-      prisma.stockCandle.upsert({
-        create: candle,
-        update: {
-          closePrice: candle.closePrice,
-          highPrice: candle.highPrice,
-          lowPrice: candle.lowPrice,
-          openPrice: candle.openPrice,
-          tradingValue: candle.tradingValue,
-          volume: candle.volume,
-        },
-        where: {
-          ticker_intervalCode_timestamp: {
-            intervalCode: candle.intervalCode,
-            ticker: candle.ticker,
-            timestamp: candle.timestamp,
+    for (
+      let candleStart = 0;
+      candleStart < missingCandles.length;
+      candleStart += CANDLE_UPSERT_BATCH_SIZE
+    ) {
+      const candleBatch = missingCandles.slice(
+        candleStart,
+        candleStart + CANDLE_UPSERT_BATCH_SIZE,
+      );
+      const candleValues = candleBatch.map((candle) =>
+        Prisma.sql`(
+          ${candle.ticker},
+          ${candle.intervalCode},
+          ${candle.timestamp},
+          ${toDecimal(candle.openPrice)},
+          ${toDecimal(candle.highPrice)},
+          ${toDecimal(candle.lowPrice)},
+          ${toDecimal(candle.closePrice)},
+          ${toDecimal(candle.tradingValue)},
+          ${toDecimal(candle.volume, 0)}
+        )`,
+      );
+
+      await tx.$executeRaw`
+        INSERT INTO "Stock_candle" (
+          "ticker",
+          "interval_code",
+          "timestamp",
+          "open_price",
+          "high_price",
+          "low_price",
+          "close_price",
+          "trading_value",
+          "volume"
+        )
+        VALUES ${Prisma.join(candleValues)}
+        ON CONFLICT ("ticker", "interval_code", "timestamp")
+        DO UPDATE SET
+          "open_price" = EXCLUDED."open_price",
+          "high_price" = EXCLUDED."high_price",
+          "low_price" = EXCLUDED."low_price",
+          "close_price" = EXCLUDED."close_price",
+          "trading_value" = EXCLUDED."trading_value",
+          "volume" = EXCLUDED."volume"
+      `;
+    }
+
+    const quoteUpdates = stockCandleResults.flatMap((result) => {
+      if (!result.quoteUpdate) {
+        return [];
+      }
+
+      const quote = result.quoteUpdate;
+      const currentPrice = toDecimal(quote.currentPrice);
+
+      return [
+        {
+          currentPrice,
+          quote: {
+            changeAmount: toDecimal(quote.changeAmount),
+            changeRate: toDecimal(quote.changeRate, 4),
+            currentPrice,
+            dayHigh: toDecimal(quote.dayHigh),
+            dayLow: toDecimal(quote.dayLow),
+            high52w: toDecimal(quote.high52w),
+            low52w: toDecimal(quote.low52w),
+            previousClose: toDecimal(quote.previousClose),
+            tradingValue: toDecimal(quote.tradingValue),
+            volume: toDecimal(quote.volume, 0),
           },
+          stockId: result.stockId,
         },
-      }),
-    ),
-  );
+      ];
+    });
+
+    for (const { quote, stockId } of quoteUpdates) {
+      await tx.stock.update({
+        data: quote,
+        where: { id: stockId },
+      });
+    }
+
+    if (quoteUpdates.length > 0) {
+      const quoteValues = quoteUpdates.map(({ currentPrice, stockId }) =>
+        Prisma.sql`(${stockId}, ${currentPrice})`,
+      );
+
+      await tx.$executeRaw`
+        WITH quote_values("stock_id", "current_price") AS (
+          VALUES ${Prisma.join(quoteValues)}
+        )
+        UPDATE "Portfolio_item" AS portfolio_item
+        SET
+          "current_price" = quote_values."current_price",
+          "current_amount" = ROUND((quote_values."current_price" * portfolio_item."quantity")::numeric, 2),
+          "evaluation_amount" = ROUND((quote_values."current_price" * portfolio_item."quantity")::numeric, 2),
+          "profit" = ROUND(((quote_values."current_price" * portfolio_item."quantity") - portfolio_item."total_invested")::numeric, 2),
+          "profit_rate" = CASE
+            WHEN portfolio_item."total_invested" > 0 THEN
+              ROUND(((((quote_values."current_price" * portfolio_item."quantity") - portfolio_item."total_invested")
+                / portfolio_item."total_invested") * 100)::numeric, 4)
+            ELSE 0
+          END,
+          "updated_at" = NOW()
+        FROM quote_values
+        WHERE portfolio_item."stock_id" = quote_values."stock_id"
+      `;
+    }
+
+    return { created: missingCandles.length };
+  }, {
+    maxWait: 30_000,
+    timeout: 240_000,
+  });
 
   return {
-    created: result.length,
+    created: transactionResult.created,
     lookbackDays,
-    stocks: stocks.length,
-    upserted: result.length,
+    stocks: stockIds.length,
+    upserted: transactionResult.created,
   };
 }
