@@ -1,3 +1,9 @@
 {
-  "regions": ["icn1"]
+  "regions": ["icn1"],
+  "crons": [
+    {
+      "path": "/api/internal/agents/scheduler-health",
+      "schedule": "*/5 * * * *"
+    }
+  ]
 }
