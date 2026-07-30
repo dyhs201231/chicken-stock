@@ -32,7 +32,10 @@ export default function ChartPanel({ stock }: StockOnlyProps) {
       <OhlcSummary currencyCode={stock.currencyCode} items={ohlcItems} />
 
       <div className="relative min-h-0 flex-1">
-        <div ref={chartContainerRef} className="h-full w-full" />
+        <div
+          ref={chartContainerRef}
+          className="h-full w-[calc(100%-1.5rem)] md:w-[calc(100%-1.75rem)] xl:w-full"
+        />
 
         <ChartOverlayLabels
           axisTickLabels={axisTickLabels}

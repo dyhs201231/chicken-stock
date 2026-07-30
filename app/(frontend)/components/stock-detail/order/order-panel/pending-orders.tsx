@@ -129,7 +129,7 @@ export default function PendingOrders({
   }
 
   return (
-    <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-5">
+    <div className="scrollbar-hide min-h-0 flex-1 overflow-y-auto px-5 pb-5">
       <ul className="mt-5 space-y-4">
         {orderContext.pendingOrders.map((order) => {
           const isEditing = editingOrderId === order.orderId;
@@ -145,14 +145,14 @@ export default function PendingOrders({
                   <p className="text-lg font-semibold">
                     <span className={getOrderTypeClassName(order.type)}>
                       {getOrderTypeLabel(order.type)}
-                    </span>{" "}
+                    </span>
                     {formatQuantity(order.remainingQuantity)}
                   </p>
                   <p className="mt-1 text-base text-zinc-500">
                     주당 {formatPrice(order.pricePerShare, stock.currencyCode)}
                   </p>
                   <p className="mt-1 text-sm text-zinc-400">
-                    {formatOrderTime(order.orderedAt)} 접수 · 총{" "}
+                    {formatOrderTime(order.orderedAt)} 접수 · 총
                     {formatPrice(orderAmount, stock.currencyCode)}
                   </p>
                 </div>

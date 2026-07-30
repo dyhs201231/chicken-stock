@@ -284,7 +284,7 @@ function CompletedOrderItem({
           <p className="text-base font-semibold">
             <span className={getOrderTypeClassName(tone)}>
               {getOrderTypeLabel(transaction.transactionType)}
-            </span>{" "}
+            </span>
             {formatQuantity(transaction.totalQuantity)}
           </p>
           <p className="mt-1 text-sm text-zinc-500">
@@ -332,7 +332,7 @@ function PendingOrderItem({
           <p className="text-base font-semibold">
             <span className={getOrderTypeClassName(tone)}>
               {getOrderTypeLabel(order.type)}
-            </span>{" "}
+            </span>
             {formatQuantity(order.remainingQuantity)}
           </p>
           <p className="mt-1 text-sm text-zinc-500">

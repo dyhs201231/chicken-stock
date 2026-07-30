@@ -18,7 +18,7 @@ export default function EduPageShell({ children }: EduPageShellProps) {
         sizes="100vw"
       />
 
-      <section className="relative z-10 mx-auto flex min-h-[calc(100dvh-74px)] w-full max-w-7xl flex-col items-center gap-8 pt-12 pb-12 md:block md:min-h-237.5 md:pt-32">
+      <section className="relative z-10 mx-auto flex min-h-[calc(100dvh-74px)] w-full max-w-7xl flex-col items-center gap-8 pt-12 pb-12 xl:block xl:min-h-237.5 xl:pt-32">
         <div className="mx-auto max-w-5xl text-center text-black">
           <h1 className="text-4xl leading-tight font-bold tracking-normal md:text-6xl lg:text-8xl">
             레벨별로 학습해보세요!
@@ -28,7 +28,7 @@ export default function EduPageShell({ children }: EduPageShellProps) {
           </p>
         </div>
 
-        <div className="mt-8 flex w-full flex-col items-center gap-8 md:mt-0">
+        <div className="mt-8 flex w-full flex-col items-center gap-8 xl:mt-0">
           {children}
         </div>
       </section>

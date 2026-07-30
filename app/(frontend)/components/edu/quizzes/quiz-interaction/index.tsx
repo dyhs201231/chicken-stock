@@ -226,7 +226,7 @@ export default function QuizInteraction({
                     submissionResult.isRewardPaid &&
                     submissionResult.rewardAmountKrw !== undefined && (
                       <p className="mt-4 text-base leading-7 font-bold text-sky-700 md:text-lg md:leading-8">
-                        보상으로{" "}
+                        보상으로
                         {formatRewardAmount(submissionResult.rewardAmountKrw)}
                         원이 지급되었어요.
                       </p>

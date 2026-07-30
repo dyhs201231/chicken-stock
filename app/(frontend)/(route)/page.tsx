@@ -74,7 +74,7 @@ export default async function Home() {
       />
 
       <div className="cs-page-shell">
-        <div className="grid min-w-0 grid-cols-1 gap-5 lg:grid-cols-[minmax(0,3fr)_minmax(0,1fr)] lg:items-stretch">
+        <div className="grid min-w-0 grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_25rem] lg:items-stretch">
           <IndexList initialIndices={initialIndices} />
           <EduProgress />
         </div>

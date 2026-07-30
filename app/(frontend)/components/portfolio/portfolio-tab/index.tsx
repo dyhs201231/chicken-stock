@@ -13,7 +13,7 @@ export default function PortfolioTab() {
       defaultValue={selectedTab}
       direction="row"
       type="fill"
-      className="w-full overflow-x-auto rounded-none bg-transparent p-0"
+      className="w-full [scrollbar-width:none] gap-0 overflow-x-auto rounded-none bg-transparent p-0 md:gap-5 [&::-webkit-scrollbar]:hidden"
     >
       {PORTFOLIO_TAB.map((tab) => (
         <Tab.Item

@@ -94,7 +94,7 @@ export default function EducationCard({
               Level {level}
             </p>
 
-            <h2 className="mt-1 truncate text-lg leading-6 font-medium tracking-normal sm:text-xl">
+            <h2 className="mt-1 line-clamp-2 text-lg leading-6 font-medium tracking-normal sm:truncate sm:text-xl">
               {title}
             </h2>
           </div>
@@ -123,7 +123,7 @@ export default function EducationCard({
         setIsOpen={handleModalOpenChange}
       >
         <Modal.Overlay>
-          <Modal.Content className="w-[min(100%,600px)] rounded-2xl p-6 md:p-7">
+          <Modal.Content className="w-[min(100%,600px)] rounded-2xl p-[14px] md:p-7">
             {isSummaryPanelVisible && (
               <section>
                 <h3 className="mt-1 text-2xl font-semibold tracking-normal">
@@ -157,7 +157,7 @@ export default function EducationCard({
                     {data.list.map((item, index) => (
                       <li
                         key={getListItemKey(item, index)}
-                        className="px-4 py-3"
+                        className="py-3 md:px-4"
                       >
                         <div className="flex w-full items-center">
                           <span className="flex size-7 shrink-0 items-center justify-center rounded-full text-sm font-semibold">

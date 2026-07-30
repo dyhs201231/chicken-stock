@@ -38,8 +38,10 @@ export default function EarningsSection({ stock }: StockOnlyProps) {
 
   return (
     <section>
-      <h3 className="mb-5 text-xl font-semibold tracking-normal">실적</h3>
-      <div className="mb-10 grid grid-cols-3 gap-4">
+      <h3 className="mb-4 text-lg font-semibold tracking-normal md:mb-5 md:text-xl">
+        실적
+      </h3>
+      <div className="mb-6 grid grid-cols-1 gap-2 md:mb-10 md:grid-cols-3 md:gap-4">
         <MetricCard
           label="발표 날짜"
           value={formatDate(latestEarning?.announcementDate)}
@@ -60,8 +62,10 @@ export default function EarningsSection({ stock }: StockOnlyProps) {
         />
       </div>
 
-      <h4 className="mb-3 text-lg font-semibold tracking-normal">예상 매출</h4>
-      <div className="mb-3 flex gap-5 text-xs">
+      <h4 className="mb-2 text-base font-semibold tracking-normal md:mb-3 md:text-lg">
+        예상 매출
+      </h4>
+      <div className="mb-3 flex gap-4 text-xs md:gap-5">
         {periodTabs.map((tab) => (
           <button
             key={tab}

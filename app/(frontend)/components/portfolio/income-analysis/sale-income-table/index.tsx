@@ -98,10 +98,10 @@ export default function SaleIncomeTable({ rows }: SaleIncomeTableProps) {
           ))}
         </div>
 
-        <div className="min-h-[380px] py-6 md:py-9" role="rowgroup">
+        <div className="min-h-95 py-6 md:py-9" role="rowgroup">
           {rows.length === 0 && (
             <div
-              className="row center h-60 text-lg text-(--cs-color-gray-700)"
+              className="flex h-60 items-center justify-start text-left text-lg text-(--cs-color-gray-700) md:justify-center md:text-center"
               role="row"
             >
               <span role="cell" aria-colspan={saleIncomeColumns.length}>

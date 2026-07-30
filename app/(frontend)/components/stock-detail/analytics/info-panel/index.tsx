@@ -25,9 +25,7 @@ function hasStockAnalyticsData(stock: StockOnlyProps["stock"]) {
 
 function isInfoSection(section: string): section is InfoSection {
   return (
-    section === "financial" ||
-    section === "earnings" ||
-    section === "valuation"
+    section === "financial" || section === "earnings" || section === "valuation"
   );
 }
 
@@ -42,10 +40,11 @@ export default function InfoPanel({ stock }: StockOnlyProps) {
           valuationMetric: stock.valuationMetric,
         }
       : undefined;
-  const { data: analyticsData, error, isPending } = useStockAnalyticsQuery(
-    stock.id,
-    initialAnalyticsData,
-  );
+  const {
+    data: analyticsData,
+    error,
+    isPending,
+  } = useStockAnalyticsQuery(stock.id, initialAnalyticsData);
   const [activeSection, setActiveSection] = useState<InfoSection>("financial");
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const sectionRefs = useRef<Record<InfoSection, HTMLElement | null>>({
@@ -135,7 +134,7 @@ export default function InfoPanel({ stock }: StockOnlyProps) {
           ref={(element) => {
             sectionRefs.current.financial = element;
           }}
-          className="pb-12"
+          className="pb-8 md:pb-12"
         >
           <FinancialSection stock={displayStock} />
         </section>
@@ -144,7 +143,7 @@ export default function InfoPanel({ stock }: StockOnlyProps) {
           ref={(element) => {
             sectionRefs.current.earnings = element;
           }}
-          className="pb-12"
+          className="pb-8 md:pb-12"
         >
           <EarningsSection stock={displayStock} />
         </section>
@@ -153,6 +152,7 @@ export default function InfoPanel({ stock }: StockOnlyProps) {
           ref={(element) => {
             sectionRefs.current.valuation = element;
           }}
+          className="min-h-full"
         >
           <ValuationSection stock={displayStock} />
         </section>
@@ -161,14 +161,34 @@ export default function InfoPanel({ stock }: StockOnlyProps) {
   })();
 
   return (
-    <section className="cs-data-panel grid h-130 grid-cols-[8rem_minmax(0,1fr)] px-5 py-5 sm:grid-cols-[10rem_minmax(0,1fr)] md:px-7 md:py-6">
-      <aside>
-        <h2 className="mb-5 text-lg font-semibold tracking-normal">
+    <section className="cs-data-panel grid h-130 grid-cols-1 grid-rows-[auto_minmax(0,1fr)] px-4 py-4 md:grid-cols-[10rem_minmax(0,1fr)] md:grid-rows-1 md:px-7 md:py-6">
+      <aside className="pb-3 md:pb-0">
+        <h2 className="mb-3 text-base font-semibold tracking-normal md:mb-5 md:text-lg">
           주요 정보
         </h2>
 
         <Tab.Root
-          className="gap-3 bg-transparent p-0 pr-10 text-base"
+          className="w-full [scrollbar-width:none] gap-0 overflow-x-auto bg-transparent p-0 text-sm md:hidden [&::-webkit-scrollbar]:hidden"
+          direction="row"
+          type="underline"
+          value={activeSection}
+          onValueChange={handleSectionChange}
+        >
+          {sections.map((section) => (
+            <Tab.Item
+              key={section}
+              value={section}
+              className="min-w-fit flex-1 rounded-none px-3 py-2"
+              activeClassName="font-semibold"
+              inactiveClassName="border-transparent"
+            >
+              {sectionLabels[section]}
+            </Tab.Item>
+          ))}
+        </Tab.Root>
+
+        <Tab.Root
+          className="hidden gap-3 bg-transparent p-0 pr-10 text-base md:flex"
           direction="col"
           type="underline"
           value={activeSection}
@@ -190,7 +210,7 @@ export default function InfoPanel({ stock }: StockOnlyProps) {
 
       <div
         ref={scrollContainerRef}
-        className="scrollbar-thin [scrollbar-color:#d4d4d8_transparent] overflow-y-auto pr-5"
+        className="[scrollbar-width:none] overflow-y-auto pt-4 md:[scrollbar-width:auto] md:scrollbar-thin md:[scrollbar-color:#d4d4d8_transparent] md:pt-0 md:pr-5 [&::-webkit-scrollbar]:hidden md:[&::-webkit-scrollbar]:block"
         tabIndex={0}
         onScroll={handleScroll}
       >

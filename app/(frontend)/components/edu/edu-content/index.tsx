@@ -11,17 +11,17 @@ const educationCardStyles = [
   {
     image: "/images/edu/egg.webp",
     className:
-      "md:absolute md:top-96 md:left-0 md:z-10 md:h-[359px] md:w-[440px] md:max-w-[500px]",
+      "xl:absolute xl:top-96 xl:left-0 xl:z-10 xl:h-[359px] xl:w-[440px] xl:max-w-[500px]",
   },
   {
     image: "/images/edu/chick.webp",
     className:
-      "md:absolute md:top-[31rem] md:left-1/2 md:z-30 md:h-[359px] md:w-[440px] md:max-w-[500px] md:-translate-x-1/2",
+      "xl:absolute xl:top-[31rem] xl:left-1/2 xl:z-30 xl:h-[359px] xl:w-[440px] xl:max-w-[500px] xl:-translate-x-1/2",
   },
   {
     image: "/images/edu/chicken.webp",
     className:
-      "md:absolute md:top-96 md:right-0 md:z-10 md:h-[359px] md:w-[440px] md:max-w-[500px]",
+      "xl:absolute xl:top-96 xl:right-0 xl:z-10 xl:h-[359px] xl:w-[440px] xl:max-w-[500px]",
   },
 ] as const;
 

@@ -19,7 +19,7 @@ export default function StockLogo({ stock }: StockOnlyProps) {
 
   return (
     <span
-      className={`relative flex size-25 shrink-0 items-center justify-center overflow-hidden border text-4xl font-bold ${logoColorClassName}`}
+      className={`relative flex size-20 shrink-0 items-center justify-center overflow-hidden border text-3xl font-bold sm:size-25 sm:text-4xl ${logoColorClassName}`}
       aria-hidden={!shouldTryImage}
     >
       {logoLabel}
@@ -31,7 +31,7 @@ export default function StockLogo({ stock }: StockOnlyProps) {
             isImageLoaded ? "opacity-100" : "opacity-0"
           }`}
           fill
-          sizes="100px"
+          sizes="(max-width: 639px) 80px, 100px"
           src={imageUrl}
           unoptimized
           onLoad={(event) => {

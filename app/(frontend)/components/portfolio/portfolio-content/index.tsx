@@ -32,13 +32,13 @@ export default function PortfolioContent({
     <div
       className={twMerge(
         "min-h-[calc(100dvh-72px)] bg-[#f8f8f9]",
-        isTransactionTab && "h-[calc(100dvh-72px)] overflow-hidden",
+        isTransactionTab && "xl:h-[calc(100dvh-72px)] xl:overflow-hidden",
       )}
     >
       <div
         className={twMerge(
           "cs-page-shell col min-h-[calc(100dvh-72px)] gap-5 py-8 md:py-12",
-          isTransactionTab && "h-full overflow-hidden",
+          isTransactionTab && "xl:h-full xl:overflow-hidden",
         )}
       >
         <PortfolioTab />

@@ -13,6 +13,7 @@ type ChartOverlayLabelsProps = {
   crosshairPriceLabel: CrosshairPriceLabel | null;
   currentPriceLabel: CurrentPriceLabel | null;
   currentPriceLabelClassName: string;
+  highLowLabelClassName?: string;
   highLabelPosition: HighLowLabel | null;
   lowLabelPosition: HighLowLabel | null;
   priceAxisTickLabels: PriceAxisTickLabel[];
@@ -24,6 +25,7 @@ export function ChartOverlayLabels({
   crosshairPriceLabel,
   currentPriceLabel,
   currentPriceLabelClassName,
+  highLowLabelClassName,
   highLabelPosition,
   lowLabelPosition,
   priceAxisTickLabels,
@@ -32,7 +34,9 @@ export function ChartOverlayLabels({
     <>
       {highLabelPosition && (
         <span
-          className="pointer-events-none absolute z-10 text-xs font-medium whitespace-nowrap text-(--cs-color-red-500)"
+          className={`pointer-events-none absolute z-10 font-medium whitespace-nowrap text-(--cs-color-red-500) ${
+            highLowLabelClassName ?? "text-xs"
+          }`}
           style={{
             left: highLabelPosition.left,
             top: highLabelPosition.top,
@@ -44,7 +48,9 @@ export function ChartOverlayLabels({
 
       {lowLabelPosition && (
         <span
-          className="pointer-events-none absolute z-10 text-xs font-medium whitespace-nowrap text-(--cs-color-blue-700)"
+          className={`pointer-events-none absolute z-10 font-medium whitespace-nowrap text-(--cs-color-blue-700) ${
+            highLowLabelClassName ?? "text-xs"
+          }`}
           style={{
             left: lowLabelPosition.left,
             top: lowLabelPosition.top,

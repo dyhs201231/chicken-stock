@@ -39,15 +39,15 @@ export default function FinancialTable({ columns, rows }: FinancialTableProps) {
   });
 
   return (
-    <div className="w-full overflow-x-auto">
-      <table className="min-w-full table-fixed text-center text-sm">
+    <div className="w-full [scrollbar-width:none] overflow-x-auto [&::-webkit-scrollbar]:hidden">
+      <table className="w-full min-w-112 table-fixed text-center text-xs md:min-w-full md:text-sm">
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
                 <th
                   key={header.id}
-                  className="px-3 pb-3 font-medium text-zinc-500 first:w-24"
+                  className="px-2 pb-2 font-medium text-zinc-500 first:w-24 md:px-3 md:pb-3"
                 >
                   {header.isPlaceholder
                     ? null
@@ -67,7 +67,7 @@ export default function FinancialTable({ columns, rows }: FinancialTableProps) {
               {row.getVisibleCells().map((cell) => (
                 <td
                   key={cell.id}
-                  className="px-3 py-1.5 text-xs font-medium whitespace-nowrap text-zinc-500 first:text-left"
+                  className="px-2 py-1.5 text-xs font-medium whitespace-nowrap text-zinc-500 first:text-left md:px-3"
                 >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>

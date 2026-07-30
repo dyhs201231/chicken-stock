@@ -1,5 +1,9 @@
 import { useMemo, useState } from "react";
-import { IconChevronDown, IconChevronUp } from "@tabler/icons-react";
+import {
+  IconChartPie,
+  IconChevronDown,
+  IconChevronUp,
+} from "@tabler/icons-react";
 import { twMerge } from "tailwind-merge";
 import type { PortfolioAssetType } from "@/app/(frontend)/apis/portfolio/api";
 import { useGetPortfolio } from "@/app/(frontend)/apis/portfolio/queries";
@@ -66,24 +70,30 @@ export default function MiniPortfolioPanel() {
   return (
     <aside
       className={twMerge(
-        "fixed right-4 z-40 w-[min(300px,calc(100vw-32px))] overflow-hidden border border-(--cs-border-strong) bg-(--cs-surface-raised) text-(--cs-text-strong) shadow-(--cs-shadow-lg) transition-all duration-300 ease-out md:right-6",
+        "fixed right-4 z-40 w-[min(300px,calc(100vw-32px))] overflow-hidden border border-(--cs-border-strong) bg-(--cs-surface-raised) text-(--cs-text-strong) shadow-(--cs-shadow-lg) transition-all duration-300 ease-out lg:right-6",
         isOpen &&
           "col bottom-3 h-[min(450px,calc(100dvh-24px))] rounded-(--cs-radius-lg) py-5",
-        !isOpen && "bottom-0 h-[30px] rounded-t-(--cs-radius-lg)",
+        !isOpen &&
+          "bottom-4 h-14 w-14 rounded-full lg:bottom-0 lg:h-[30px] lg:w-[min(300px,calc(100vw-32px))] lg:rounded-t-(--cs-radius-lg) lg:rounded-b-none",
       )}
     >
       <button
         type="button"
         aria-expanded={isOpen}
         aria-label={togglePortfolioAriaLabel}
-        className="row h-[30px] w-full shrink-0 cursor-pointer items-center justify-between px-5 text-left"
+        aria-controls="mini-portfolio-content"
+        className={twMerge(
+          "row h-[30px] w-full shrink-0 cursor-pointer items-center justify-between px-5 text-left",
+          !isOpen &&
+            "h-full justify-center px-0 lg:h-[30px] lg:justify-between lg:px-5",
+        )}
         onClick={() => setIsOpen((prev) => !prev)}
       >
         <span
           className={twMerge(
             "text-[16px] leading-none font-semibold transition-opacity duration-200",
             isOpen && "opacity-100",
-            !isOpen && "opacity-0",
+            !isOpen && "hidden opacity-0 lg:block",
           )}
         >
           기본계좌
@@ -97,15 +107,24 @@ export default function MiniPortfolioPanel() {
           />
         )}
         {!isOpen && (
-          <IconChevronUp
-            aria-hidden="true"
-            className="mr-5 ml-auto text-(--cs-color-gray-400)"
-            size={20}
-          />
+          <>
+            <IconChevronUp
+              aria-hidden="true"
+              className="mr-5 ml-auto hidden text-(--cs-color-gray-400) lg:block"
+              size={20}
+            />
+            <IconChartPie
+              aria-hidden="true"
+              className="text-(--cs-brand-700) lg:hidden"
+              size={26}
+              stroke={1.8}
+            />
+          </>
         )}
       </button>
 
       <div
+        id="mini-portfolio-content"
         aria-hidden={!isOpen}
         className="min-h-0 flex-1 [scrollbar-width:none] overflow-y-auto px-5 pt-5 [&::-webkit-scrollbar]:hidden"
       >

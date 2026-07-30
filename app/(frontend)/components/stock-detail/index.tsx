@@ -185,11 +185,11 @@ export default function StockDetail({ stock, activeTab }: StockDetailProps) {
     <main className="min-h-[calc(100dvh-72px)] bg-[#f8f8f9] py-8 md:py-12">
       <div className="cs-page-shell text-(--cs-text-strong)">
         <section className="mb-5 flex flex-col gap-6 rounded-2xl bg-white p-5 lg:flex-row lg:items-end lg:justify-between lg:p-7">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <StockLogo stock={liveStock} />
 
-            <div>
-              <div className="mb-3 flex items-center gap-3">
+            <div className="min-w-0 flex-1">
+              <div className="mb-3 flex items-center gap-2 sm:gap-3">
                 <h1 className="text-2xl font-bold">{liveStock.name}</h1>
 
                 <span className="rounded-md bg-(--cs-brand-100) px-2 py-1 text-base font-semibold text-(--cs-brand-800)">
@@ -203,8 +203,10 @@ export default function StockDetail({ stock, activeTab }: StockDetailProps) {
                   displayStock.currencyCode,
                 )}
 
-                <span className={`ml-2 text-base ${changeClassName}`}>
-                  어제보다{" "}
+                <span
+                  className={`block text-sm sm:ml-2 sm:inline sm:text-base ${changeClassName}`}
+                >
+                  어제보다
                   {formatChange(
                     displayStock.changeAmount,
                     displayStock.currencyCode,
@@ -252,14 +254,14 @@ export default function StockDetail({ stock, activeTab }: StockDetailProps) {
         </section>
 
         <Tab.Root
-          className="mb-5 w-full overflow-x-auto rounded-none bg-transparent p-0"
+          className="mb-5 w-full gap-2 overflow-x-auto rounded-none bg-transparent p-0 sm:gap-5"
           value={activeTab}
           onValueChange={handleTabChange}
         >
           {sideTabs.map((tab) => (
             <Tab.Item
               activeClassName="bg-transparent text-[#df2b2e]"
-              className="shrink-0 rounded-none px-5 py-3 text-base font-semibold md:px-10 md:py-4 md:text-xl"
+              className="shrink-0 rounded-none px-4 py-3 text-base font-semibold sm:px-5 md:px-10 md:py-4 md:text-xl"
               key={tab.value}
               onFocus={
                 tab.value === "portfolio-info"
@@ -279,7 +281,7 @@ export default function StockDetail({ stock, activeTab }: StockDetailProps) {
         </Tab.Root>
 
         {activeTab === "chart-orderbook" && (
-          <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_20rem_20rem]">
+          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_20rem_20rem] md:[&>:first-child]:col-span-2 xl:[&>:first-child]:col-span-1">
             <ChartPanel stock={displayStock} />
             <OrderBookPanel
               initialOrderBookSnapshot={liveStock.orderBookSnapshot}
@@ -300,7 +302,7 @@ export default function StockDetail({ stock, activeTab }: StockDetailProps) {
         )}
 
         {activeTab === "portfolio-info" && (
-          <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_20rem_20rem]">
+          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_20rem_20rem] md:[&>:first-child]:col-span-2 xl:[&>:first-child]:col-span-1">
             <InfoPanel stock={displayStock} />
             <MyStockPanel stock={displayStock} />
             <OrderHistoryPanel

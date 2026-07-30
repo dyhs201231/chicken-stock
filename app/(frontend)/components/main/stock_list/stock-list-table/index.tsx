@@ -50,17 +50,27 @@ export default function StockListTable({
 
   return (
     <>
-      <div className="grid min-w-230 grid-cols-[2.5rem_3.25rem_minmax(16rem,1fr)_12rem_minmax(8rem,1fr)_10rem_12rem] items-center gap-4 border-b border-(--cs-border-subtle) pb-3 text-sm text-(--cs-text-muted)">
-        <span className="col-span-3 flex h-4 items-center text-left leading-none">
-          순위 / 오늘 {seoulTime}
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-(--cs-border-subtle) pb-3 text-sm text-(--cs-text-muted) md:grid-cols-[2rem_2.25rem_minmax(0,1fr)_7rem_5rem_8rem] md:gap-[3px] lg:grid-cols-[2.5rem_3.25rem_minmax(10rem,16rem)_minmax(8rem,1fr)_minmax(6rem,0.8fr)_minmax(10rem,1fr)] lg:gap-3">
+        <span className="flex h-4 items-center text-left leading-none md:col-span-3">
+          <span className="text-xs whitespace-nowrap sm:text-sm md:hidden">
+            순위 / 오늘 {seoulTime}
+          </span>
+          <span className="hidden md:inline">순위 / 오늘 {seoulTime}</span>
         </span>
-        <span className="col-start-4 flex h-4 items-center justify-end leading-none">
+
+        <span className="flex h-4 items-center justify-end text-xs leading-none sm:text-sm md:hidden">
+          현재가 / 등락률
+        </span>
+
+        <span className="hidden h-4 items-center justify-end leading-none md:col-start-4 md:flex lg:justify-start">
           현재가
         </span>
-        <span className="col-start-5 flex h-4 translate-x-1/2 items-center justify-center leading-none">
+
+        <span className="hidden h-4 items-center justify-center leading-none md:col-start-5 md:flex">
           등락률
         </span>
-        <span className="col-start-7 flex h-4 items-center justify-end leading-none">
+
+        <span className="hidden h-4 items-center justify-end leading-none md:col-start-6 md:flex lg:justify-start">
           {rankingLabel}
         </span>
       </div>
@@ -84,7 +94,7 @@ export default function StockListTable({
       )}
 
       {stocks.length > 0 && (
-        <ol className="min-w-230">
+        <ol>
           {stocks.map((stock) => (
             <StockListRow key={stock.id} stock={stock} />
           ))}
