@@ -9,6 +9,28 @@ import { prisma } from "./prisma";
 
 const EDUCATION_CONTENT_REVALIDATE_SECONDS = 60 * 10;
 
+function normalizeEducationText(value: string) {
+  return value.normalize("NFC");
+}
+
+export function normalizeEducationArticle(
+  article: EducationArticle | null,
+): EducationArticle | null {
+  if (!article) {
+    return null;
+  }
+
+  return {
+    ...article,
+    title: normalizeEducationText(article.title),
+    content: normalizeEducationText(article.content),
+    educationSummary: {
+      ...article.educationSummary,
+      title: normalizeEducationText(article.educationSummary.title),
+    },
+  };
+}
+
 function withArticleDefaults(
   summaries: Array<{
     articles: Array<{
@@ -24,8 +46,11 @@ function withArticleDefaults(
 ): EducationSummary[] {
   return summaries.map((summary) => ({
     ...summary,
+    title: normalizeEducationText(summary.title),
+    summary: summary.summary.map(normalizeEducationText),
     articles: summary.articles.map((article) => ({
       ...article,
+      title: normalizeEducationText(article.title),
       progressRate: 0,
       isCompleted: false,
     })),
@@ -62,7 +87,7 @@ export const getCachedEducationSummaries = unstable_cache(
 
 export const getCachedEducationArticle = unstable_cache(
   async (articleId: number, level: number): Promise<EducationArticle | null> => {
-    return prisma.article.findFirst({
+    const article = await prisma.article.findFirst({
       where: {
         id: articleId,
         educationSummary: {
@@ -84,6 +109,8 @@ export const getCachedEducationArticle = unstable_cache(
         },
       },
     });
+
+    return normalizeEducationArticle(article);
   },
   ["education-article"],
   {

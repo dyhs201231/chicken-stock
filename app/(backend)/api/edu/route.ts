@@ -8,6 +8,7 @@ import {
 import {
   getCachedEducationArticle,
   getCachedEducationSummaries,
+  normalizeEducationArticle,
 } from "../../lib/education";
 import { prisma } from "../../lib/prisma";
 
@@ -209,7 +210,9 @@ export async function GET(request: NextRequest) {
           })
         : await getCachedEducationArticle(articleId, level ?? 0);
 
-      if (!article) {
+      const normalizedArticle = normalizeEducationArticle(article);
+
+      if (!normalizedArticle) {
         return NextResponse.json(
           {
             ok: false,
@@ -222,7 +225,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         {
           ok: true,
-          data: article,
+          data: normalizedArticle,
         },
         {
           headers: EDUCATION_PUBLIC_CACHE_HEADERS,
