@@ -8,6 +8,7 @@ import { getTotalAvailableOrderAmountKrw } from "@/app/(backend)/lib/portfolio-b
 import { ExchangeRateQuoteError } from "@/app/(backend)/lib/exchange-rate-quote";
 import { runWithVerifiedExchangeRateQuote } from "@/app/(backend)/lib/portfolio-exchange-boundary";
 import { prisma } from "@/app/(backend)/lib/prisma";
+import { reportServerError } from "@/app/(backend)/lib/report-server-error";
 import { lockPortfolioRows } from "@/app/(backend)/lib/stock-order-matching";
 import { Prisma } from "@/app/(backend)/generated/prisma/client";
 import {
@@ -432,6 +433,12 @@ export async function POST(request: NextRequest) {
         { status: error.status },
       );
     }
+
+    reportServerError(error, {
+      component: "portfolio-exchange-api",
+      kind: "handled-5xx",
+      operation: "exchange-currency",
+    });
 
     return NextResponse.json(
       { message: "환전에 실패했습니다." },

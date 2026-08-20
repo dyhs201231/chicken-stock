@@ -2,6 +2,7 @@ import "server-only";
 
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { prisma } from "@/app/(backend)/lib/prisma";
+import { reportServerError } from "@/app/(backend)/lib/report-server-error";
 import {
   getStockRealtimeChannelName,
   getUserOrderRealtimeChannelName,
@@ -125,6 +126,14 @@ async function publishBroadcast(
     });
 
     if (response !== "ok") {
+      reportServerError(
+        new Error("Supabase Realtime broadcast was not acknowledged"),
+        {
+          component: "realtime-events",
+          kind: "background",
+          operation: "publish-broadcast",
+        },
+      );
       console.warn("Supabase Realtime broadcast was not acknowledged", {
         channelName,
         event,
@@ -132,6 +141,11 @@ async function publishBroadcast(
       });
     }
   } catch (error) {
+    reportServerError(error, {
+      component: "realtime-events",
+      kind: "background",
+      operation: "publish-broadcast",
+    });
     console.error("Supabase Realtime broadcast failed", {
       channelName,
       error,
@@ -149,6 +163,11 @@ async function getSafeStockMarketSync(
   try {
     return await getStockMarketSync(stockId, reason);
   } catch (error) {
+    reportServerError(error, {
+      component: "realtime-events",
+      kind: "background",
+      operation: "build-stock-sync",
+    });
     console.error("Building stock realtime sync payload failed", {
       error,
       reason,
@@ -174,6 +193,11 @@ async function getSafeStockMutationSync(
       userId,
     });
   } catch (error) {
+    reportServerError(error, {
+      component: "realtime-events",
+      kind: "background",
+      operation: "build-user-order-sync",
+    });
     console.error("Building user order realtime sync payload failed", {
       error,
       stockId,
@@ -428,6 +452,11 @@ export async function publishOrderFilledEventsForOrder(
       }),
     );
   } catch (error) {
+    reportServerError(error, {
+      component: "realtime-events",
+      kind: "background",
+      operation: "publish-order-filled-events",
+    });
     console.error("Publishing order filled realtime events failed", {
       error,
       orderId: orderId.toString(),

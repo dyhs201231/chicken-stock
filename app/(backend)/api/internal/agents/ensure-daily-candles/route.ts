@@ -1,5 +1,6 @@
 import { after, NextRequest, NextResponse } from "next/server";
 import { ensureListedDailyCandles } from "@/app/(backend)/lib/stock-daily-candles";
+import { reportServerError } from "@/app/(backend)/lib/report-server-error";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -62,6 +63,11 @@ async function handleEnsureDailyCandlesRequest(request: NextRequest) {
 
         console.info("Scheduled daily candle maintenance finished", result);
       } catch (error) {
+        reportServerError(error, {
+          component: "daily-candle-scheduler",
+          kind: "background",
+          operation: "ensure-daily-candles",
+        });
         console.error("Scheduled daily candle maintenance failed", error);
       }
     });
@@ -88,6 +94,11 @@ async function handleEnsureDailyCandlesRequest(request: NextRequest) {
       ok: true,
     });
   } catch (error) {
+    reportServerError(error, {
+      component: "daily-candle-api",
+      kind: "handled-5xx",
+      operation: "ensure-daily-candles",
+    });
     console.error("Daily candle maintenance API failed", error);
 
     return NextResponse.json(

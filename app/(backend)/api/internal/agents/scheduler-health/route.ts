@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server.js";
 
 import { getSchedulerHealth } from "../../../../lib/scheduler-health.ts";
+import { reportServerError } from "../../../../lib/report-server-error.ts";
 
 export const runtime = "nodejs";
 
@@ -46,6 +47,11 @@ export async function GET(request: NextRequest) {
       { status: health.healthy ? 200 : 503 },
     );
   } catch (error) {
+    reportServerError(error, {
+      component: "scheduler-health-api",
+      kind: "handled-5xx",
+      operation: "check-health",
+    });
     console.error("Scheduler watchdog failed", error);
 
     return NextResponse.json(

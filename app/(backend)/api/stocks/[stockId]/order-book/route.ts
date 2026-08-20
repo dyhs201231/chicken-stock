@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCachedLatestOrderBookSnapshot } from "@/app/(backend)/lib/stock-order-book";
+import { reportServerError } from "@/app/(backend)/lib/report-server-error";
 
 type StockOrderBookRouteProps = {
   params: Promise<{
@@ -46,6 +47,11 @@ export async function GET(
       },
     );
   } catch (error) {
+    reportServerError(error, {
+      component: "stock-order-book-api",
+      kind: "handled-5xx",
+      operation: "fetch-order-book",
+    });
     const message =
       process.env.NODE_ENV === "production"
         ? "STOCK_ORDER_BOOK_FETCH_FAILED"

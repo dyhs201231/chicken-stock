@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCachedStocksRanking } from "../../lib/stocks";
+import { reportServerError } from "../../lib/report-server-error";
 import {
   getCanonicalStockRankingQuery,
   getStockRankingCacheControl,
@@ -47,6 +48,11 @@ export async function GET(request: NextRequest) {
       },
     );
   } catch (error) {
+    reportServerError(error, {
+      component: "stocks-api",
+      kind: "handled-5xx",
+      operation: "list-stocks",
+    });
     const message =
       process.env.NODE_ENV === "production"
         ? "STOCKS_FETCH_FAILED"

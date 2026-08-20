@@ -5,6 +5,7 @@ import {
   toDailyCandles,
 } from "../../../../lib/stock-candles";
 import { prisma } from "../../../../lib/prisma";
+import { reportServerError } from "../../../../lib/report-server-error";
 
 type StockCandlesRouteProps = {
   params: Promise<{
@@ -67,6 +68,11 @@ export async function GET(
       },
     });
   } catch (error) {
+    reportServerError(error, {
+      component: "stock-candles-api",
+      kind: "handled-5xx",
+      operation: "fetch-candles",
+    });
     const message =
       process.env.NODE_ENV === "production"
         ? "STOCK_CANDLES_FETCH_FAILED"

@@ -1,5 +1,6 @@
 import { after, NextRequest, NextResponse } from "next/server";
 import { runAgentTradeJob } from "@/app/(backend)/lib/agent-trade-runner";
+import { reportServerError } from "@/app/(backend)/lib/report-server-error";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -84,6 +85,11 @@ async function handleRunTradeRequest(
 
         console.info("Scheduled agent trade job finished", job);
       } catch (error) {
+        reportServerError(error, {
+          component: "agent-trade-scheduler",
+          kind: "background",
+          operation: "run-scheduled-trade",
+        });
         console.error("Scheduled agent trade job failed", error);
       }
     });
@@ -118,6 +124,11 @@ async function handleRunTradeRequest(
       ok: true,
     });
   } catch (error) {
+    reportServerError(error, {
+      component: "agent-trade-api",
+      kind: "handled-5xx",
+      operation: "run-trade",
+    });
     console.error("Agent trade run failed", error);
 
     return NextResponse.json(

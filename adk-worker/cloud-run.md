@@ -21,6 +21,9 @@ sent to `main.py --stdin`.
 - `GEMINI_MODEL`: defaults to `gemini-2.5-flash-lite`
 - `ADK_WORKER_CONCURRENCY`: defaults to `5`
 - `MAX_CANDIDATES_PER_RUN`: defaults to `15`
+- `SENTRY_ENABLED`: set to `true` only in Production
+- `SENTRY_DSN`: DSN for the `chicken-stock-adk-worker` Sentry project
+- `SENTRY_ENVIRONMENT`: set to `production` to enable monitoring
 
 ## Recommended Production Setup
 
@@ -74,6 +77,18 @@ gcloud run deploy "$SERVICE_NAME" \
   --allow-unauthenticated \
   --set-secrets GOOGLE_API_KEY=GOOGLE_API_KEY:latest,ADK_WORKER_TOKEN=ADK_WORKER_TOKEN:latest
 ```
+
+Enable Production monitoring after storing the Worker DSN in Secret Manager:
+
+```bash
+gcloud run services update "$SERVICE_NAME" \
+  --project "$PROJECT_ID" \
+  --region "$REGION" \
+  --update-env-vars SENTRY_ENABLED=true,SENTRY_ENVIRONMENT=production \
+  --update-secrets SENTRY_DSN=SENTRY_DSN:latest
+```
+
+The SDK uses Cloud Run's built-in `K_REVISION` value as its Sentry release.
 
 Read the deployed URL:
 

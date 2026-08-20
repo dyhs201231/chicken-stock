@@ -8,7 +8,11 @@ from fastapi import FastAPI, Header, HTTPException, status
 from pydantic import BaseModel, Field
 
 from adk_worker.config import load_config
+from adk_worker.monitoring import init_sentry
 from adk_worker.trade_intents import run_trade_intents_from_payload
+
+
+init_sentry()
 
 
 class AgentCandidateGroup(BaseModel):

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "../../../lib/prisma";
+import { reportServerError } from "../../../lib/report-server-error";
 
 const DEFAULT_SEARCH_LIMIT = 6;
 const MAX_SEARCH_LIMIT = 20;
@@ -130,6 +131,11 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
+    reportServerError(error, {
+      component: "stocks-api",
+      kind: "handled-5xx",
+      operation: "search-stocks",
+    });
     const message =
       process.env.NODE_ENV === "production"
         ? "STOCK_SEARCH_FAILED"

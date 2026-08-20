@@ -11,6 +11,7 @@ import {
   normalizeEducationArticle,
 } from "../../lib/education";
 import { prisma } from "../../lib/prisma";
+import { reportServerError } from "../../lib/report-server-error";
 
 const EDUCATION_PUBLIC_CACHE_HEADERS = {
   "Cache-Control": "public, s-maxage=600, stale-while-revalidate=86400",
@@ -245,6 +246,11 @@ export async function GET(request: NextRequest) {
       },
     );
   } catch (error) {
+    reportServerError(error, {
+      component: "education-api",
+      kind: "handled-5xx",
+      operation: "fetch-content",
+    });
     const message =
       process.env.NODE_ENV === "production"
         ? "EDUCATION_CONTENT_FETCH_FAILED"
@@ -334,6 +340,11 @@ export async function POST(request: NextRequest) {
       data: completion,
     });
   } catch (error) {
+    reportServerError(error, {
+      component: "education-api",
+      kind: "handled-5xx",
+      operation: "save-article-completion",
+    });
     const message =
       process.env.NODE_ENV === "production"
         ? "ARTICLE_COMPLETION_SAVE_FAILED"

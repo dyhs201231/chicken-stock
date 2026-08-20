@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCachedStockAnalyticsData } from "@/app/(frontend)/(route)/stock/[stockId]/page-data";
+import { reportServerError } from "@/app/(backend)/lib/report-server-error";
 
 type StockAnalyticsRouteProps = {
   params: Promise<{
@@ -43,6 +44,11 @@ export async function GET(
       },
     );
   } catch (error) {
+    reportServerError(error, {
+      component: "stock-analytics-api",
+      kind: "handled-5xx",
+      operation: "fetch-analytics",
+    });
     const message =
       process.env.NODE_ENV === "production"
         ? "STOCK_ANALYTICS_FETCH_FAILED"

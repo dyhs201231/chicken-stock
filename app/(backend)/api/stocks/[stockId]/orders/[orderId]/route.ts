@@ -15,6 +15,7 @@ import {
   publishOrderFilledEventsForOrder,
   scheduleStockUpdated,
 } from "@/app/(backend)/lib/realtime-events";
+import { reportServerError } from "@/app/(backend)/lib/report-server-error";
 import {
   getStockMutationSync,
   type StockSyncReason,
@@ -327,6 +328,11 @@ async function getSafeStockMutationSync({
   try {
     return await getStockMutationSync({ reason, stockId, userId });
   } catch (error) {
+    reportServerError(error, {
+      component: "stock-order-api",
+      kind: "background",
+      operation: "build-sync-snapshot",
+    });
     console.error("Stock order sync snapshot failed", {
       error,
       reason,
@@ -530,6 +536,12 @@ export async function PATCH(
       return createStockOrderErrorResponse(error.message, error.status);
     }
 
+    reportServerError(error, {
+      component: "stock-order-api",
+      kind: "handled-5xx",
+      operation: "update-order",
+    });
+
     return createStockOrderErrorResponse("주문 수정에 실패했습니다.", 500);
   }
 }
@@ -614,6 +626,12 @@ export async function DELETE(
     ) {
       return createStockOrderErrorResponse(error.message, error.status);
     }
+
+    reportServerError(error, {
+      component: "stock-order-api",
+      kind: "handled-5xx",
+      operation: "cancel-order",
+    });
 
     return createStockOrderErrorResponse("주문 취소에 실패했습니다.", 500);
   }

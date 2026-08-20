@@ -12,6 +12,7 @@ import type {
   AgentType,
 } from "@/app/(backend)/types/agent-trade-intent";
 import { prisma } from "@/app/(backend)/lib/prisma";
+import { reportServerError } from "@/app/(backend)/lib/report-server-error";
 import {
   getAdkRunWindowStatus,
   getMarketSessionStatus,
@@ -911,6 +912,14 @@ async function executeIntent(intent: AgentTradeIntent) {
 
     return "EXECUTED";
   } catch (error) {
+    if (!(error instanceof StockOrderServiceError)) {
+      reportServerError(error, {
+        component: "agent-trade",
+        kind: "background",
+        operation: "execute-intent",
+      });
+    }
+
     const rejectReason =
       error instanceof StockOrderServiceError
         ? error.code
@@ -925,6 +934,11 @@ async function executeIntent(intent: AgentTradeIntent) {
             : DecisionStatus.FAILED,
       });
     } catch (updateError) {
+      reportServerError(updateError, {
+        component: "agent-trade",
+        kind: "background",
+        operation: "update-decision-log",
+      });
       console.error("Agent decision log final status update failed", {
         error: serializeError(updateError),
         intent,
@@ -1213,6 +1227,14 @@ async function runAdkForCandidates(
     const responseText = await response.text();
 
     if (!response.ok) {
+      reportServerError(
+        new Error("ADK worker returned a non-success response"),
+        {
+          component: "agent-trade",
+          kind: "background",
+          operation: "request-worker",
+        },
+      );
       console.error("ADK worker HTTP request failed", {
         body: responseText,
         status: response.status,
@@ -1232,6 +1254,11 @@ async function runAdkForCandidates(
     try {
       parsed = JSON.parse(responseText);
     } catch (error) {
+      reportServerError(error, {
+        component: "agent-trade",
+        kind: "background",
+        operation: "parse-worker-response",
+      });
       console.error("ADK worker HTTP response parse failed", error, responseText);
 
       return {
@@ -1247,6 +1274,11 @@ async function runAdkForCandidates(
     }
 
     if (!isAdkWorkerResponse(parsed)) {
+      reportServerError(new Error("ADK worker returned an invalid response"), {
+        component: "agent-trade",
+        kind: "background",
+        operation: "validate-worker-response",
+      });
       console.error("ADK worker HTTP response shape invalid", parsed);
 
       return {
@@ -1298,6 +1330,12 @@ async function runAdkForCandidates(
       error instanceof Error && error.name === "AbortError"
         ? "ADK_WORKER_TIMEOUT"
         : "ADK_WORKER_FETCH_ERROR";
+
+    reportServerError(error, {
+      component: "agent-trade",
+      kind: "background",
+      operation: "request-worker",
+    });
 
     console.error("ADK worker HTTP request errored", {
       code,
@@ -1404,6 +1442,11 @@ async function mapWithConcurrency<T, R>(
       try {
         results[currentIndex] = await mapper(values[currentIndex]);
       } catch (error) {
+        reportServerError(error, {
+          component: "agent-trade",
+          kind: "background",
+          operation: "process-intent",
+        });
         console.error("Agent trade intent processing failed", {
           error: serializeError(error),
           index: currentIndex,

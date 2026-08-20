@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "../lib/prisma";
+import { reportServerError } from "../lib/report-server-error";
 
 export async function GET() {
   try {
@@ -12,6 +13,11 @@ export async function GET() {
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
+    reportServerError(error, {
+      component: "api-health",
+      kind: "handled-5xx",
+      operation: "check-database",
+    });
     const message =
       process.env.NODE_ENV === "production"
         ? "DB_UNHEALTHY"

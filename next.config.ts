@@ -1,3 +1,4 @@
+import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
 
 const agentTraceExcludes = [
@@ -48,4 +49,27 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+const shouldUploadSentrySourceMaps = Boolean(
+  process.env.VERCEL_ENV === "production" &&
+  process.env.NEXT_PUBLIC_SENTRY_ENABLED === "true" &&
+  process.env.SENTRY_AUTH_TOKEN &&
+  process.env.SENTRY_ORG &&
+  process.env.SENTRY_PROJECT,
+);
+
+export default withSentryConfig(nextConfig, {
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  silent: !process.env.CI,
+  widenClientFileUpload: true,
+  sourcemaps: {
+    deleteSourcemapsAfterUpload: true,
+    disable: !shouldUploadSentrySourceMaps,
+  },
+  bundleSizeOptimizations: {
+    excludeDebugStatements: true,
+    excludeReplayIframe: true,
+    excludeReplayShadowDom: true,
+  },
+});

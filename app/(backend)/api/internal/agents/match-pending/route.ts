@@ -1,6 +1,7 @@
 import { after, NextRequest, NextResponse } from "next/server";
 import { isMarketSessionOpenWakeupWindow } from "@/app/(backend)/lib/market-hours";
 import { matchPendingStockOrders } from "@/app/(backend)/lib/stock-order-service";
+import { reportServerError } from "@/app/(backend)/lib/report-server-error";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -102,6 +103,11 @@ async function handleMatchPendingRequest(request: NextRequest) {
 
         console.info("Scheduled pending order matching finished", result);
       } catch (error) {
+        reportServerError(error, {
+          component: "pending-order-scheduler",
+          kind: "background",
+          operation: "match-pending-orders",
+        });
         console.error("Scheduled pending order matching failed", error);
       }
     });
@@ -129,6 +135,11 @@ async function handleMatchPendingRequest(request: NextRequest) {
       ok: true,
     });
   } catch (error) {
+    reportServerError(error, {
+      component: "pending-order-api",
+      kind: "handled-5xx",
+      operation: "match-pending-orders",
+    });
     console.error("Pending order matching API failed", error);
 
     return NextResponse.json(

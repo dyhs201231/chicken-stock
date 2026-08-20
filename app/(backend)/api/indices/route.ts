@@ -3,6 +3,7 @@ import {
   getCachedMarketIndexSummaries,
   getCachedMarketIndexViews,
 } from "../../lib/market-indices";
+import { reportServerError } from "../../lib/report-server-error";
 import { toMarketIndexListRouteResponse } from "./market-index-route-state";
 
 export async function GET() {
@@ -16,6 +17,11 @@ export async function GET() {
 
     return NextResponse.json(response.body, { status: response.status });
   } catch (error) {
+    reportServerError(error, {
+      component: "market-indices-api",
+      kind: "handled-5xx",
+      operation: "list-indices",
+    });
     const message =
       process.env.NODE_ENV === "production"
         ? "MARKET_INDICES_FETCH_FAILED"

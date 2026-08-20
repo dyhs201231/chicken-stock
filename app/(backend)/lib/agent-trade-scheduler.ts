@@ -2,6 +2,7 @@ import {
   getAgentTradeJobState,
   runAgentTradeJob,
 } from "@/app/(backend)/lib/agent-trade-runner";
+import { reportServerError } from "@/app/(backend)/lib/report-server-error";
 
 type AgentTradeSchedulerState = {
   intervalMinutes: number;
@@ -55,6 +56,11 @@ async function runScheduledAgentTrade() {
 
     console.info("Agent trade scheduler completed run", job.result);
   } catch (error) {
+    reportServerError(error, {
+      component: "agent-trade-scheduler",
+      kind: "background",
+      operation: "run-interval-trade",
+    });
     console.error("Agent trade scheduler failed run", error);
   }
 }

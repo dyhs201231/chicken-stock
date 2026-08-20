@@ -4,6 +4,7 @@ import {
   verifyAuthToken,
 } from "@/app/(backend)/lib/auth";
 import { scheduleStockUpdated } from "@/app/(backend)/lib/realtime-events";
+import { reportServerError } from "@/app/(backend)/lib/report-server-error";
 import {
   getStockMutationSync,
   getStockOrderContext,
@@ -250,6 +251,11 @@ async function getSafeStockMutationSync({
   try {
     return await getStockMutationSync({ reason, stockId, userId });
   } catch (error) {
+    reportServerError(error, {
+      component: "stock-orders-api",
+      kind: "background",
+      operation: "build-sync-snapshot",
+    });
     console.error("Stock order sync snapshot failed", {
       error,
       reason,
@@ -286,6 +292,12 @@ export async function GET(request: NextRequest, { params }: StockOrderParams) {
     if (error instanceof StockOrderContextError) {
       return createStockOrderErrorResponse(error.message, error.status);
     }
+
+    reportServerError(error, {
+      component: "stock-orders-api",
+      kind: "handled-5xx",
+      operation: "fetch-order-context",
+    });
 
     console.error("Stock order context fetch failed", error);
 
@@ -362,6 +374,11 @@ export async function POST(request: NextRequest, { params }: StockOrderParams) {
             since: order.orderedAt,
           });
         } catch (error) {
+          reportServerError(error, {
+            component: "stock-orders-api",
+            kind: "background",
+            operation: "publish-realtime-update",
+          });
           console.error("Stock order realtime publish failed", {
             error,
             orderId: order.orderId.toString(),
@@ -392,6 +409,12 @@ export async function POST(request: NextRequest, { params }: StockOrderParams) {
     ) {
       return createStockOrderErrorResponse(error.message, error.status);
     }
+
+    reportServerError(error, {
+      component: "stock-orders-api",
+      kind: "handled-5xx",
+      operation: "create-order",
+    });
 
     console.error("Stock order creation failed", error);
 
@@ -472,6 +495,12 @@ export async function DELETE(
     ) {
       return createStockOrderErrorResponse(error.message, error.status);
     }
+
+    reportServerError(error, {
+      component: "stock-orders-api",
+      kind: "handled-5xx",
+      operation: "cancel-order",
+    });
 
     console.error("Stock order cancellation failed", error);
 

@@ -3,6 +3,7 @@ import {
   getMarketIndexCandleResult,
   parseCandleInterval,
 } from "../../../../lib/market-indices";
+import { reportServerError } from "../../../../lib/report-server-error";
 import { toMarketIndexCandleRouteResponse } from "../../market-index-route-state";
 
 type MarketIndexCandlesRouteProps = {
@@ -26,6 +27,11 @@ export async function GET(
 
     return NextResponse.json(response.body, { status: response.status });
   } catch (error) {
+    reportServerError(error, {
+      component: "market-indices-api",
+      kind: "handled-5xx",
+      operation: "fetch-index-candles",
+    });
     const message =
       process.env.NODE_ENV === "production"
         ? "MARKET_INDEX_CANDLES_FETCH_FAILED"

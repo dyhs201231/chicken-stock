@@ -7,6 +7,7 @@ import {
   TradeOrderType,
 } from "@/app/(backend)/generated/prisma/enums";
 import { prisma } from "@/app/(backend)/lib/prisma";
+import { reportServerError } from "@/app/(backend)/lib/report-server-error";
 import { getMarketSessionStatus } from "@/app/(backend)/lib/market-hours";
 import {
   publishOrderFilledEventsForOrder,
@@ -808,6 +809,11 @@ export async function matchPendingStockOrders({
       });
     } catch (error) {
       failedCount += 1;
+      reportServerError(error, {
+        component: "pending-order-matcher",
+        kind: "background",
+        operation: "match-order",
+      });
       console.error("Pending order matching failed", {
         durationMs: Date.now() - orderStartedAt,
         error,

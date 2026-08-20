@@ -4,6 +4,7 @@ import {
   AUTH_RETURN_TO_COOKIE_NAME,
   GOOGLE_OAUTH_STATE_COOKIE_NAME,
 } from "@/app/(backend)/lib/auth";
+import { reportServerError } from "@/app/(backend)/lib/report-server-error";
 
 export const runtime = "nodejs";
 
@@ -53,6 +54,11 @@ export async function GET(request: NextRequest) {
   const clientId = process.env.GOOGLE_CLIENT_ID;
 
   if (!clientId) {
+    reportServerError(new Error("GOOGLE_CLIENT_ID is not configured"), {
+      component: "google-auth-api",
+      kind: "handled-5xx",
+      operation: "start-oauth",
+    });
     return NextResponse.json(
       { message: "GOOGLE_CLIENT_ID 환경변수가 필요합니다." },
       { status: 500 },

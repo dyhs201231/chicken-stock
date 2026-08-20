@@ -6,6 +6,7 @@ import {
   verifyAuthToken,
 } from "../../../lib/auth";
 import { prisma } from "../../../lib/prisma";
+import { reportServerError } from "../../../lib/report-server-error";
 
 function parsePositiveBigInt(value: string | null) {
   if (!value || !/^\d+$/.test(value)) {
@@ -122,6 +123,11 @@ export async function GET(request: NextRequest) {
       data: completions,
     });
   } catch (error) {
+    reportServerError(error, {
+      component: "education-api",
+      kind: "handled-5xx",
+      operation: "fetch-progress",
+    });
     const message =
       process.env.NODE_ENV === "production"
         ? "EDUCATION_PROGRESS_FETCH_FAILED"

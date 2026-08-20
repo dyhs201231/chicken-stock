@@ -4,6 +4,7 @@ import {
   getCachedUsdKrwExchangeRateResult,
   getFreshUsdKrwExchangeRateResult,
 } from "../../../lib/market-indices";
+import { reportServerError } from "../../../lib/report-server-error";
 
 export const dynamic = "force-dynamic";
 
@@ -46,6 +47,11 @@ export async function GET(request: NextRequest) {
       { headers: { "Cache-Control": "no-store" } },
     );
   } catch (error) {
+    reportServerError(error, {
+      component: "exchange-rate-api",
+      kind: "handled-5xx",
+      operation: "fetch-exchange-rate",
+    });
     const message =
       process.env.NODE_ENV === "production"
         ? "EXCHANGE_RATE_FETCH_FAILED"

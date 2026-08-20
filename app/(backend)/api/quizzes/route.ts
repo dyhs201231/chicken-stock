@@ -8,6 +8,7 @@ import {
 import { Prisma } from "../../generated/prisma/client";
 import { TransactionType } from "../../generated/prisma/enums";
 import { prisma } from "../../lib/prisma";
+import { reportServerError } from "../../lib/report-server-error";
 import {
   getArticleQuizProgress,
   getArticleQuizzes,
@@ -400,6 +401,11 @@ export async function GET(request: NextRequest) {
       { status: 400 },
     );
   } catch (error) {
+    reportServerError(error, {
+      component: "quizzes-api",
+      kind: "handled-5xx",
+      operation: "fetch-quiz",
+    });
     const message =
       process.env.NODE_ENV === "production"
         ? "QUIZ_FETCH_FAILED"
@@ -626,6 +632,11 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
+    reportServerError(error, {
+      component: "quizzes-api",
+      kind: "handled-5xx",
+      operation: "submit-quiz",
+    });
     const message =
       process.env.NODE_ENV === "production"
         ? "QUIZ_SUBMISSION_FAILED"

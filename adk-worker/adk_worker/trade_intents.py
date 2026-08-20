@@ -5,6 +5,7 @@ from typing import Any
 
 from adk_worker.agents import run_growth_agent, run_momentum_agent, run_value_agent
 from adk_worker.config import load_config
+from adk_worker.monitoring import WorkerFailure, report_batch_failures
 from adk_worker.schema import AgentTradeIntent, AgentType, StockCandidate
 
 
@@ -67,7 +68,11 @@ async def run_trade_intents_from_payload(
     async def run_pair(
         agent_type: AgentType,
         candidate: StockCandidate,
-    ) -> tuple[AgentTradeIntent | None, dict[str, Any] | None]:
+    ) -> tuple[
+        AgentTradeIntent | None,
+        dict[str, Any] | None,
+        WorkerFailure | None,
+    ]:
         async with semaphore:
             try:
                 intent = await run_agent_for_candidate(
@@ -77,13 +82,17 @@ async def run_trade_intents_from_payload(
                     use_mock=should_mock,
                 )
 
-                return intent, None
+                return intent, None, None
             except Exception as error:
-                return None, {
-                    "agentType": agent_type,
-                    "error": str(error),
-                    "stockId": candidate.get("stockId"),
-                }
+                return (
+                    None,
+                    {
+                        "agentType": agent_type,
+                        "error": str(error),
+                        "stockId": candidate.get("stockId"),
+                    },
+                    WorkerFailure(agent_type=agent_type, error=error),
+                )
 
     results = await asyncio.gather(
         *[
@@ -94,7 +103,14 @@ async def run_trade_intents_from_payload(
             for agent_type, candidate in pairs
         ]
     )
-    intents = [intent for intent, _ in results if intent is not None]
-    errors = [error for _, error in results if error is not None]
+    intents = [intent for intent, _, _ in results if intent is not None]
+    errors = [error for _, error, _ in results if error is not None]
+    failures = [failure for _, _, failure in results if failure is not None]
+
+    try:
+        report_batch_failures(failures)
+    except Exception:
+        # Monitoring must never change the Worker HTTP response contract.
+        pass
 
     return intents, errors
