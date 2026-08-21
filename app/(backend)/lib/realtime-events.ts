@@ -2,6 +2,7 @@ import "server-only";
 
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { prisma } from "@/app/(backend)/lib/prisma";
+import { sendRealtimeBroadcastWithRetry } from "@/app/(backend)/lib/realtime-broadcast-retry";
 import { reportServerError } from "@/app/(backend)/lib/report-server-error";
 import {
   getStockRealtimeChannelName,
@@ -119,25 +120,29 @@ async function publishBroadcast(
   const channel = supabase.channel(channelName);
 
   try {
-    const response = await channel.send({
-      event,
-      payload,
-      type: "broadcast",
-    });
+    const { attempts, result } = await sendRealtimeBroadcastWithRetry(() =>
+      channel.send({
+        event,
+        payload,
+        type: "broadcast",
+      }),
+    );
 
-    if (response !== "ok") {
+    if (result !== "ok") {
       reportServerError(
         new Error("Supabase Realtime broadcast was not acknowledged"),
         {
           component: "realtime-events",
+          failure_result: result,
           kind: "background",
           operation: "publish-broadcast",
         },
       );
       console.warn("Supabase Realtime broadcast was not acknowledged", {
+        attempts,
         channelName,
         event,
-        response,
+        response: result,
       });
     }
   } catch (error) {

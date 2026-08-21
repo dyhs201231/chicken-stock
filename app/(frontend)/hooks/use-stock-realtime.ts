@@ -11,11 +11,13 @@ import type {
 } from "@/app/(frontend)/apis/stocks/api";
 import { stockQueryKeys } from "@/app/(frontend)/apis/stocks/queries";
 import type { ChartCandleData } from "@/app/(frontend)/components/stock-detail/order/chart-panel/types";
+import { rememberRealtimeExecution } from "@/app/(frontend)/lib/realtime-execution-dedupe";
 import type { StockOrderBookSnapshotData } from "@/app/(frontend)/types/stock/stock-detail";
 import { showSuccessToast } from "@/app/(frontend)/utils/toast";
 
 type UserOrderFilledPayload = {
   executedAt: string;
+  executionId: string;
   orderId: string;
   price: number;
   quantity: number;
@@ -85,6 +87,7 @@ function isUserOrderFilledPayload(
   return (
     isRecord(value) &&
     typeof value.executedAt === "string" &&
+    typeof value.executionId === "string" &&
     typeof value.orderId === "string" &&
     typeof value.price === "number" &&
     typeof value.quantity === "number" &&
@@ -304,6 +307,7 @@ export function useUserRealtime(userOrderChannel: string | null | undefined) {
 
     let didCancel = false;
     let removeChannel: (() => void) | null = null;
+    const seenExecutionIds = new Set<string>();
 
     const cancelSubscriptionStart = scheduleRealtimeSubscription(async () => {
       const { getSupabaseBrowserClient } =
@@ -323,6 +327,12 @@ export function useUserRealtime(userOrderChannel: string | null | undefined) {
         .channel(userOrderChannel)
         .on("broadcast", { event: "order_filled" }, ({ payload }) => {
           if (!isUserOrderFilledPayload(payload)) {
+            return;
+          }
+
+          if (
+            !rememberRealtimeExecution(seenExecutionIds, payload.executionId)
+          ) {
             return;
           }
 

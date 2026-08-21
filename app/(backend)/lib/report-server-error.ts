@@ -2,6 +2,7 @@ import * as Sentry from "@sentry/node";
 
 export type ServerErrorContext = Readonly<{
   component: string;
+  failure_result?: "error" | "timed_out" | "unknown";
   kind: "background" | "handled-5xx";
   operation: string;
 }>;

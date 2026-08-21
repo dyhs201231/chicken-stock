@@ -27,6 +27,7 @@ test("reportServerError sends one exception with safe context tags", async () =>
 
   reportServerError(new Error("database failed"), {
     component: "portfolio",
+    failure_result: "timed_out",
     kind: "handled-5xx",
     operation: "load-portfolio",
   });
@@ -38,6 +39,7 @@ test("reportServerError sends one exception with safe context tags", async () =>
 
   assert.deepEqual(event.tags, {
     component: "portfolio",
+    failure_result: "timed_out",
     kind: "handled-5xx",
     operation: "load-portfolio",
   });
