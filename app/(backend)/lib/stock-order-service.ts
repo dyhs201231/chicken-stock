@@ -445,7 +445,7 @@ export async function publishStockOrderRealtimeUpdate({
     since,
   });
 
-  scheduleStockUpdated(order.stockId, {
+  await scheduleStockUpdated(order.stockId, {
     includeSync,
     reason,
     ticker: order.ticker,
@@ -721,6 +721,7 @@ export async function matchPendingStockOrders({
   );
   let matchedCount = 0;
   let failedCount = 0;
+  const stockUpdateTasks: Promise<void>[] = [];
 
   markDuration("load-pending-orders", {
     marketOpenPendingOrderCount: pendingOrders.length,
@@ -790,11 +791,13 @@ export async function matchPendingStockOrders({
           includeSync: false,
           since: pendingOrder.orderedAt,
         });
-        scheduleStockUpdated(pendingOrder.stockId, {
-          includeSync: false,
-          reason: "TRADE_EXECUTED",
-          ticker: pendingOrder.ticker,
-        });
+        stockUpdateTasks.push(
+          scheduleStockUpdated(pendingOrder.stockId, {
+            includeSync: false,
+            reason: "TRADE_EXECUTED",
+            ticker: pendingOrder.ticker,
+          }),
+        );
       }
 
       console.info("Pending order matching processed order", {
@@ -822,6 +825,8 @@ export async function matchPendingStockOrders({
       });
     }
   }
+
+  await Promise.all(stockUpdateTasks);
 
   markDuration("process-pending-orders", {
     failedCount,

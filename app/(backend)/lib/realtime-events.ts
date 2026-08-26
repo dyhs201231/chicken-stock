@@ -2,7 +2,9 @@ import "server-only";
 
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { prisma } from "@/app/(backend)/lib/prisma";
-import { sendRealtimeBroadcastWithRetry } from "@/app/(backend)/lib/realtime-broadcast-retry";
+import { getRealtimeBroadcastDurationBucket } from "@/app/(backend)/lib/realtime-broadcast-retry";
+import { sendRealtimeHttpBroadcast } from "@/app/(backend)/lib/realtime-http-broadcast";
+import { createRealtimeStockUpdateScheduler } from "@/app/(backend)/lib/realtime-stock-update-scheduler";
 import { reportServerError } from "@/app/(backend)/lib/report-server-error";
 import {
   getStockRealtimeChannelName,
@@ -64,7 +66,6 @@ type UserOrderFilledEvent = {
 };
 
 let serverSupabaseClient: SupabaseClient | null = null;
-const stockUpdatedTimers = new Map<number, NodeJS.Timeout>();
 const stockUpdatedPayloads = new Map<number, ScheduledStockUpdatedPayload>();
 const lastStockUpdatedAt = new Map<number, number>();
 
@@ -120,29 +121,52 @@ async function publishBroadcast(
   const channel = supabase.channel(channelName);
 
   try {
-    const { attempts, result } = await sendRealtimeBroadcastWithRetry(() =>
-      channel.send({
-        event,
-        payload,
-        type: "broadcast",
-      }),
-    );
+    const { cleanupError, delivery } = await sendRealtimeHttpBroadcast({
+      channel,
+      event,
+      payload,
+      removeChannel: () => supabase.removeChannel(channel),
+    });
 
-    if (result !== "ok") {
+    if (delivery.result !== "ok") {
+      const deliveryError =
+        delivery.error instanceof Error
+          ? delivery.error
+          : new Error("Supabase Realtime HTTP broadcast failed");
+
       reportServerError(
-        new Error("Supabase Realtime broadcast was not acknowledged"),
+        deliveryError,
         {
+          attempt_count: String(delivery.attempts),
           component: "realtime-events",
-          failure_result: result,
+          duration_bucket: getRealtimeBroadcastDurationBucket(
+            delivery.elapsedMs,
+          ),
+          failure_result: delivery.result,
           kind: "background",
           operation: "publish-broadcast",
         },
       );
-      console.warn("Supabase Realtime broadcast was not acknowledged", {
-        attempts,
+      console.warn("Supabase Realtime HTTP broadcast failed", {
+        attempts: delivery.attempts,
         channelName,
+        durationMs: delivery.elapsedMs,
         event,
-        response: result,
+        response: delivery.result,
+      });
+    }
+
+    if (cleanupError) {
+      reportServerError(cleanupError, {
+        component: "realtime-events",
+        failure_result: "error",
+        kind: "background",
+        operation: "cleanup-broadcast-channel",
+      });
+      console.warn("Supabase Realtime channel cleanup failed", {
+        channelName,
+        error: cleanupError,
+        event,
       });
     }
   } catch (error) {
@@ -156,8 +180,6 @@ async function publishBroadcast(
       error,
       event,
     });
-  } finally {
-    void supabase.removeChannel(channel);
   }
 }
 
@@ -255,55 +277,63 @@ function mergeStockUpdatedPayload(
 }
 
 async function publishScheduledStockUpdated(stockId: number) {
-  const payload = stockUpdatedPayloads.get(stockId);
+  try {
+    const payload = stockUpdatedPayloads.get(stockId);
 
-  stockUpdatedTimers.delete(stockId);
-  stockUpdatedPayloads.delete(stockId);
+    stockUpdatedPayloads.delete(stockId);
 
-  if (!payload) {
-    return;
-  }
+    if (!payload) {
+      return;
+    }
 
-  const broadcastPayload = { ...payload };
-  delete broadcastPayload.includeSync;
-  const sync =
-    payload.includeSync === false
-      ? {
-          candles: null,
-          orderBookSnapshot: null,
-          reason: payload.reason,
-        }
-      : await getSafeStockMarketSync(stockId, payload.reason);
+    const broadcastPayload = { ...payload };
+    delete broadcastPayload.includeSync;
+    const sync =
+      payload.includeSync === false
+        ? {
+            candles: null,
+            orderBookSnapshot: null,
+            reason: payload.reason,
+          }
+        : await getSafeStockMarketSync(stockId, payload.reason);
 
-  lastStockUpdatedAt.set(stockId, Date.now());
-  await publishBroadcast(
-    getStockRealtimeChannelName(stockId),
-    "stock_updated",
-    {
-      ...broadcastPayload,
-      ...sync,
+    lastStockUpdatedAt.set(stockId, Date.now());
+    await publishBroadcast(
+      getStockRealtimeChannelName(stockId),
+      "stock_updated",
+      {
+        ...broadcastPayload,
+        ...sync,
+        stockId,
+      },
+    );
+  } catch (error) {
+    reportServerError(error, {
+      component: "realtime-events",
+      kind: "background",
+      operation: "publish-stock-update",
+    });
+    console.error("Publishing scheduled stock update failed", {
+      error,
       stockId,
-    },
-  );
+    });
+  }
 }
+
+const stockUpdateScheduler = createRealtimeStockUpdateScheduler({
+  publish: publishScheduledStockUpdated,
+});
 
 export function scheduleStockUpdated(
   stockId: number,
   payload: Omit<ScheduledStockUpdatedPayload, "stockId">,
-) {
+): Promise<void> {
   mergeStockUpdatedPayload(stockId, payload);
-
-  const previousTimer = stockUpdatedTimers.get(stockId);
-
-  if (previousTimer) {
-    clearTimeout(previousTimer);
-    stockUpdatedTimers.delete(stockId);
-  }
 
   const scheduledPayload = stockUpdatedPayloads.get(stockId);
 
   if (!scheduledPayload) {
-    return;
+    return Promise.resolve();
   }
 
   const now = Date.now();
@@ -311,17 +341,7 @@ export function scheduleStockUpdated(
   const throttleMs = getStockUpdatedThrottleMs(scheduledPayload.reason);
   const delay = Math.max(throttleMs - (now - lastPublishedAt), 0);
 
-  if (delay === 0) {
-    void publishScheduledStockUpdated(stockId);
-    return;
-  }
-
-  const timer = setTimeout(() => {
-    void publishScheduledStockUpdated(stockId);
-  }, delay);
-
-  timer.unref?.();
-  stockUpdatedTimers.set(stockId, timer);
+  return stockUpdateScheduler.schedule(stockId, delay);
 }
 
 export async function getOrderFilledRealtimeEvents(

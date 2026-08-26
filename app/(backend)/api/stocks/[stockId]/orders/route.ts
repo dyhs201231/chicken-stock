@@ -470,10 +470,12 @@ export async function DELETE(
     });
 
     if (result.count > 0) {
-      scheduleStockUpdated(parsedStockId, {
-        changedAt: canceledAt.toISOString(),
-        reason: "ORDER_CHANGED",
-      });
+      after(
+        scheduleStockUpdated(parsedStockId, {
+          changedAt: canceledAt.toISOString(),
+          reason: "ORDER_CHANGED",
+        }),
+      );
     }
     const sync = await getSafeStockMutationSync({
       reason: "ORDER_CHANGED",
