@@ -1,8 +1,14 @@
 import * as Sentry from "@sentry/node";
 
 export type ServerErrorContext = Readonly<{
+  attempt_count?: string;
   component: string;
-  failure_result?: "error" | "timed_out" | "unknown";
+  duration_bucket?:
+    | "under_1s"
+    | "1s_to_5s"
+    | "5s_to_10s"
+    | "10s_or_more";
+  failure_result?: "aborted" | "error" | "timed_out" | "unknown";
   kind: "background" | "handled-5xx";
   operation: string;
 }>;

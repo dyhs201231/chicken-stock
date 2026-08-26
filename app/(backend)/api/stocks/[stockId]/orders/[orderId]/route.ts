@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { after, NextRequest, NextResponse } from "next/server";
 import {
   ACCESS_TOKEN_COOKIE_NAME,
   verifyAuthToken,
@@ -516,10 +516,12 @@ export async function PATCH(
       }),
     ]);
 
-    scheduleStockUpdated(parsedStockId, {
-      reason,
-      ticker: order.ticker,
-    });
+    after(
+      scheduleStockUpdated(parsedStockId, {
+        reason,
+        ticker: order.ticker,
+      }),
+    );
 
     return NextResponse.json({
       ok: true,
@@ -602,10 +604,12 @@ export async function DELETE(
       );
     }
 
-    scheduleStockUpdated(parsedStockId, {
-      changedAt: canceledAt.toISOString(),
-      reason: "ORDER_CHANGED",
-    });
+    after(
+      scheduleStockUpdated(parsedStockId, {
+        changedAt: canceledAt.toISOString(),
+        reason: "ORDER_CHANGED",
+      }),
+    );
     const sync = await getSafeStockMutationSync({
       reason: "ORDER_CHANGED",
       stockId: parsedStockId,
