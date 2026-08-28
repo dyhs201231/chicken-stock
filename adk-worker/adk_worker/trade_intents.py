@@ -4,6 +4,7 @@ import asyncio
 from typing import Any
 
 from adk_worker.agents import run_growth_agent, run_momentum_agent, run_value_agent
+from adk_worker.agents.base import GEMINI_TOTAL_TIMEOUT_SECONDS, GeminiRequestTimeoutError
 from adk_worker.config import load_config
 from adk_worker.monitoring import WorkerFailure, report_batch_failures
 from adk_worker.schema import AgentTradeIntent, AgentType, StockCandidate
@@ -65,6 +66,25 @@ async def run_trade_intents_from_payload(
     concurrency = max(1, min(config.adk_worker_concurrency, len(pairs) or 1))
     semaphore = asyncio.Semaphore(concurrency)
 
+    def failure_result(
+        agent_type: AgentType,
+        candidate: StockCandidate,
+        error: Exception,
+    ) -> tuple[
+        AgentTradeIntent | None,
+        dict[str, Any] | None,
+        WorkerFailure | None,
+    ]:
+        return (
+            None,
+            {
+                "agentType": agent_type,
+                "error": str(error),
+                "stockId": candidate.get("stockId"),
+            },
+            WorkerFailure(agent_type=agent_type, error=error),
+        )
+
     async def run_pair(
         agent_type: AgentType,
         candidate: StockCandidate,
@@ -84,25 +104,42 @@ async def run_trade_intents_from_payload(
 
                 return intent, None, None
             except Exception as error:
-                return (
-                    None,
-                    {
-                        "agentType": agent_type,
-                        "error": str(error),
-                        "stockId": candidate.get("stockId"),
-                    },
-                    WorkerFailure(agent_type=agent_type, error=error),
-                )
+                return failure_result(agent_type, candidate, error)
 
-    results = await asyncio.gather(
-        *[
+    tasks = [
+        asyncio.create_task(
             run_pair(
                 agent_type=agent_type,
                 candidate=candidate,
             )
-            for agent_type, candidate in pairs
+        )
+        for agent_type, candidate in pairs
+    ]
+
+    async def cancel_unfinished_tasks() -> None:
+        for task in tasks:
+            if not task.done():
+                task.cancel()
+        await asyncio.gather(*tasks, return_exceptions=True)
+
+    try:
+        completed_tasks, unfinished_tasks = await asyncio.wait(
+            tasks,
+            timeout=GEMINI_TOTAL_TIMEOUT_SECONDS,
+        ) if tasks else (set(), set())
+
+        if unfinished_tasks:
+            await cancel_unfinished_tasks()
+
+        results = [
+            task.result()
+            if task in completed_tasks
+            else failure_result(agent_type, candidate, GeminiRequestTimeoutError())
+            for task, (agent_type, candidate) in zip(tasks, pairs, strict=True)
         ]
-    )
+    except BaseException:
+        await cancel_unfinished_tasks()
+        raise
     intents = [intent for intent, _, _ in results if intent is not None]
     errors = [error for _, error, _ in results if error is not None]
     failures = [failure for _, _, failure in results if failure is not None]

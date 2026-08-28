@@ -19,7 +19,17 @@ decisionSource MUST be "ADK". Never return "RULE_BASED".
 Keep reason under 80 Korean characters.
 """
 
-GEMINI_RETRY_DELAYS_SECONDS = (3, 10, 25)
+GEMINI_RETRY_DELAYS_SECONDS = (3, 10)
+GEMINI_ATTEMPT_TIMEOUT_SECONDS = 20
+GEMINI_TOTAL_TIMEOUT_SECONDS = 70
+GEMINI_MAX_ATTEMPTS = len(GEMINI_RETRY_DELAYS_SECONDS) + 1
+
+
+class GeminiRequestTimeoutError(TimeoutError):
+    """Raised when one candidate exhausts its Gemini request budget."""
+
+    def __init__(self) -> None:
+        super().__init__("Gemini request exceeded the candidate timeout budget")
 
 
 def create_adk_agent(agent_type: AgentType, model: str, strategy_instruction: str):
@@ -126,21 +136,36 @@ def parse_trade_intent(raw: dict, expected_agent_type: AgentType) -> AgentTradeI
 async def run_adk_json_agent_with_retry(agent, prompt: str) -> dict:
     last_error: Exception | None = None
 
-    for attempt in range(len(GEMINI_RETRY_DELAYS_SECONDS) + 1):
-        try:
-            return await run_adk_json_agent(agent, prompt)
-        except Exception as error:
-            last_error = error
+    try:
+        async with asyncio.timeout(GEMINI_TOTAL_TIMEOUT_SECONDS):
+            for attempt in range(GEMINI_MAX_ATTEMPTS):
+                try:
+                    async with asyncio.timeout(GEMINI_ATTEMPT_TIMEOUT_SECONDS):
+                        return await run_adk_json_agent(agent, prompt)
+                except TimeoutError as error:
+                    last_error = error
+                except Exception as error:
+                    if not is_retryable_gemini_error(error):
+                        raise
+                    last_error = error
 
-            if attempt >= len(GEMINI_RETRY_DELAYS_SECONDS):
-                break
-
-            await asyncio.sleep(GEMINI_RETRY_DELAYS_SECONDS[attempt])
+                if attempt < GEMINI_MAX_ATTEMPTS - 1:
+                    await asyncio.sleep(GEMINI_RETRY_DELAYS_SECONDS[attempt])
+    except TimeoutError as error:
+        raise GeminiRequestTimeoutError() from error
 
     if last_error:
         raise last_error
 
     raise RuntimeError("ADK retry loop ended without a response")
+
+
+def is_retryable_gemini_error(error: Exception) -> bool:
+    from google.genai import errors
+
+    return isinstance(error, errors.ServerError) or (
+        isinstance(error, errors.ClientError) and error.code == 429
+    )
 
 
 async def run_agent(
